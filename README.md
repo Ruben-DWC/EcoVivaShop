@@ -168,11 +168,12 @@ EcoVivaShop está diseñado específicamente para:
 
 ## � Avances del Proyecto
 
-### 🎯 **Avance 3 - Sistema Completo (v1.0.0)**
+### 🎯 **Avance 80% - Sistema Completo (v0.8.0)**
 
-**Estado:** ✅ Completado
+**Estado:** ✅ Completado (80% del proyecto total)
 
 **Funcionalidades Implementadas:**
+
 - ✅ Sistema de autenticación completo (registro, login, logout)
 - ✅ Catálogo de productos con filtros dinámicos
 - ✅ Carrito de compras inteligente
@@ -185,22 +186,32 @@ EcoVivaShop está diseñado específicamente para:
 - ✅ Base de datos PostgreSQL completa
 - ✅ Seguridad implementada con Spring Security
 
+**Funcionalidades Pendientes (20% restante):**
+
+- 🔄 Integración con pasarelas de pago reales
+- 🔄 Sistema de notificaciones push
+- 🔄 API REST completa para móviles
+- 🔄 Análisis avanzado de datos
+- 🔄 Optimizaciones de rendimiento
+
 **Archivos de Documentación:**
+
 - `ADMIN_SYSTEM_DOCUMENTATION.md` - Documentación del panel admin
 - `CLIENT_FLOW_COMPLETION.md` - Flujo completo del cliente
 - `SISTEMA_EMAIL_COMPLETO_FINAL.md` - Sistema de emails
 - `EXPLICACION_VALORES_NULL.md` - Manejo de valores NULL
 
-**Tag Git:** `v1.0.0` - [Ver en GitHub](https://github.com/Ruben-DWC/EcoVivaShop/releases/tag/v1.0.0)
+**Tag Git:** `v0.8.0` - [Ver en GitHub](https://github.com/Ruben-DWC/EcoVivaShop/releases/tag/v0.8.0)
 
 ### 📋 **Avances Anteriores**
 
-- **Avance 1:** Diseño de prototipos UX/UI en Balsamiq, modelado de base de datos
-- **Avance 2:** Implementación inicial del backend y estructura del proyecto
+- **Avance 1 (20%):** Diseño de prototipos UX/UI en Balsamiq, modelado de base de datos
+- **Avance 2 (40%):** Implementación inicial del backend y estructura del proyecto
+- **Avance 3 (80%):** Sistema completo con todas las funcionalidades principales
 
 ## 👨‍� Autor
 
-**Ruben Walter**
+**Ruben Walter*
 
 - GitHub: [@Ruben-DWC](https://github.com/Ruben-DWC)
 - Proyecto: Sistema de Gestión EcoVivaShop
