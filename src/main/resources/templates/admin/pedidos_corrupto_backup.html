@@ -1,0 +1,1571 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/head :: head('Historial de Pedidos | EcoVivaShop Admin')}">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Historial de Pedidos | EcoVivaShop Admin</title>
+</head>
+<body class="eco-bg">
+    <!-- Admin Navbar -->
+    <div th:replace="~{fragments/admin-navbar :: admin-navbar}"></div>
+
+    <main class="container-fluid py-4">
+        <!-- Header -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h1 class="h3 mb-0 text-dark fw-bold">
+                            <i class="bi bi-cart-check text-success me-2"></i>
+                            Historial de Pedidos
+                        </h1>
+                        <p class="text-muted mb-0">Gestiona y monitorea todos los pedidos de EcoVivaShop</p>
+                    </div>
+                    <div>
+                        <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#exportModal">
+                            <i class="bi bi-download me-2"></i>Exportar
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>        <!-- Stats Cards -->
+        <div class="row g-4 mb-4">
+            <div class="col-xl-3 col-md-6">
+                <div class="card border-0 shadow-sm stats-card-1 stats-card-white-text">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center">
+                            <div class="flex-shrink-0">
+                                <i class="bi bi-cart-plus-fill display-6 force-visible-icon"></i>
+                            </div>
+                            <div class="flex-grow-1 ms-3 stats-card-white-text">
+                                <div class="small fw-bold">Total Pedidos</div>
+                                <div class="h4 mb-0" th:text="${totalPedidos ?: 0}">2,847</div>
+                                <div class="small">Desde el inicio</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xl-3 col-md-6">
+                <div class="card border-0 shadow-sm stats-card-2 stats-card-white-text">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center">
+                            <div class="flex-shrink-0">
+                                <i class="bi bi-clock-fill display-6 force-visible-icon"></i>
+                            </div>
+                            <div class="flex-grow-1 ms-3 stats-card-white-text">
+                                <div class="small fw-bold">Pendientes</div>
+                                <div class="h4 mb-0" th:text="${pedidosPendientes ?: 0}">89</div>
+                                <div class="small">Requieren atención</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xl-3 col-md-6">
+                <div class="card border-0 shadow-sm stats-card-3 stats-card-white-text">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center">
+                            <div class="flex-shrink-0">
+                                <i class="bi bi-check-circle-fill display-6 force-visible-icon"></i>
+                            </div>
+                            <div class="flex-grow-1 ms-3 stats-card-white-text">
+                                <div class="small fw-bold">Completados</div>
+                                <div class="h4 mb-0" th:text="${pedidosEntregados ?: 0}">2,712</div>
+                                <div class="small">Entregados</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xl-3 col-md-6">
+                <div class="card border-0 shadow-sm stats-card-4 stats-card-dark-text">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center">
+                            <div class="flex-shrink-0">
+                                <i class="bi bi-currency-dollar display-6" style="color: #212529 !important; font-size: 3rem !important;"></i>
+                            </div>
+                            <div class="flex-grow-1 ms-3 stats-card-dark-text">
+                                <div class="small fw-bold">Ingresos Total</div>
+                                <div class="h4 mb-0" th:text="'S/ ' + ${#numbers.formatDecimal(ingresosTotales ?: 0, 1, 2)}">S/ 416,530</div>
+                                <div class="small">Este año</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Filters -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-body">
+                        <form method="get" action="/admin/pedidos" id="filtrosForm">
+                            <div class="row g-3 align-items-end">
+                                <div class="col-md-3">
+                                    <label class="form-label fw-bold">Estado del Pedido</label>
+                                    <select class="form-select" name="estado" id="statusFilter" title="Estado del Pedido" th:value="${estado}">
+                                        <option value="">Todos los estados</option>
+                                        <option th:each="est : ${estados}" 
+                                                th:value="${est}" 
+                                                th:text="${est}" 
+                                                th:selected="${est == estado}">Estado</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-3">
+                                    <label class="form-label fw-bold">Fecha Desde</label>
+                                    <input type="date" class="form-control" name="fechaDesde" id="dateFrom" title="Fecha Desde" th:value="${fechaDesde}">
+                                </div>
+                                <div class="col-md-3">
+                                    <label class="form-label fw-bold">Fecha Hasta</label>
+                                    <input type="date" class="form-control" name="fechaHasta" id="dateTo" title="Fecha Hasta" th:value="${fechaHasta}">
+                                </div>
+                                <div class="col-md-3">
+                                    <label class="form-label fw-bold">Buscar</label>
+                                    <div class="input-group">
+                                        <input type="text" class="form-control" name="busqueda" placeholder="ID, cliente, email..." id="searchOrders" th:value="${busqueda}">
+                                        <button class="btn btn-outline-secondary" type="submit" title="Buscar">
+                                            <i class="bi bi-search"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Orders Table -->
+        <div class="row">
+            <div class="col-12">
+                <div class="card border-0 shadow-sm">                    <div class="card-header bg-white border-bottom">
+                        <div class="row align-items-center">
+                            <div class="col">
+                                <h5 class="card-title mb-0 text-dark fw-bold">Lista de Pedidos</h5>
+                            </div>
+                            <div class="col-auto">
+                                <div class="btn-group" role="group">
+                                    <input type="radio" class="btn-check" name="viewMode" id="tableView" checked title="Vista de tabla">
+                                    <label class="btn btn-outline-secondary" for="tableView" title="Vista de tabla">
+                                        <i class="bi bi-table"></i>
+                                    </label>
+                                    <input type="radio" class="btn-check" name="viewMode" id="cardView" title="Vista de tarjetas">
+                                    <label class="btn btn-outline-secondary" for="cardView">
+                                        <i class="bi bi-grid-3x3-gap"></i>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table table-hover mb-0" id="ordersTable">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>ID Pedido</th>
+                                        <th>Cliente</th>
+                                        <th>Fecha</th>
+                                        <th>Productos</th>
+                                        <th>Total</th>
+                                        <th>Estado</th>
+                                        <th>Método Pago</th>
+                                        <th>Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr th:each="pedido : ${pedidos.content}" th:if="${pedidos.hasContent()}">
+                                        <td>
+                                            <span class="fw-bold text-primary" th:text="'#' + ${pedido.numeroPedido}">#ECO-2024-1025</span>
+                                        </td>
+                                        <td>
+                                            <div class="d-flex align-items-center">
+                                                <img th:src="${pedido.usuario.fotoPerfil != null ? pedido.usuario.fotoPerfil : '/img/default-profile.svg'}" 
+                                                     alt="Avatar" class="rounded-circle me-2" width="32" height="32">
+                                                <div>
+                                                    <div class="fw-bold" th:text="${pedido.usuario.nombre + ' ' + pedido.usuario.apellido}">Cliente</div>
+                                                    <small class="text-muted" th:text="${pedido.usuario.email}">email@ejemplo.com</small>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div th:text="${#temporals.format(pedido.fechaPedido, 'dd/MM/yyyy')}">15/05/2024</div>
+                                            <small class="text-muted" th:text="${#temporals.format(pedido.fechaPedido, 'HH:mm')}">14:30</small>
+                                        </td>
+                                        <td>
+                                            <div class="d-flex align-items-center">
+                                                <span class="badge bg-info me-2" th:text="${#lists.size(pedido.detalles)} + ' items'">3 items</span>
+                                                <small th:text="${#strings.abbreviate(#strings.listJoin(pedido.detalles.![producto.nombre], ', '), 20)}">Productos...</small>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <span class="fw-bold text-success" th:text="'S/ ' + ${#numbers.formatDecimal(pedido.total, 1, 2)}">S/ 300.50</span>
+                                        </td>
+                                        <td>
+                                            <span th:class="${pedido.estado == 'PENDIENTE' ? 'badge bg-warning' : 
+                                                           (pedido.estado == 'CONFIRMADO' ? 'badge bg-info' :
+                                                           (pedido.estado == 'PREPARANDO' ? 'badge bg-primary' :
+                                                           (pedido.estado == 'ENVIADO' ? 'badge bg-secondary' :
+                                                           (pedido.estado == 'ENTREGADO' ? 'badge bg-success' : 'badge bg-danger'))))}"
+                                                  th:text="${pedido.estado}">Estado</span>
+                                        </td>
+                                        <td>
+                                            <i th:class="${pedido.metodoPago == 'TARJETA' ? 'bi bi-credit-card text-primary me-1' : 
+                                                          (pedido.metodoPago == 'PAYPAL' ? 'bi bi-paypal text-info me-1' : 
+                                                          'bi bi-cash text-success me-1')}"></i>
+                                            <span th:text="${pedido.metodoPago}">Método</span>
+                                        </td>
+                                        <td>
+                                            <div class="btn-group btn-group-sm">
+                                                <a th:href="@{/admin/pedidos/detalle/{id}(id=${pedido.idPedido})}" 
+                                                   class="btn btn-outline-primary" title="Ver detalles">
+                                                    <i class="bi bi-eye"></i>
+                                                </a>
+                                                <button class="btn btn-outline-warning" title="Editar estado" 
+                                                        th:onclick="'editOrderStatus(' + ${pedido.idPedido} + ')'">
+                                                    <i class="bi bi-pencil"></i>
+                                                </button>
+                                                <button class="btn btn-outline-info" title="Imprimir" 
+                                                        th:onclick="'printOrder(' + ${pedido.idPedido} + ')'">
+                                                    <i class="bi bi-printer"></i>
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr th:unless="${pedidos.hasContent()}">
+                                        <td colspan="8" class="text-center py-4">
+                                            <i class="bi bi-inbox text-muted" style="font-size: 3rem;"></i>
+                                            <p class="text-muted mt-2">No se encontraron pedidos</p>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="card-footer bg-white" th:if="${pedidos.totalPages > 1}">
+                        <nav>
+                            <ul class="pagination justify-content-center mb-0">
+                                <!-- Botón Anterior -->
+                                <li th:class="${pedidos.first ? 'page-item disabled' : 'page-item'}">
+                                    <a th:if="${!pedidos.first}" 
+                                       th:href="@{/admin/pedidos(page=${currentPage - 1}, size=${pedidos.size}, estado=${estado}, busqueda=${busqueda})}" 
+                                       class="page-link">Anterior</a>
+                                    <span th:if="${pedidos.first}" class="page-link">Anterior</span>
+                                </li>
+                                
+                                <!-- Números de página -->
+                                <li th:each="i : ${#numbers.sequence(0, pedidos.totalPages - 1)}" 
+                                    th:class="${i == currentPage ? 'page-item active' : 'page-item'}">
+                                    <a th:if="${i != currentPage}" 
+                                       th:href="@{/admin/pedidos(page=${i}, size=${pedidos.size}, estado=${estado}, busqueda=${busqueda})}" 
+                                       th:text="${i + 1}" class="page-link">1</a>
+                                    <span th:if="${i == currentPage}" th:text="${i + 1}" class="page-link">1</span>
+                                </li>
+                                
+                                <!-- Botón Siguiente -->
+                                <li th:class="${pedidos.last ? 'page-item disabled' : 'page-item'}">
+                                    <a th:if="${!pedidos.last}" 
+                                       th:href="@{/admin/pedidos(page=${currentPage + 1}, size=${pedidos.size}, estado=${estado}, busqueda=${busqueda})}" 
+                                       class="page-link">Siguiente</a>
+                                    <span th:if="${pedidos.last}" class="page-link">Siguiente</span>
+                                </li>
+                            </ul>
+                        </nav>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Order Details Modal -->
+    <div class="modal fade" id="orderDetailsModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        <i class="bi bi-cart-check me-2"></i>Detalles del Pedido <span id="orderIdModal"></span>
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row g-4">
+                        <div class="col-md-6">
+                            <h6 class="fw-bold text-success">Información del Cliente</h6>
+                            <div class="card bg-light">
+                                <div class="card-body">
+                                    <p class="mb-1"><strong>Nombre:</strong> <span id="customerName"></span></p>
+                                    <p class="mb-1"><strong>Email:</strong> <span id="customerEmail"></span></p>
+                                    <p class="mb-1"><strong>Teléfono:</strong> <span id="customerPhone"></span></p>
+                                    <p class="mb-0"><strong>Dirección:</strong> <span id="customerAddress"></span></p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <h6 class="fw-bold text-success">Información del Pedido</h6>
+                            <div class="card bg-light">
+                                <div class="card-body">
+                                    <p class="mb-1"><strong>Fecha:</strong> <span id="orderDate"></span></p>
+                                    <p class="mb-1"><strong>Estado:</strong> <span id="orderStatus"></span></p>
+                                    <p class="mb-1"><strong>Método de Pago:</strong> <span id="paymentMethod"></span></p>
+                                    <p class="mb-0"><strong>Total:</strong> <span id="orderTotal"></span></p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <h6 class="fw-bold text-success">Productos</h6>
+                            <div class="table-responsive">
+                                <table class="table table-sm">
+                                    <thead>
+                                        <tr>
+                                            <th>Producto</th>
+                                            <th>Cantidad</th>
+                                            <th>Precio Unit.</th>
+                                            <th>Subtotal</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="orderProductsList">
+                                        <!-- Products will be loaded here -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                    <button type="button" class="btn btn-primary">
+                        <i class="bi bi-printer me-2"></i>Imprimir
+                    </button>
+                    <button type="button" class="btn btn-success">
+                        <i class="bi bi-pencil me-2"></i>Editar Estado
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Export Modal -->
+    <div class="modal fade" id="exportModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        <i class="bi bi-download me-2"></i>Exportar Pedidos
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="exportForm">
+                        <div class="mb-3">
+                            <label class="form-label" for="exportFormatSelect">Formato de Exportación</label>
+                            <select class="form-select" id="exportFormatSelect" title="Formato de Exportación">
+                                <option value="pdf">PDF (.pdf)</option>
+                                <option value="excel">Excel (.xlsx)</option>
+                                <option value="csv">CSV (.csv)</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Rango de Fechas</label>
+                            <div class="row g-2">
+                                <div class="col">
+                                    <input type="text" class="form-control" id="fechaInicio" placeholder="dd/mm/aaaa" title="Fecha de inicio">
+                                </div>
+                                <div class="col">
+                                    <input type="text" class="form-control" id="fechaFin" placeholder="dd/mm/aaaa" title="Fecha de fin">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Estados a Incluir</label>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="todosEstados" checked title="Seleccionar todos los estados">
+                                <label class="form-check-label" for="todosEstados">Todos los estados</label>
+                            </div>
+                            <div id="estadosIndividuales" style="display: none;">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" value="PENDIENTE" id="estadoPendiente">
+                                    <label class="form-check-label" for="estadoPendiente">Pendiente</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" value="CONFIRMADO" id="estadoConfirmado">
+                                    <label class="form-check-label" for="estadoConfirmado">Confirmado</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" value="ENTREGADO" id="estadoEntregado">
+                                    <label class="form-check-label" for="estadoEntregado">Entregado</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" value="CANCELADO" id="estadoCancelado">
+                                    <label class="form-check-label" for="estadoCancelado">Cancelado</label>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-success" onclick="exportarPedidos()">
+                        <i class="bi bi-download me-2"></i>Exportar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div th:replace="~{fragments/footer :: footer}"></div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- jsPDF para generar PDFs - VERSIÓN MÁS ACTUALIZADA -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.2/jspdf.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.2/dist/jspdf.umd.min.js"></script>
+    
+    <!-- Verificación de carga de librerías -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('🔄 Verificando librerías...');
+            console.log('Bootstrap:', typeof bootstrap !== 'undefined' ? '✅ Cargado' : '❌ No encontrado');
+            console.log('jsPDF:', typeof window.jsPDF !== 'undefined' ? '✅ Cargado' : '❌ No encontrado');
+            
+            if (typeof window.jsPDF === 'undefined') {
+                console.warn('⚠️ jsPDF no está disponible, PDFs se generarán como TXT');
+            }
+        });
+    </script>
+
+    <!-- Scripts de funcionalidad -->
+    <script>
+        // =====================================================
+        // FUNCIÓN PRINCIPAL DE EXPORTACIÓN - SIMPLIFICADA
+        // =====================================================
+        function exportarPedidos() {
+            console.log('🚀 Iniciando exportación simplificada...');
+            
+            const formatoSelect = document.getElementById('exportFormatSelect');
+            if (!formatoSelect) {
+                alert('Error: No se encontró el selector de formato');
+                return;
+            }
+            
+            const formato = formatoSelect.value;
+            console.log('📋 Formato:', formato);
+            
+            // Obtener todas las filas de la tabla
+            const tabla = document.querySelector('table');
+            const filas = tabla ? tabla.querySelectorAll('tbody tr') : [];
+            
+            console.log('📊 Filas encontradas:', filas.length);
+            
+            if (filas.length === 0) {
+                alert('No hay pedidos para exportar');
+                return;
+            }
+            
+            // Extraer datos
+            const pedidos = [];
+            filas.forEach((fila, index) => {
+                const celdas = fila.querySelectorAll('td');
+                if (celdas.length >= 6) {
+                    pedidos.push({
+                        id: celdas[0]?.textContent?.trim() || `PEDIDO-${index + 1}`,
+                        cliente: (celdas[1]?.querySelector('.fw-bold')?.textContent || celdas[1]?.textContent)?.trim() || 'Cliente N/A',
+                        fecha: celdas[2]?.textContent?.trim() || new Date().toLocaleDateString(),
+                        productos: celdas[3]?.textContent?.trim() || 'N/A',
+                        total: celdas[4]?.textContent?.trim() || 'S/0.00',
+                        estado: (celdas[5]?.querySelector('.badge')?.textContent || celdas[5]?.textContent)?.trim() || 'PENDIENTE'
+                    });
+                }
+            });
+            
+            console.log('📋 Pedidos extraídos:', pedidos.length);
+            
+            if (pedidos.length === 0) {
+                alert('No se pudieron extraer datos de la tabla');
+                return;
+            }
+            
+            // Mostrar indicador de carga
+            mostrarCargando(true, formato);
+            
+            // Cerrar modal
+            const modal = document.querySelector('#exportModal');
+            if (modal) {
+                const bootstrapModal = bootstrap.Modal.getInstance(modal);
+                if (bootstrapModal) bootstrapModal.hide();
+            }
+            
+            // Procesar con delay para UI responsiva
+            setTimeout(() => {
+                try {
+                    const fecha = new Date().toISOString().split('T')[0];
+                    const nombreBase = `ecovivashop-pedidos-${fecha}`;
+                    
+                    switch (formato) {
+                        case 'csv':
+                            exportarCSV(pedidos, `${nombreBase}.csv`);
+                            break;
+                        case 'excel':
+                            exportarExcel(pedidos, `${nombreBase}.xls`);
+                            break;
+                        case 'pdf':
+                            exportarPDF(pedidos, `${nombreBase}.pdf`);
+                            break;
+                        default:
+                            throw new Error('Formato no válido: ' + formato);
+                    }
+                    
+                    mostrarMensaje('success', `✅ Archivo ${formato.toUpperCase()} generado correctamente`);
+                    
+                } catch (error) {
+                    console.error('❌ Error en exportación:', error);
+                    mostrarMensaje('error', `❌ Error al generar archivo: ${error.message}`);
+                } finally {
+                    mostrarCargando(false);
+                }
+            }, 500);
+        }
+        
+        // =====================================================
+        // FUNCIONES ESPECÍFICAS DE EXPORTACIÓN
+        // =====================================================
+        function exportarCSV(pedidos, nombreArchivo) {
+            let csv = 'ID Pedido,Cliente,Fecha,Productos,Total,Estado\n';
+            pedidos.forEach(p => {
+                csv += `"${p.id}","${p.cliente}","${p.fecha}","${p.productos}","${p.total}","${p.estado}"\n`;
+            });
+            descargarTexto(csv, nombreArchivo, 'text/csv');
+        }
+        
+        function exportarExcel(pedidos, nombreArchivo) {
+            let html = '<table border="1" cellspacing="0" cellpadding="5">';
+            html += '<thead><tr style="background-color: #28a745; color: white; font-weight: bold;">';
+            html += '<th>ID Pedido</th><th>Cliente</th><th>Fecha</th><th>Productos</th><th>Total</th><th>Estado</th>';
+            html += '</tr></thead><tbody>';
+            
+            pedidos.forEach(p => {
+                html += `<tr>`;
+                html += `<td>${p.id}</td>`;
+                html += `<td>${p.cliente}</td>`;
+                html += `<td>${p.fecha}</td>`;
+                html += `<td>${p.productos}</td>`;
+                html += `<td>${p.total}</td>`;
+                html += `<td>${p.estado}</td>`;
+                html += `</tr>`;
+            });
+            
+            html += '</tbody></table>';
+            descargarTexto(html, nombreArchivo, 'application/vnd.ms-excel');
+        }
+        
+        function exportarPDF(pedidos, nombreArchivo) {
+            console.log('🔄 Intentando generar PDF...');
+            
+            // Verificar si jsPDF está disponible
+            if (typeof window.jsPDF === 'undefined') {
+                console.warn('⚠️ jsPDF no disponible, generando TXT alternativo');
+                exportarTXTAlternativo(pedidos, nombreArchivo.replace('.pdf', '.txt'));
+                return;
+            }
+            
+            try {
+                const { jsPDF } = window.jsPDF;
+                const doc = new jsPDF();
+                
+                // Encabezado
+                doc.setFontSize(16);
+                doc.setTextColor(40, 167, 69); // Verde EcoVivaShop
+                doc.text('ECOVIVASHOP - REPORTE DE PEDIDOS', 105, 20, { align: 'center' });
+                
+                // Información del reporte
+                doc.setFontSize(10);
+                doc.setTextColor(100, 100, 100);
+                const hoy = new Date().toLocaleDateString('es-ES');
+                doc.text(`Fecha: ${hoy}`, 20, 35);
+                doc.text(`Total pedidos: ${pedidos.length}`, 150, 35);
+                
+                // Tabla de datos
+                let yPos = 50;
+                doc.setFontSize(8);
+                doc.setTextColor(0, 0, 0);
+                
+                // Headers
+                doc.setFont(undefined, 'bold');
+                doc.text('ID', 20, yPos);
+                doc.text('Cliente', 45, yPos);
+                doc.text('Fecha', 90, yPos);
+                doc.text('Total', 120, yPos);
+                doc.text('Estado', 145, yPos);
+                
+                yPos += 8;
+                doc.setFont(undefined, 'normal');
+                
+                // Datos (máximo 30 pedidos por limitaciones de espacio)
+                pedidos.slice(0, 30).forEach((pedido, index) => {
+                    if (yPos > 270) { // Nueva página si se acaba el espacio
+                        doc.addPage();
+                        yPos = 30;
+                    }
+                    
+                    doc.text(pedido.id.substring(0, 12), 20, yPos);
+                    doc.text(pedido.cliente.substring(0, 20), 45, yPos);
+                    doc.text(pedido.fecha.substring(0, 10), 90, yPos);
+                    doc.text(pedido.total, 120, yPos);
+                    doc.text(pedido.estado, 145, yPos);
+                    
+                    yPos += 6;
+                });
+                
+                // Footer
+                doc.setFontSize(8);
+                doc.setTextColor(150, 150, 150);
+                doc.text('EcoVivaShop - Cuidamos el planeta juntos 🌱', 105, 285, { align: 'center' });
+                
+                // Descargar
+                const pdfBlob = doc.output('blob');
+                descargarBlob(pdfBlob, nombreArchivo);
+                
+                console.log('✅ PDF generado exitosamente');
+                
+            } catch (error) {
+                console.error('❌ Error generando PDF:', error);
+                console.warn('⚠️ Generando TXT como alternativa...');
+                exportarTXTAlternativo(pedidos, nombreArchivo.replace('.pdf', '.txt'));
+            }
+        }
+        
+        function exportarTXTAlternativo(pedidos, nombreArchivo) {
+            let contenido = 'ECOVIVASHOP - REPORTE DE PEDIDOS\n';
+            contenido += '='.repeat(50) + '\n\n';
+            contenido += `Fecha: ${new Date().toLocaleDateString('es-ES')}\n`;
+            contenido += `Total de pedidos: ${pedidos.length}\n\n`;
+            
+            pedidos.forEach((pedido, index) => {
+                contenido += `${index + 1}. PEDIDO ${pedido.id}\n`;
+                contenido += `   Cliente: ${pedido.cliente}\n`;
+                contenido += `   Fecha: ${pedido.fecha}\n`;
+                contenido += `   Productos: ${pedido.productos}\n`;
+                contenido += `   Total: ${pedido.total}\n`;
+                contenido += `   Estado: ${pedido.estado}\n\n`;
+            });
+            
+            contenido += '-'.repeat(50) + '\n';
+            contenido += 'EcoVivaShop - Tu tienda eco-friendly de confianza 🌱\n';
+            contenido += `Generado: ${new Date().toLocaleString('es-ES')}\n`;
+            
+            descargarTexto(contenido, nombreArchivo, 'text/plain');
+        }
+        
+        // =====================================================
+        // FUNCIONES UTILITARIAS DE DESCARGA Y UI
+        // =====================================================
+        function descargarTexto(contenido, nombreArchivo, tipoMime) {
+            const blob = new Blob([contenido], { type: tipoMime + ';charset=utf-8;' });
+            descargarBlob(blob, nombreArchivo);
+        }
+        
+        function descargarBlob(blob, nombreArchivo) {
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = nombreArchivo;
+            link.style.display = 'none';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(url);
+            console.log(`✅ Archivo descargado: ${nombreArchivo}`);
+        }
+        
+        function mostrarCargando(mostrar, formato = '') {
+            let indicator = document.getElementById('loadingIndicator');
+            
+            if (mostrar) {
+                if (!indicator) {
+                    indicator = document.createElement('div');
+                    indicator.id = 'loadingIndicator';
+                    indicator.className = 'position-fixed top-0 start-50 translate-middle-x bg-primary text-white px-4 py-2 rounded-bottom';
+                    indicator.style.zIndex = '10000';
+                    document.body.appendChild(indicator);
+                }
+                indicator.innerHTML = `<div class="d-flex align-items-center">
+                    <div class="spinner-border spinner-border-sm me-2"></div>
+                    <span>Generando ${formato.toUpperCase()}...</span>
+                </div>`;
+                indicator.style.display = 'block';
+            } else {
+                if (indicator) {
+                    indicator.style.display = 'none';
+                }
+            }
+        }
+        
+        function mostrarMensaje(tipo, mensaje) {
+            const alertClass = tipo === 'success' ? 'alert-success' : 'alert-danger';
+            const iconClass = tipo === 'success' ? 'bi-check-circle' : 'bi-exclamation-triangle';
+            
+            const alert = document.createElement('div');
+            alert.className = `alert ${alertClass} alert-dismissible position-fixed fade show`;
+            alert.style.cssText = 'top: 20px; right: 20px; z-index: 10001; min-width: 300px;';
+            alert.innerHTML = `
+                <i class="bi ${iconClass} me-2"></i>${mensaje}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            `;
+            document.body.appendChild(alert);
+            
+            // Auto-remover después de 5 segundos
+            setTimeout(() => {
+                if (alert && alert.parentNode) {
+                    alert.remove();
+                }
+            }, 5000);
+        }
+    </script>
+
+    <style>
+        /* FORZAR ESTILOS TARJETAS MÉTRICAS */
+        .stats-card-1 {
+            background: linear-gradient(135deg, #007bff 0%, #0056b3 100%) !important;
+        }
+        .stats-card-2 {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%) !important;
+        }
+        .stats-card-3 {
+            background: linear-gradient(135deg, #17a2b8 0%, #138496 100%) !important;
+        }
+        .stats-card-4 {
+            background: linear-gradient(135deg, #ffc107 0%, #e0a800 100%) !important;
+        }
+        .stats-card-white-text, .stats-card-white-text * {
+            color: white !important;
+        }
+        .stats-card-dark-text, .stats-card-dark-text * {
+            color: #212529 !important;
+        }
+        .force-visible-icon {
+            color: white !important;
+            font-size: 3rem !important;
+            display: inline-block !important;
+            opacity: 1 !important;
+        }
+        /* SUBTITLE FIXES */
+        .admin-subtitle {
+            color: #2c3e50 !important;
+            font-weight: 600 !important;
+            margin-bottom: 0 !important;
+        }
+        
+        /* ESTILOS DE LA PÁGINA */
+        .eco-bg {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            min-height: 100vh;
+        }
+        
+        .table-hover tbody tr:hover {
+            background-color: rgba(40, 167, 69, 0.05);
+        }
+        
+        .btn-group-sm .btn {
+            padding: 0.25rem 0.5rem;
+        }
+        
+        .badge {
+            font-size: 0.75rem;
+        }
+        
+        /* FORZAR VISIBILIDAD DE COLUMNAS */
+        .table-responsive {
+            overflow-x: auto !important;
+        }
+        
+        .table th, .table td {
+            white-space: nowrap;
+        }
+        
+        /* MEJORAR ESTADO Y MÉTODO PAGO */
+        .badge {
+            font-weight: 600 !important;
+            min-width: 80px !important;
+            text-align: center !important;
+        }
+        
+        /* INDICADOR DE CARGA */
+        #loadingIndicator {
+            animation: slideDown 0.3s ease-out;
+        }
+        
+        @keyframes slideDown {
+            from {
+                transform: translateX(-50%) translateY(-100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(-50%) translateY(0);
+                opacity: 1;
+            }
+        }
+        
+        /* ALERTAS */
+        .alert {
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        /* TABLAS - VISIBILIDAD FORZADA */
+        .table-responsive {
+            overflow-x: auto !important;
+            min-height: 500px;
+        }
+        
+        .table {
+            min-width: 1000px !important;
+            table-layout: fixed !important;
+        }
+        
+        .table th:nth-child(1) { width: 120px !important; } /* ID Pedido */
+        .table th:nth-child(2) { width: 180px !important; } /* Cliente */
+        .table th:nth-child(3) { width: 120px !important; } /* Fecha */
+        .table th:nth-child(4) { width: 150px !important; } /* Productos */
+        .table th:nth-child(5) { width: 100px !important; } /* Total */
+        .table th:nth-child(6) { width: 120px !important; } /* Estado */
+        .table th:nth-child(7) { width: 120px !important; } /* Método Pago */
+        .table th:nth-child(8) { width: 140px !important; } /* Acciones */
+        
+        .table td:nth-child(1) { width: 120px !important; }
+        .table td:nth-child(2) { width: 180px !important; }
+        .table td:nth-child(3) { width: 120px !important; }
+        .table td:nth-child(4) { width: 150px !important; }
+        .table td:nth-child(5) { width: 100px !important; }
+        .table td:nth-child(6) { width: 120px !important; }
+        .table td:nth-child(7) { width: 120px !important; }
+        .table td:nth-child(8) { width: 140px !important; }
+        
+        /* FORZAR VISIBILIDAD DE ESTADO, MÉTODO PAGO Y ACCIONES */
+        .table th:nth-child(6), 
+        .table th:nth-child(7), 
+        .table th:nth-child(8),
+        .table td:nth-child(6), 
+        .table td:nth-child(7), 
+        .table td:nth-child(8) {
+            display: table-cell !important;
+            visibility: visible !important;
+        }
+        
+        .table th {
+            border-top: none;
+            font-weight: 600;
+            color: #495057;
+            background-color: #f8f9fa;
+        }
+    </style>
+</body>
+</html>
+            display: table-cell !important;
+            visibility: visible !important;
+            opacity: 1 !important;
+        }
+        
+        /* MEJORAR BADGES DE ESTADO */
+        .table td:nth-child(6) .badge {
+            font-weight: 600 !important;
+            min-width: 80px !important;
+            text-align: center !important;
+        }
+        
+        /* MEJORAR MÉTODO DE PAGO */
+        .table td:nth-child(7) {
+            font-weight: 500 !important;
+        }
+        
+        /* MEJORAR BOTONES DE ACCIONES */
+        .table td:nth-child(8) .btn-group {
+            display: flex !important;
+            gap: 2px !important;
+        }
+        
+        /* RESPONSIVE FIXES */
+        @media (max-width: 1200px) {
+            .table th:nth-child(4) { width: 100px !important; }
+            .table td:nth-child(4) { width: 100px !important; }
+            .table td:nth-child(4) small { display: none; }
+        }
+        
+        @media (max-width: 992px) {
+            .table th:nth-child(2) { width: 150px !important; }
+            .table td:nth-child(2) { width: 150px !important; }
+            .table td:nth-child(2) small { display: none; }
+        }
+    </style>
+    </style>
+
+    <script>
+        // FUNCIONALIDAD PRINCIPAL DE EXPORTACIÓN - LIMPIO Y OPTIMIZADO
+        function exportarPedidos() {
+            console.log('🚀 Iniciando exportación...');
+            
+            const formatoSelect = document.getElementById('exportFormatSelect');
+            if (!formatoSelect) {
+                alert('Error: No se encontró el selector de formato');
+                return;
+            }
+            
+            const formato = formatoSelect.value;
+            console.log('📋 Formato seleccionado:', formato);
+            
+            // Mostrar indicador de carga
+            mostrarCargando(true);
+            
+            // Obtener datos de la tabla actual
+            const filas = document.querySelectorAll('#ordersTable tbody tr');
+            const datos = [];
+            
+            filas.forEach(fila => {
+                const celdas = fila.querySelectorAll('td');
+                if (celdas.length >= 8) {
+                    const pedido = {
+                        id: celdas[0].textContent.trim(),
+                        cliente: celdas[1].textContent.trim(),
+                        fecha: celdas[2].textContent.trim(),
+                        productos: celdas[3].textContent.trim(),
+                        total: celdas[4].textContent.trim(),
+                        estado: celdas[5].textContent.trim(),
+                        metodoPago: celdas[6].textContent.trim()
+                    };
+                    datos.push(pedido);
+                }
+            });
+            
+            if (datos.length === 0) {
+                mostrarCargando(false);
+                alert('No hay pedidos para exportar');
+                return;
+            }
+            
+            console.log(`� Exportando ${datos.length} pedidos en formato ${formato}`);
+            
+            // Usar exportación del servidor en lugar de cliente
+            setTimeout(() => {
+                const fechaInicio = document.getElementById('dateFrom')?.value || '';
+                const fechaFin = document.getElementById('dateTo')?.value || '';
+                const estados = document.getElementById('todosEstados')?.checked ? 'todos' : 'seleccionados';
+                
+                let url = `/admin/pedidos/exportar/${formato}`;
+                const params = new URLSearchParams();
+                
+                if (fechaInicio) params.append('fechaInicio', fechaInicio);
+                if (fechaFin) params.append('fechaFin', fechaFin);
+                params.append('estados', estados);
+                
+                if (params.toString()) {
+                    url += '?' + params.toString();
+                }
+                
+                console.log('🔗 URL de exportación:', url);
+                
+                // Crear enlace de descarga
+                const link = document.createElement('a');
+                link.href = url;
+                link.style.display = 'none';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                
+                // Mostrar mensaje de éxito
+                mostrarCargando(false);
+                mostrarMensaje('success', `✅ Descarga de archivo ${formato.toUpperCase()} iniciada`);
+                
+                // Cerrar modal
+                const modal = bootstrap.Modal.getInstance(document.getElementById('exportModal'));
+                if (modal) modal.hide();
+                
+            }, 1000);
+        }
+        
+        function mostrarCargando(mostrar) {
+            let indicator = document.getElementById('loadingIndicator');
+            if (mostrar) {
+                if (!indicator) {
+                    indicator = document.createElement('div');
+                    indicator.id = 'loadingIndicator';
+                    indicator.className = 'position-fixed top-50 start-50 translate-middle text-center';
+                    indicator.style.zIndex = '10000';
+                    indicator.innerHTML = `
+                        <div class="spinner-border text-success" style="width: 3rem; height: 3rem;"></div>
+                        <div class="mt-2">Generando archivo...</div>
+                    `;
+                    document.body.appendChild(indicator);
+                }
+            } else {
+                if (indicator) indicator.remove();
+            }
+        }
+        
+        function mostrarMensaje(tipo, mensaje) {
+            const alertClass = tipo === 'success' ? 'alert-success' : 'alert-danger';
+            const iconClass = tipo === 'success' ? 'bi-check-circle' : 'bi-exclamation-triangle';
+            
+            const alert = document.createElement('div');
+            alert.className = `alert ${alertClass} alert-dismissible fade show position-fixed`;
+            alert.style.cssText = 'top: 20px; right: 20px; z-index: 10001; min-width: 300px;';
+            alert.innerHTML = `
+                <i class="bi ${iconClass} me-2"></i>${mensaje}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            `;
+            document.body.appendChild(alert);
+            
+            setTimeout(() => {
+                if (alert && alert.parentNode) alert.remove();
+            }, 5000);
+        }
+                                            <select class="form-select" id="nuevoEstado" required>
+                                                <option value="">Seleccione un estado</option>
+                                                <option value="PENDIENTE">Pendiente</option>
+                                                <option value="CONFIRMADO">Confirmado</option>
+                                                <option value="PREPARANDO">Preparando</option>
+                                                <option value="ENVIADO">Enviado</option>
+        // CONFIGURACIÓN DE DOM Y ESTILOS
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('🚀 Inicializando página de pedidos');
+            
+            // Configurar funcionalidades
+            configurarBusqueda();
+            configurarFiltroEstado();
+            
+            // Aplicar estilos a tarjetas métricas
+            const statsCards = document.querySelectorAll('.row.g-4.mb-4 .card');
+            if (statsCards.length >= 4) {
+                const gradients = [
+                    'linear-gradient(135deg, #007bff 0%, #0056b3 100%)',
+                    'linear-gradient(135deg, #28a745 0%, #20c997 100%)',
+                    'linear-gradient(135deg, #17a2b8 0%, #138496 100%)',
+                    'linear-gradient(135deg, #ffc107 0%, #e0a800 100%)'
+                ];
+                const textColors = ['white', 'white', 'white', '#212529'];
+                
+                statsCards.forEach((card, index) => {
+                    if (index < 4) {
+                        card.style.setProperty('background', gradients[index], 'important');
+                        const elements = card.querySelectorAll('*');
+                        elements.forEach(el => {
+                            el.style.setProperty('color', textColors[index], 'important');
+                        });
+                        const icon = card.querySelector('i');
+                        if (icon) {
+                            icon.style.setProperty('color', textColors[index], 'important');
+                            icon.style.setProperty('font-size', '3rem', 'important');
+                        }
+                    }
+                });
+            }
+            
+            // Forzar visibilidad de columnas críticas
+            setTimeout(() => {
+                const table = document.querySelector('#ordersTable');
+                if (table) {
+                    const headers = table.querySelectorAll('th');
+                    const rows = table.querySelectorAll('tbody tr');
+                    
+                    // Visibilidad de headers críticos
+                    if (headers.length >= 8) {
+                        [5, 6, 7].forEach(index => {
+                            if (headers[index]) {
+                                headers[index].style.setProperty('display', 'table-cell', 'important');
+                                headers[index].style.setProperty('visibility', 'visible', 'important');
+                            }
+                        });
+                    }
+                    
+                    // Visibilidad de celdas críticas
+                    rows.forEach(row => {
+                        const cells = row.querySelectorAll('td');
+                        if (cells.length >= 8) {
+                            [5, 6, 7].forEach(index => {
+                                if (cells[index]) {
+                                    cells[index].style.setProperty('display', 'table-cell', 'important');
+                                    cells[index].style.setProperty('visibility', 'visible', 'important');
+                                }
+                            });
+                        }
+                    });
+                    
+                    table.style.setProperty('min-width', '1000px', 'important');
+                }
+            }, 500);
+            
+            console.log('✅ Página de pedidos inicializada correctamente');
+        });
+                
+                // Mostrar mensaje de éxito
+                const mensaje = document.createElement('div');
+                mensaje.className = 'alert alert-success alert-dismissible fade show position-fixed';
+                mensaje.style.top = '20px';
+                mensaje.style.right = '20px';
+                mensaje.style.zIndex = '9999';
+                mensaje.innerHTML = `
+                    <strong>¡Estado actualizado!</strong> El pedido #${orderId} ahora está "${nuevoEstado}".
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                `;
+                document.body.appendChild(mensaje);
+                
+                // Cerrar modal
+                const modal = bootstrap.Modal.getInstance(document.getElementById('editStatusModal'));
+                modal.hide();
+                
+                // Actualizar la página después de 2 segundos
+                setTimeout(() => {
+                    mensaje.remove();
+                    location.reload();
+                }, 2000);
+            }
+        }
+        
+        // Función para generar contenido de impresión
+        function generarContenidoImpresion(orderId) {
+            // Buscar la fila del pedido en la tabla
+            const filas = document.querySelectorAll('.table tbody tr');
+            let pedidoData = null;
+            
+            filas.forEach(fila => {
+                const idCelda = fila.querySelector('td:first-child');
+                if (idCelda && idCelda.textContent.includes(orderId)) {
+                    const celdas = fila.querySelectorAll('td');
+                    pedidoData = {
+                        id: celdas[0].textContent.trim(),
+                        cliente: celdas[1].querySelector('.fw-bold').textContent.trim(),
+                        email: celdas[1].querySelector('small').textContent.trim(),
+                        fecha: celdas[2].textContent.trim(),
+                        productos: celdas[3].textContent.trim(),
+                        total: celdas[4].textContent.trim(),
+                        estado: celdas[5].textContent.trim(),
+                        metodoPago: celdas[6].textContent.trim()
+                    };
+                }
+            });
+            
+            if (!pedidoData) {
+                return '<p>No se pudo encontrar la información del pedido.</p>';
+            }
+            
+            return `
+                <div class="header">
+                    <h1>🌱 EcoVivaShop</h1>
+                    <h2>Comprobante de Pedido</h2>
+                </div>
+                
+                <div class="pedido-info">
+                    <div>
+                        <strong>Pedido:</strong> ${pedidoData.id}<br>
+                        <strong>Fecha:</strong> ${pedidoData.fecha}<br>
+                        <strong>Estado:</strong> ${pedidoData.estado}
+                    </div>
+                    <div>
+                        <strong>Cliente:</strong> ${pedidoData.cliente}<br>
+                        <strong>Email:</strong> ${pedidoData.email}<br>
+                        <strong>Método de Pago:</strong> ${pedidoData.metodoPago}
+                    </div>
+                </div>
+                
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Productos</th>
+                            <th>Total</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>${pedidoData.productos}</td>
+                            <td>${pedidoData.total}</td>
+                        </tr>
+                    </tbody>
+                </table>
+                
+                <div class="total">
+                    Total a Pagar: ${pedidoData.total}
+                </div>
+                
+                <div style="margin-top: 40px; text-align: center; color: #666; border-top: 1px solid #ddd; padding-top: 20px;">
+                    <p>¡Gracias por elegirnos! 🌱 Cuidamos el planeta juntos.</p>
+                    <small>EcoVivaShop - Tu tienda eco-friendly de confianza</small>
+                </div>
+            `;
+        }
+        
+        // Función para exportar pedidos - VERSIÓN COMPLETAMENTE FUNCIONAL
+        function exportarPedidos() {
+            console.log('🔄 Iniciando exportación...');
+            
+            try {
+                // Obtener formato del select
+                const formatoSelect = document.getElementById('exportFormatSelect');
+                if (!formatoSelect) {
+                    mostrarError('No se encontró el selector de formato');
+                    return;
+                }
+                const formato = formatoSelect.value;
+                console.log('📋 Formato seleccionado:', formato);
+                
+                // Obtener datos de la tabla
+                const filasPedidos = document.querySelectorAll('table tbody tr');
+                const datos = [];
+                
+                console.log('📊 Filas encontradas:', filasPedidos.length);
+                
+                filasPedidos.forEach((fila, index) => {
+                    const celdas = fila.querySelectorAll('td');
+                    console.log(`Fila ${index + 1}: ${celdas.length} celdas`);
+                    
+                    if (celdas.length >= 6) {
+                        const pedido = {
+                            id: celdas[0]?.textContent?.trim() || `ECO-${index + 1}`,
+                            cliente: celdas[1]?.querySelector('.fw-bold')?.textContent?.trim() || 
+                                   celdas[1]?.textContent?.trim() || 'Cliente no especificado',
+                            email: celdas[1]?.querySelector('small')?.textContent?.trim() || 'N/A',
+                            fecha: celdas[2]?.textContent?.trim()?.replace(/\s+/g, ' ') || new Date().toLocaleDateString(),
+                            productos: celdas[3]?.textContent?.trim() || 'N/A',
+                            total: celdas[4]?.textContent?.trim() || 'S/0.00',
+                            estado: celdas[5]?.querySelector('.badge')?.textContent?.trim() || 
+                                   celdas[5]?.textContent?.trim() || 'PENDIENTE',
+                            metodoPago: celdas[6]?.textContent?.trim() || 'N/A'
+                        };
+                        datos.push(pedido);
+                        console.log(`Pedido agregado:`, pedido);
+                    }
+                });
+                
+                console.log(`📋 Total de pedidos encontrados: ${datos.length}`);
+                
+                if (datos.length === 0) {
+                    mostrarError('No hay datos para exportar. Asegúrate de que hay pedidos en la tabla.');
+                    return;
+                }
+                
+                // Indicador de progreso visual
+                const progreso = document.createElement('div');
+                progreso.className = 'position-fixed top-0 start-50 translate-middle-x bg-primary text-white px-4 py-2 rounded-bottom';
+                progreso.style.zIndex = '10000';
+                progreso.innerHTML = `<div class="d-flex align-items-center">
+                    <div class="spinner-border spinner-border-sm me-2"></div>
+                    <span>Exportando ${formato.toUpperCase()}...</span>
+                </div>`;
+                document.body.appendChild(progreso);
+                
+                // Cerrar el modal
+                const modal = bootstrap.Modal.getInstance(document.getElementById('exportModal'));
+                if (modal) {
+                    modal.hide();
+                }
+                
+                // Procesar exportación con timeout para no bloquear UI
+                setTimeout(() => {
+                    try {
+                        let resultado = null;
+                        const nombreArchivo = `ecovivashop-pedidos-${new Date().toISOString().split('T')[0]}`;
+                        
+                        switch (formato) {
+                            case 'csv':
+                                resultado = generarCSV(datos);
+                                if (resultado) {
+                                    descargarArchivo(resultado, `${nombreArchivo}.csv`, 'text/csv');
+                                    mostrarExito('✅ Archivo CSV generado correctamente');
+                                }
+                                break;
+                            case 'excel':
+                                resultado = generarExcel(datos);
+                                if (resultado) {
+                                    descargarArchivo(resultado, `${nombreArchivo}.xls`, 'application/vnd.ms-excel');
+                                    mostrarExito('✅ Archivo Excel generado correctamente');
+                                }
+                                break;
+                            case 'pdf':
+                                const pdfResult = generarPDFMejorado(datos);
+                                if (pdfResult.success && pdfResult.blob) {
+                                    descargarBlob(pdfResult.blob, `${nombreArchivo}.pdf`);
+                                    mostrarExito('✅ Archivo PDF generado correctamente');
+                                } else {
+                                    // Fallback a TXT si PDF falla
+                                    console.warn('⚠️ PDF falló, generando TXT como alternativa');
+                                    resultado = generarTexto(datos);
+                                    descargarArchivo(resultado, `${nombreArchivo}.txt`, 'text/plain');
+                                    mostrarExito('✅ Archivo TXT generado (PDF no disponible)');
+                                }
+                                break;
+                            default:
+                                throw new Error(`Formato no soportado: ${formato}`);
+                        }
+                        
+                    } catch (error) {
+                        console.error('❌ Error en exportación:', error);
+                        mostrarError(`Error al generar archivo: ${error.message}`);
+                    } finally {
+                        if (progreso && progreso.parentNode) {
+                            progreso.remove();
+                        }
+                    }
+                }, 300);
+                
+            } catch (error) {
+                console.error('❌ Error general en exportación:', error);
+                mostrarError(`Error inesperado: ${error.message}`);
+            }
+        }
+        
+        // Generadores de formato
+        function generarCSV(datos) {
+            let csv = 'ID Pedido,Cliente,Email,Fecha,Productos,Total,Estado,Método Pago\n';
+            datos.forEach(p => csv += `"${p.id}","${p.cliente}","${p.email}","${p.fecha}","${p.productos}","${p.total}","${p.estado}","${p.metodoPago}"\n`);
+            return csv;
+        }
+        
+        function generarExcel(datos) {
+            let html = '<table border="1"><tr style="background:#f8f9fa;font-weight:bold;">';
+            html += '<th>ID</th><th>Cliente</th><th>Email</th><th>Fecha</th><th>Productos</th><th>Total</th><th>Estado</th><th>Método</th></tr>';
+            datos.forEach(p => html += `<tr><td>${p.id}</td><td>${p.cliente}</td><td>${p.email}</td><td>${p.fecha}</td><td>${p.productos}</td><td>${p.total}</td><td>${p.estado}</td><td>${p.metodoPago}</td></tr>`);
+            return html + '</table>';
+        }
+        
+        function generarTexto(datos) {
+            let txt = 'ECOVIVASHOP - REPORTE DE PEDIDOS\n=================================\n\n';
+            txt += `Fecha: ${new Date().toLocaleDateString('es-ES')}\nTotal: ${datos.length} pedidos\n\n`;
+            datos.forEach((p, i) => {
+                txt += `${i + 1}. PEDIDO #${p.id}\n   Cliente: ${p.cliente}\n   Email: ${p.email}\n   Fecha: ${p.fecha}\n   Productos: ${p.productos}\n   Total: ${p.total}\n   Estado: ${p.estado}\n   Método: ${p.metodoPago}\n\n`;
+            });
+            return txt;
+        }
+        
+        // Función PDF mejorada con mejor detección
+        function generarPDFMejorado(datos) {
+            try {
+                console.log('🔄 Iniciando generación de PDF...');
+                
+                // Verificar si jsPDF está disponible
+                if (!window.jsPDF && !window.jspdf) {
+                    console.warn('❌ jsPDF no está disponible');
+                    return { success: false, error: 'jsPDF no encontrado' };
+                }
+                
+                const { jsPDF } = window.jsPDF || window.jspdf || {};
+                if (!jsPDF) {
+                    console.warn('❌ Constructor jsPDF no encontrado');
+                    return { success: false, error: 'Constructor jsPDF no encontrado' };
+                }
+                
+                // Crear documento PDF
+                const doc = new jsPDF();
+                const pageWidth = doc.internal.pageSize.width;
+                const pageHeight = doc.internal.pageSize.height;
+                let yPosition = 30;
+                
+                // Header
+                doc.setFontSize(18);
+                doc.setTextColor(40, 167, 69); // Verde EcoVivaShop
+                doc.text('ECOVIVASHOP - REPORTE DE PEDIDOS', pageWidth / 2, 20, { align: 'center' });
+                
+                // Fecha y resumen
+                doc.setFontSize(10);
+                doc.setTextColor(100, 100, 100);
+                const fechaHoy = new Date().toLocaleDateString('es-ES', {
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric'
+                });
+                doc.text(`Fecha: ${fechaHoy}`, 20, yPosition);
+                doc.text(`Total de pedidos: ${datos.length}`, pageWidth - 20, yPosition, { align: 'right' });
+                
+                yPosition += 20;
+                
+                // Tabla de pedidos
+                doc.setFontSize(8);
+                doc.setTextColor(0, 0, 0);
+                
+                // Headers de tabla
+                const headers = ['ID', 'Cliente', 'Fecha', 'Total', 'Estado'];
+                const columnWidths = [30, 50, 30, 25, 25];
+                let xPosition = 20;
+                
+                doc.setFont(undefined, 'bold');
+                headers.forEach((header, index) => {
+                    doc.text(header, xPosition, yPosition);
+                    xPosition += columnWidths[index];
+                });
+                
+                yPosition += 8;
+                doc.setFont(undefined, 'normal');
+                
+                // Datos de pedidos
+                datos.slice(0, 25).forEach((pedido, index) => {
+                    if (yPosition > pageHeight - 30) {
+                        doc.addPage();
+                        yPosition = 30;
+                    }
+                    
+                    xPosition = 20;
+                    const rowData = [
+                        pedido.id.substring(0, 15),
+                        pedido.cliente.substring(0, 20),
+                        pedido.fecha.substring(0, 10),
+                        pedido.total,
+                        pedido.estado
+                    ];
+                    
+                    rowData.forEach((data, colIndex) => {
+                        doc.text(data, xPosition, yPosition);
+                        xPosition += columnWidths[colIndex];
+                    });
+                    
+                    yPosition += 8;
+                });
+                
+                // Footer
+                if (yPosition > pageHeight - 40) {
+                    doc.addPage();
+                    yPosition = 30;
+                }
+                
+                yPosition = pageHeight - 30;
+                doc.setFontSize(8);
+                doc.setTextColor(150, 150, 150);
+                doc.text('EcoVivaShop - Tu tienda eco-friendly de confianza 🌱', pageWidth / 2, yPosition, { align: 'center' });
+                doc.text(`Generado el ${new Date().toLocaleString('es-ES')}`, pageWidth / 2, yPosition + 8, { align: 'center' });
+                
+                console.log('✅ PDF generado exitosamente');
+                return { 
+                    success: true, 
+                    blob: doc.output('blob'),
+                    info: `PDF con ${datos.length} pedidos generado`
+                };
+                
+            } catch (error) {
+                console.error('❌ Error generando PDF:', error);
+                return { 
+                    success: false, 
+                    error: error.message,
+                    stack: error.stack
+                };
+            }
+        }
+        
+        // Utilidades de descarga
+        function descargarArchivo(contenido, nombre, tipo) {
+            descargarBlob(new Blob([contenido], { type: tipo + ';charset=utf-8;' }), nombre);
+        }
+        
+        function descargarBlob(blob, nombre) {
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url; link.download = nombre; link.style.display = 'none';
+            document.body.appendChild(link); link.click(); document.body.removeChild(link);
+            URL.revokeObjectURL(url);
+        }
+        
+        // Notificaciones
+        function mostrarExito(msg) {
+            const alert = crearAlert('alert-success', 'bi-check-circle', msg);
+            setTimeout(() => alert.remove(), 4000);
+        }
+        
+        function mostrarError(msg) {
+            const alert = crearAlert('alert-danger', 'bi-exclamation-triangle', msg);
+            setTimeout(() => alert.remove(), 6000);
+        }
+        
+        function crearAlert(clase, icono, mensaje) {
+            const alert = document.createElement('div');
+            alert.className = `alert ${clase} alert-dismissible position-fixed`;
+            alert.style.cssText = 'top:20px;right:20px;z-index:10001;';
+            alert.innerHTML = `<i class="bi ${icono}"></i> ${mensaje}<button type="button" class="btn-close" data-bs-dismiss="alert"></button>`;
+            document.body.appendChild(alert);
+            return alert;
+        }
+        // CONFIGURACIÓN DE DOM Y ESTILOS
+        document.addEventListener('DOMContentLoaded', function() {
+            // Aplicar estilos a tarjetas métricas
+            const statsCards = document.querySelectorAll('.row.g-4.mb-4 .card');
+            if (statsCards.length >= 4) {
+                const gradients = [
+                    'linear-gradient(135deg, #007bff 0%, #0056b3 100%)',
+                    'linear-gradient(135deg, #28a745 0%, #20c997 100%)',
+                    'linear-gradient(135deg, #17a2b8 0%, #138496 100%)',
+                    'linear-gradient(135deg, #ffc107 0%, #e0a800 100%)'
+                ];
+                const textColors = ['white', 'white', 'white', '#212529'];
+                
+                statsCards.forEach((card, index) => {
+                    if (index < 4) {
+                        card.style.setProperty('background', gradients[index], 'important');
+                        const elements = card.querySelectorAll('*');
+                        elements.forEach(el => {
+                            el.style.setProperty('color', textColors[index], 'important');
+                        });
+                        const icon = card.querySelector('i');
+                        if (icon) {
+                            icon.style.setProperty('color', textColors[index], 'important');
+                            icon.style.setProperty('font-size', '3rem', 'important');
+                        }
+                    }
+                });
+            }
+            
+            // Forzar visibilidad de columnas críticas de tabla
+            setTimeout(() => {
+                const table = document.querySelector('.table');
+                if (table) {
+                    const headers = table.querySelectorAll('th');
+                    const rows = table.querySelectorAll('tbody tr');
+                    
+                    // Asegurar visibilidad de headers (Estado, Método, Acciones)
+                    if (headers.length >= 8) {
+                        [5, 6, 7].forEach(index => {
+                            if (headers[index]) {
+                                headers[index].style.setProperty('display', 'table-cell', 'important');
+                                headers[index].style.setProperty('visibility', 'visible', 'important');
+                            }
+                        });
+                    }
+                    
+                    // Forzar visibilidad de celdas
+                    rows.forEach(row => {
+                        const cells = row.querySelectorAll('td');
+                        if (cells.length >= 8) {
+                            [5, 6, 7].forEach(index => {
+                                if (cells[index]) {
+                                    cells[index].style.setProperty('display', 'table-cell', 'important');
+                                    cells[index].style.setProperty('visibility', 'visible', 'important');
+                                }
+                            });
+                        }
+                    });
+                    
+                    table.style.setProperty('min-width', '1000px', 'important');
+                }
+                
+                const tableResponsive = document.querySelector('.table-responsive');
+                if (tableResponsive) {
+                    tableResponsive.style.setProperty('overflow-x', 'auto', 'important');
+                }
+                
+            }, 500);
+            
+            // Configurar modal de exportación
+            const todosEstadosCheckbox = document.getElementById('todosEstados');
+            const estadosIndividuales = document.getElementById('estadosIndividuales');
+            
+            if (todosEstadosCheckbox && estadosIndividuales) {
+                todosEstadosCheckbox.addEventListener('change', function() {
+                    estadosIndividuales.style.display = this.checked ? 'none' : 'block';
+                });
+            }
+            
+            // Configurar fechas por defecto
+            const today = new Date().toISOString().split('T')[0];
+            const lastMonth = new Date();
+            lastMonth.setMonth(lastMonth.getMonth() - 1);
+            const lastMonthStr = lastMonth.toISOString().split('T')[0];
+            
+            const dateFrom = document.getElementById('dateFrom');
+            const dateTo = document.getElementById('dateTo');
+            if (dateFrom) dateFrom.value = lastMonthStr;
+            if (dateTo) dateTo.value = today;
+        });
+    </script>
+</body>
+</html>

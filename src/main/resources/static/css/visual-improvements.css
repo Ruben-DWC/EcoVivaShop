@@ -1,0 +1,458 @@
+/* ==================================
+   ELIMINACIÓN TOTAL DE FONDOS GRISES/PLOMIZOS
+   ================================== */
+
+/* FORZAR fondos blancos en TODAS las cards */
+.card, .card-body {
+    background: white !important;
+    background-color: white !important;
+    background-image: none !important;
+}
+
+/* Cards específicas del catálogo de productos */
+.product-card {
+    background: white !important;
+    border: 2px solid #e9ecef !important;
+    transition: all 0.3s ease;
+}
+
+.product-card:hover {
+    border-color: #28a745 !important;
+    transform: translateY(-5px);
+    box-shadow: 0 8px 25px rgba(40, 167, 69, 0.15) !important;
+}
+
+/* Eliminar CUALQUIER gradiente gris de Bootstrap */
+.bg-light, .bg-secondary, [class*="bg-"] {
+    background: white !important;
+}
+
+/* Solo permitir gradientes en elementos específicos */
+.hero-gradient {
+    background: linear-gradient(135deg, #28a745 0%, #20c997 100%) !important;
+}
+
+.navbar-custom {
+    background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%) !important;
+}
+
+/* Cards del panel de control con fondos blancos y bordes coloridos */
+.control-panel-card {
+    background: white !important;
+    border: 2px solid #28a745 !important;
+}
+
+/* Texto siempre visible */
+.text-muted {
+    color: #495057 !important;
+    font-weight: 500;
+}
+
+.text-white {
+    color: #2c3e50 !important;
+}
+
+/* Mantener texto blanco SOLO en botones y badges */
+.btn .text-white,
+.badge .text-white,
+.bg-success .text-white,
+.bg-primary .text-white,
+.bg-info .text-white,
+.bg-warning .text-white,
+.bg-danger .text-white,
+.rounded-circle .text-white {
+    color: white !important;
+}
+
+/* Headers más visibles */
+h1, h2, h3, h4, h5, h6 {
+    color: #2c3e50 !important;
+    font-weight: 600;
+}
+
+/* Párrafos más visibles */
+p, .card-text {
+    color: #495057 !important;
+    font-weight: 500;
+}
+
+/* Eliminar fondos grises de elementos Bootstrap específicos */
+.shadow-sm, .shadow, .shadow-lg {
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1) !important;
+}
+
+/* Cards hover effect sin fondo gris */
+.card:hover {
+    background: white !important;
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15) !important;
+}
+
+/* Específico para las cards del home que aparecen grises */
+.card[style*="background: linear-gradient"] {
+    background: white !important;
+}
+
+/* Botones más atractivos */
+.btn {
+    border-radius: 25px !important;
+    font-weight: 600;
+    border: none;
+    transition: all 0.3s ease;
+}
+
+.btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+.btn-success {
+    background: linear-gradient(45deg, #28a745, #20c997) !important;
+}
+
+.btn-outline-success {
+    border: 2px solid #28a745 !important;
+    color: #28a745 !important;
+    background: white !important;
+}
+
+.btn-outline-success:hover {
+    background: linear-gradient(45deg, #28a745, #20c997) !important;
+    color: white !important;
+}
+
+/* Inputs más atractivos */
+.form-control {
+    border-radius: 15px !important;
+    border: 2px solid #e9ecef !important;
+    background: white !important;
+}
+
+.form-control:focus {
+    border-color: #28a745 !important;
+    box-shadow: 0 0 0 0.2rem rgba(40, 167, 69, 0.25) !important;
+}
+
+/* ==================================
+   MEJORAS VISUALES ECOVIVASHOP EXISTENTES
+   ================================== */
+
+/* Fondo general más colorido */
+.eco-bg {
+    background: linear-gradient(135deg, #e8f5e8 0%, #f0f9f0 50%, #e3f2fd 100%) !important;
+    min-height: 100vh;
+}
+
+.eco-admin-bg {
+    background: linear-gradient(135deg, #e8f5e8 0%, #f0f9f0 50%, #e3f2fd 100%) !important;
+    min-height: 100vh;
+}
+
+/* Navbar mejorado */
+.navbar-dark .navbar-nav .nav-link {
+    color: rgba(255, 255, 255, 0.9) !important;
+    transition: all 0.3s ease;
+    border-radius: 20px;
+    margin: 0 3px;
+    padding: 8px 15px !important;
+}
+
+.navbar-dark .navbar-nav .nav-link:hover {
+    background: rgba(40, 167, 69, 0.3) !important;
+    color: white !important;
+    transform: translateY(-2px);
+}
+
+.navbar-dark .navbar-nav .nav-link.active {
+    background: linear-gradient(45deg, #28a745, #20c997) !important;
+    color: white !important;
+    font-weight: bold;
+}
+
+/* Cards más atractivas */
+.card {
+    transition: all 0.3s ease;
+    border: none !important;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1) !important;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15) !important;
+}
+
+/* Botones mejorados */
+.btn {
+    border-radius: 25px !important;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    border: none;
+}
+
+.btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+.btn-success {
+    background: linear-gradient(45deg, #28a745, #20c997) !important;
+    border: none !important;
+}
+
+.btn-outline-success {
+    border: 2px solid #28a745 !important;
+    color: #28a745 !important;
+    background: rgba(40, 167, 69, 0.1) !important;
+}
+
+.btn-outline-success:hover {
+    background: linear-gradient(45deg, #28a745, #20c997) !important;
+    color: white !important;
+}
+
+/* Inputs más atractivos */
+.form-control {
+    border-radius: 15px !important;
+    border: 2px solid #e9ecef !important;
+    transition: all 0.3s ease;
+    background-color: rgba(255, 255, 255, 0.9) !important;
+}
+
+.form-control:focus {
+    border-color: #28a745 !important;
+    box-shadow: 0 0 0 0.2rem rgba(40, 167, 69, 0.25) !important;
+    background-color: white !important;
+}
+
+.border-success {
+    border-color: #28a745 !important;
+}
+
+/* Labels más visibles */
+.form-label {
+    font-weight: 600 !important;
+    color: #495057 !important;
+}
+
+/* Alertas mejoradas */
+.alert {
+    border-radius: 20px !important;
+    border: none !important;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1) !important;
+}
+
+.alert-success {
+    background: linear-gradient(45deg, #d4edda, #c3e6cb) !important;
+    color: #155724 !important;
+}
+
+/* Tables más atractivas */
+.table {
+    background: white !important;
+    border-radius: 15px !important;
+    overflow: hidden;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1) !important;
+}
+
+.table thead th {
+    background: linear-gradient(45deg, #28a745, #20c997) !important;
+    color: white !important;
+    border: none !important;
+    font-weight: 600;
+}
+
+.table tbody tr {
+    transition: all 0.3s ease;
+}
+
+.table tbody tr:hover {
+    background-color: rgba(40, 167, 69, 0.1) !important;
+    transform: scale(1.01);
+}
+
+/* Badges más coloridos */
+.badge {
+    border-radius: 15px !important;
+    font-weight: 500;
+    padding: 8px 12px !important;
+}
+
+/* Dropdowns mejorados */
+.dropdown-menu {
+    border-radius: 15px !important;
+    border: none !important;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15) !important;
+    background: linear-gradient(135deg, #ffffff, #f8f9fa) !important;
+}
+
+.dropdown-item {
+    border-radius: 10px !important;
+    margin: 5px !important;
+    transition: all 0.3s ease;
+}
+
+.dropdown-item:hover {
+    background: linear-gradient(45deg, #28a745, #20c997) !important;
+    color: white !important;
+    transform: translateX(5px);
+}
+
+/* Iconos más atractivos */
+.bi {
+    transition: all 0.3s ease;
+}
+
+.card:hover .bi {
+    transform: scale(1.1);
+}
+
+/* Sidebar mejorado */
+.list-group-item {
+    border-radius: 15px !important;
+    margin: 5px !important;
+    border: none !important;
+    transition: all 0.3s ease;
+}
+
+.list-group-item:hover {
+    transform: translateX(10px);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.list-group-item.active {
+    background: linear-gradient(45deg, #28a745, #20c997) !important;
+    color: white !important;
+    border: none !important;
+}
+
+/* Profile images mejoradas */
+.profile-image {
+    transition: all 0.3s ease;
+    border: 3px solid #28a745 !important;
+}
+
+.profile-image:hover {
+    transform: scale(1.05);
+    box-shadow: 0 8px 25px rgba(40, 167, 69, 0.3);
+}
+
+/* Footer mejorado */
+footer {
+    background: linear-gradient(135deg, #2c3e50, #34495e) !important;
+    color: white !important;
+}
+
+/* Animaciones generales */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.card {
+    animation: fadeInUp 0.6s ease-out;
+}
+
+/* Gradientes personalizados para diferentes secciones */
+.gradient-green {
+    background: linear-gradient(135deg, #56ab2f 0%, #a8e6cf 100%) !important;
+}
+
+.gradient-blue {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+}
+
+.gradient-pink {
+    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%) !important;
+}
+
+.gradient-cyan {
+    background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%) !important;
+}
+
+.gradient-orange {
+    background: linear-gradient(135deg, #fa709a 0%, #fee140 100%) !important;
+}
+
+/* Texto más visible */
+.text-muted {
+    color: #6c757d !important;
+}
+
+.text-dark {
+    color: #495057 !important;
+}
+
+/* Mejoras para móviles */
+@media (max-width: 768px) {
+    .card {
+        margin-bottom: 20px;
+    }
+    
+    .btn {
+        width: 100%;
+        margin-bottom: 10px;
+    }
+    
+    .navbar-brand {
+        font-size: 1.1rem;
+    }
+}
+
+/* Efectos especiales */
+.card-hover-effect:hover {
+    background: linear-gradient(45deg, #f8fff8, #e8f5e8) !important;
+}
+
+/* Quitar cualquier fondo gris o negro residual */
+.bg-light {
+    background: linear-gradient(135deg, #f8fff8, #e8f5e8) !important;
+}
+
+.bg-dark {
+    background: linear-gradient(135deg, #2c3e50, #34495e) !important;
+}
+
+.bg-secondary {
+    background: linear-gradient(135deg, #6c757d, #495057) !important;
+}
+
+/* Headers más atractivos */
+h1, h2, h3, h4, h5, h6 {
+    color: #2c3e50 !important;
+    font-weight: 600;
+}
+
+.text-success {
+    color: #28a745 !important;
+}
+
+/* Loading states */
+.loading {
+    opacity: 0.7;
+    pointer-events: none;
+}
+
+/* Scrollbar personalizado */
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: linear-gradient(45deg, #28a745, #20c997);
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(45deg, #20c997, #28a745);
+}

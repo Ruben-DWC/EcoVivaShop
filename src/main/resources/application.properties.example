@@ -1,0 +1,24 @@
+# ===============================================================
+# ARCHIVO DE CONFIGURACIÓN DE EJEMPLO - NO SUBIR A GITHUB
+# ===============================================================
+# Copia este archivo como "application-local.properties" 
+# y configura tus credenciales reales ahí
+
+# EMAIL CONFIGURATION - GMAIL
+spring.mail.host=smtp.gmail.com
+spring.mail.port=587
+spring.mail.username=tu_email@gmail.com
+spring.mail.password=tu_contraseña_de_aplicacion_aqui
+spring.mail.properties.mail.smtp.auth=true
+spring.mail.properties.mail.smtp.starttls.enable=true
+
+# DATABASE CONFIGURATION (LOCAL)
+spring.datasource.url=jdbc:postgresql://localhost:5432/eco_maxtienda
+spring.datasource.username=tu_usuario_db
+spring.datasource.password=tu_contraseña_db
+
+# INSTRUCCIONES:
+# 1. Copia este archivo como "application-local.properties"
+# 2. Configura tus credenciales reales
+# 3. Ejecuta con: mvn spring-boot:run -Dspring.profiles.active=local
+# 4. NUNCA subas este archivo a GitHub

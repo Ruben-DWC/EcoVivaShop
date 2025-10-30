@@ -1,0 +1,1083 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/head :: head('Historial de Pedidos | EcoVivaShop Admin')}">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Historial de Pedidos | EcoVivaShop Admin</title>
+</head>
+<body class="eco-bg">
+    <!-- Admin Navbar -->
+    <div th:replace="~{fragments/admin-navbar :: admin-navbar}"></div>
+
+    <main class="container-fluid py-4">
+        <!-- Header -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h1 class="h3 mb-0 text-dark fw-bold">
+                            <i class="bi bi-cart-check text-success me-2"></i>Pedidos
+                        </h1>
+                        <p class="text-muted mb-0">Gestiona y monitorea todos los pedidos de EcoVivaShop</p>
+                    </div>
+                    <div>
+                        <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#exportModal">
+                            <i class="bi bi-download me-2"></i>Exportar
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Stats Cards -->
+        <div class="row g-4 mb-4">
+            <div class="col-xl-3 col-md-6">
+                <div class="card border-0 shadow-sm stats-card-1 stats-card-white-text">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center">
+                            <div class="flex-shrink-0">
+                                <i class="bi bi-cart-plus-fill display-6 force-visible-icon"></i>
+                            </div>
+                            <div class="flex-grow-1 ms-3 stats-card-white-text">
+                                <div class="small fw-bold">Total Pedidos</div>
+                                <div class="h4 mb-0" th:text="${totalPedidos ?: 0}">6</div>
+                                <div class="small">Desde el inicio</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xl-3 col-md-6">
+                <div class="card border-0 shadow-sm stats-card-2 stats-card-white-text">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center">
+                            <div class="flex-shrink-0">
+                                <i class="bi bi-clock-fill display-6 force-visible-icon"></i>
+                            </div>
+                            <div class="flex-grow-1 ms-3 stats-card-white-text">
+                                <div class="small fw-bold">Pendientes</div>
+                                <div class="h4 mb-0" th:text="${pedidosPendientes ?: 0}">4</div>
+                                <div class="small">Requieren atención</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xl-3 col-md-6">
+                <div class="card border-0 shadow-sm stats-card-3 stats-card-white-text">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center">
+                            <div class="flex-shrink-0">
+                                <i class="bi bi-check-circle-fill display-6 force-visible-icon"></i>
+                            </div>
+                            <div class="flex-grow-1 ms-3 stats-card-white-text">
+                                <div class="small fw-bold">Completados</div>
+                                <div class="h4 mb-0" th:text="${pedidosEntregados ?: 0}">1</div>
+                                <div class="small">Entregados</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xl-3 col-md-6">
+                <div class="card border-0 shadow-sm stats-card-4 stats-card-dark-text">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center">
+                            <div class="flex-shrink-0">
+                                <i class="bi bi-currency-dollar display-6" style="color: #212529 !important; font-size: 3rem !important;"></i>
+                            </div>
+                            <div class="flex-grow-1 ms-3 stats-card-dark-text">
+                                <div class="small fw-bold">Ingresos Total</div>
+                                <div class="h4 mb-0" th:text="'S/ ' + ${#numbers.formatDecimal(ingresosTotales ?: 0, 1, 2)}">S/ 348.19</div>
+                                <div class="small">Este año</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Filters -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-body">
+                        <form method="get" action="/admin/pedidos" id="filtrosForm">
+                            <div class="row g-3 align-items-end">
+                                <div class="col-md-3">
+                                    <label class="form-label fw-bold" for="statusFilter">Estado del Pedido</label>
+                                    <select class="form-select" name="estado" id="statusFilter" title="Estado del Pedido" th:value="${estado}">
+                                        <option value="">Todos los estados</option>
+                                        <option th:each="est : ${estados}" 
+                                                th:value="${est}" 
+                                                th:text="${est}" 
+                                                th:selected="${est == estado}">Estado</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-3">
+                                    <label class="form-label fw-bold" for="dateFrom">Fecha Desde</label>
+                                    <input type="date" class="form-control" name="fechaDesde" id="dateFrom" title="Fecha Desde" th:value="${fechaDesde}">
+                                </div>
+                                <div class="col-md-3">
+                                    <label class="form-label fw-bold" for="dateTo">Fecha Hasta</label>
+                                    <input type="date" class="form-control" name="fechaHasta" id="dateTo" title="Fecha Hasta" th:value="${fechaHasta}">
+                                </div>
+                                <div class="col-md-3">
+                                    <label class="form-label fw-bold">Buscar</label>
+                                    <div class="input-group">
+                                        <input type="text" class="form-control" name="busqueda" placeholder="ID, cliente, email..." id="searchOrders" th:value="${busqueda}">
+                                        <button class="btn btn-outline-secondary" type="submit" title="Buscar">
+                                            <i class="bi bi-search"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Orders Table -->
+        <div class="row">
+            <div class="col-12">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-header bg-white border-bottom">
+                        <div class="row align-items-center">
+                            <div class="col">
+                                <h5 class="card-title mb-0 text-dark fw-bold">Lista de Pedidos</h5>
+                            </div>
+                            <div class="col-auto">
+                                <div class="btn-group" role="group">
+                                    <input type="radio" class="btn-check" name="viewMode" id="tableView" checked title="Vista de tabla">
+                                    <label class="btn btn-outline-secondary" for="tableView" title="Vista de tabla">
+                                        <i class="bi bi-table"></i>
+                                    </label>
+                                    <input type="radio" class="btn-check" name="viewMode" id="cardView" title="Vista de tarjetas">
+                                    <label class="btn btn-outline-secondary" for="cardView">
+                                        <i class="bi bi-grid-3x3-gap"></i>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table table-hover mb-0" id="ordersTable">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>ID PEDIDO</th>
+                                        <th>CLIENTE</th>
+                                        <th>FECHA</th>
+                                        <th>PRODUCTOS</th>
+                                        <th>TOTAL</th>
+                                        <th>ESTADO</th>
+                                        <th>MÉTODO PAGO</th>
+                                        <th>ACCIONES</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr th:each="pedido : ${pedidos.content}" th:if="${pedidos.hasContent()}">
+                                        <td>
+                                            <span class="fw-bold text-primary" th:text="'#' + ${pedido.numeroPedido}">#ECO-2024-1025</span>
+                                        </td>
+                                        <td>
+                                            <div class="d-flex align-items-center">
+                                                <img th:src="${pedido.usuario.fotoPerfil != null ? pedido.usuario.fotoPerfil : '/img/default-profile.svg'}" 
+                                                     alt="Avatar" class="rounded-circle me-2" width="32" height="32">
+                                                <div>
+                                                    <div class="fw-bold" th:text="${pedido.usuario.nombre + ' ' + pedido.usuario.apellido}">Cliente</div>
+                                                    <small class="text-muted" th:text="${pedido.usuario.email}">email@ejemplo.com</small>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div th:text="${#temporals.format(pedido.fechaPedido, 'dd/MM/yyyy')}">15/05/2024</div>
+                                            <small class="text-muted" th:text="${#temporals.format(pedido.fechaPedido, 'HH:mm')}">14:30</small>
+                                        </td>
+                                        <td>
+                                            <div class="d-flex align-items-center">
+                                                <span class="badge bg-info me-2" th:text="${#lists.size(pedido.detalles)} + ' items'">3 items</span>
+                                                <small th:text="${#strings.abbreviate(#strings.listJoin(pedido.detalles.![producto.nombre], ', '), 20)}">Productos...</small>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <span class="fw-bold text-success" th:text="'S/ ' + ${#numbers.formatDecimal(pedido.total, 1, 2)}">S/ 300.50</span>
+                                        </td>
+                                        <td>
+                                            <span th:class="${pedido.estado == 'PENDIENTE' ? 'badge bg-warning' : 
+                                                           (pedido.estado == 'CONFIRMADO' ? 'badge bg-info' :
+                                                           (pedido.estado == 'PREPARANDO' ? 'badge bg-primary' :
+                                                           (pedido.estado == 'ENVIADO' ? 'badge bg-secondary' :
+                                                           (pedido.estado == 'ENTREGADO' ? 'badge bg-success' : 'badge bg-danger'))))}"
+                                                  th:text="${pedido.estado}">Estado</span>
+                                        </td>
+                                        <td>
+                                            <i th:class="${pedido.metodoPago == 'TARJETA' ? 'bi bi-credit-card text-primary me-1' : 
+                                                          (pedido.metodoPago == 'PAYPAL' ? 'bi bi-paypal text-info me-1' : 
+                                                          'bi bi-cash text-success me-1')}"></i>
+                                            <span th:text="${pedido.metodoPago}">Método</span>
+                                        </td>
+                                        <td>
+                                            <div class="btn-group btn-group-sm">
+                                                <a th:href="@{/admin/pedidos/detalle/{id}(id=${pedido.idPedido})}" 
+                                                   class="btn btn-outline-primary" title="Ver detalles">
+                                                    <i class="bi bi-eye"></i>
+                                                </a>
+                                                <button class="btn btn-outline-warning" title="Editar estado" 
+                                                        th:onclick="'editOrderStatus(' + ${pedido.idPedido} + ')'">
+                                                    <i class="bi bi-pencil"></i>
+                                                </button>
+                                                <button class="btn btn-outline-info" title="Ver para imprimir" 
+                                                        th:onclick="'printOrder(' + ${pedido.idPedido} + ')'">
+                                                    <i class="bi bi-printer"></i>
+                                                </button>
+                                                <button class="btn btn-outline-success" title="Descargar PDF" 
+                                                        th:onclick="'downloadOrderPDF(' + ${pedido.idPedido} + ')'">
+                                                    <i class="bi bi-file-earmark-pdf"></i>
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr th:unless="${pedidos.hasContent()}">
+                                        <td colspan="8" class="text-center py-4">
+                                            <i class="bi bi-inbox text-muted" style="font-size: 3rem;"></i>
+                                            <p class="text-muted mt-2">No se encontraron pedidos</p>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="card-footer bg-white" th:if="${pedidos.totalPages > 1}">
+                        <nav>
+                            <ul class="pagination justify-content-center mb-0">
+                                <!-- Botón Anterior -->
+                                <li th:class="${pedidos.first ? 'page-item disabled' : 'page-item'}">
+                                    <a th:if="${!pedidos.first}" 
+                                       th:href="@{/admin/pedidos(page=${currentPage - 1}, size=${pedidos.size}, estado=${estado}, busqueda=${busqueda})}" 
+                                       class="page-link">Anterior</a>
+                                    <span th:if="${pedidos.first}" class="page-link">Anterior</span>
+                                </li>
+                                
+                                <!-- Números de página -->
+                                <li th:each="i : ${#numbers.sequence(0, pedidos.totalPages - 1)}" 
+                                    th:class="${i == currentPage ? 'page-item active' : 'page-item'}">
+                                    <a th:if="${i != currentPage}" 
+                                       th:href="@{/admin/pedidos(page=${i}, size=${pedidos.size}, estado=${estado}, busqueda=${busqueda})}" 
+                                       th:text="${i + 1}" class="page-link">1</a>
+                                    <span th:if="${i == currentPage}" th:text="${i + 1}" class="page-link">1</span>
+                                </li>
+                                
+                                <!-- Botón Siguiente -->
+                                <li th:class="${pedidos.last ? 'page-item disabled' : 'page-item'}">
+                                    <a th:if="${!pedidos.last}" 
+                                       th:href="@{/admin/pedidos(page=${currentPage + 1}, size=${pedidos.size}, estado=${estado}, busqueda=${busqueda})}" 
+                                       class="page-link">Siguiente</a>
+                                    <span th:if="${pedidos.last}" class="page-link">Siguiente</span>
+                                </li>
+                            </ul>
+                        </nav>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Export Modal -->
+    <div class="modal fade" id="exportModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        <i class="bi bi-download me-2"></i>Exportar Pedidos
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="exportForm">
+                        <div class="mb-3">
+                            <label class="form-label" for="exportFormatSelect">Formato de Exportación</label>
+                            <select class="form-select" id="exportFormatSelect" title="Formato de Exportación">
+                                <option value="pdf">PDF (.pdf)</option>
+                                <option value="excel">Excel (.xlsx)</option>
+                                <option value="csv">CSV (.csv)</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Rango de Fechas (Opcional)</label>
+                            <div class="row g-2">
+                                <div class="col">
+                                    <input type="date" class="form-control" id="fechaInicioExport" placeholder="dd/mm/aaaa" title="Fecha de inicio">
+                                </div>
+                                <div class="col">
+                                    <input type="date" class="form-control" id="fechaFinExport" placeholder="dd/mm/aaaa" title="Fecha de fin">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Estados a Incluir</label>
+                            <select class="form-select" id="estadosExport" title="Estados a incluir">
+                                <option value="todos">Todos los estados</option>
+                                <option value="PENDIENTE">Pendiente</option>
+                                <option value="CONFIRMADO">Confirmado</option>
+                                <option value="ENTREGADO">Entregado</option>
+                                <option value="CANCELADO">Cancelado</option>
+                            </select>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-success" onclick="exportarPedidos()">
+                        <i class="bi bi-download me-2"></i>Exportar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading Indicator -->
+    <div id="loadingIndicator" class="position-fixed top-50 start-50 translate-middle" style="display: none; z-index: 9999;">
+        <div class="card shadow-lg border-0">
+            <div class="card-body text-center p-4">
+                <div class="spinner-border text-success mb-3" role="status">
+                    <span class="visually-hidden">Cargando...</span>
+                </div>
+                <h6 class="mb-0">Generando archivo...</h6>
+                <small class="text-muted">Por favor espere</small>
+            </div>
+        </div>
+    </div>
+
+    <div th:replace="~{fragments/footer :: footer}"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        // =====================================================
+        // =====================================================
+        // FUNCIÓN SIMPLIFICADA DE EXPORTACIÓN (COMO REPORTES)
+        // =====================================================
+        function exportarPedidos() {
+            console.log('🚀 [MODAL] Iniciando exportación simplificada...');
+
+            const formato = document.getElementById('exportFormatSelect').value;
+            const fechaInicio = document.getElementById('fechaInicioExport').value;
+            const fechaFin = document.getElementById('fechaFinExport').value;
+            const estados = document.getElementById('estadosExport').value;
+
+            console.log('📋 [MODAL] Parámetros:', { formato, fechaInicio, fechaFin, estados });
+
+            // Construir URL con parámetros
+            let url = `/admin/pedidos/exportar/${formato}`;
+            const params = new URLSearchParams();
+
+            if (fechaInicio) params.append('fechaInicio', fechaInicio);
+            if (fechaFin) params.append('fechaFin', fechaFin);
+            if (estados !== 'todos') params.append('estados', estados);
+
+            if (params.toString()) {
+                url += '?' + params.toString();
+            }
+
+            console.log('🔗 [MODAL] URL completa:', url);
+
+            // MOVER FOCO FUERA DEL MODAL ANTES DE CERRARLO
+            const exportButton = document.querySelector('[data-bs-target="#exportModal"]');
+            if (exportButton) {
+                exportButton.focus();
+            }
+
+            // Remover foco de cualquier elemento dentro del modal
+            const modalElement = document.getElementById('exportModal');
+            const focusedElements = modalElement.querySelectorAll('button:focus, input:focus, select:focus');
+            focusedElements.forEach(element => {
+                element.blur();
+            });
+
+            console.log('🎯 [MODAL] Iniciando descarga (modal permanece abierto)...');
+
+            // INICIAR DESCARGA INMEDIATAMENTE
+            proceedWithDownload();
+
+            // NO CERRAR MODAL AUTOMÁTICAMENTE - Dejar que el usuario lo cierre manualmente
+            // para evitar conflictos con Bootstrap y creación de múltiples backdrops
+
+            function proceedWithDownload() {
+                console.log('💾 [MODAL] Ejecutando descarga...');
+
+                // CAMBIAR EL BOTÓN DE EXPORTAR A ESTADO DE "PROCESANDO"
+                const exportButton = document.querySelector('#exportModal .btn-primary');
+                if (exportButton) {
+                    const originalText = exportButton.innerHTML;
+                    exportButton.innerHTML = '<i class="bi bi-hourglass-split me-2"></i>Procesando...';
+                    exportButton.disabled = true;
+                    console.log('🔄 [MODAL] Botón cambiado a estado procesando');
+                }
+
+                // MOSTRAR MENSAJE DE CONFIRMACIÓN EN EL MODAL
+                const modalBody = document.querySelector('#exportModal .modal-body');
+                if (modalBody) {
+                    const successMessage = document.createElement('div');
+                    successMessage.className = 'alert alert-success mt-3';
+                    successMessage.innerHTML = '<i class="bi bi-check-circle-fill me-2"></i>¡Exportación iniciada! El archivo PDF se descargará automáticamente.';
+                    modalBody.appendChild(successMessage);
+                    console.log('📢 [MODAL] Mensaje de éxito agregado al modal');
+                }
+
+                // SISTEMA SIMPLIFICADO: Mostrar alerta temporal y descargar directamente
+                const alertDiv = document.createElement('div');
+                alertDiv.className = 'alert alert-success alert-dismissible fade show position-fixed';
+                alertDiv.style.top = '20px';
+                alertDiv.style.right = '20px';
+                alertDiv.style.zIndex = '1050';
+                alertDiv.innerHTML = `
+                    <i class="bi bi-download me-2"></i>
+                    Exportando pedidos en formato ${formato.toUpperCase()}...
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                `;
+                document.body.appendChild(alertDiv);
+                console.log('📢 [MODAL] Alerta de descarga mostrada');
+
+                // Crear enlace temporal para descarga
+                const link = document.createElement('a');
+                link.href = url;
+                link.download = true; // Como en reportes
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                console.log('⬇️ [MODAL] Descarga iniciada');
+
+                // LIMPIEZA INMEDIATA DE OVERLAYS DESPUÉS DE INICIAR DESCARGA
+                console.log('🧹 [MODAL] Ejecutando limpieza inmediata de overlays después de iniciar descarga...');
+                window.limpiarOverlaysResiduales();
+
+                // Limpiar overlays adicionales por si acaso
+                setTimeout(() => {
+                    console.log('🧹 [MODAL] Limpieza programada 200ms después de la descarga...');
+                    window.limpiarOverlaysResiduales();
+                }, 200);
+
+                setTimeout(() => {
+                    console.log('🧹 [MODAL] Limpieza programada 1s después de la descarga...');
+                    window.limpiarOverlaysResiduales();
+                }, 1000);
+
+                // RESTAURAR BOTÓN Y CERRAR MODAL DESPUÉS DE 2 SEGUNDOS
+                setTimeout(() => {
+                    if (exportButton) {
+                        exportButton.innerHTML = originalText;
+                        exportButton.disabled = false;
+                        console.log('✅ [MODAL] Botón restaurado');
+                    }
+
+                    // Cerrar modal automáticamente después de completar la descarga
+                    const modal = bootstrap.Modal.getInstance(document.getElementById('exportModal'));
+                    if (modal) {
+                        modal.hide();
+                        console.log('🔒 [MODAL] Modal cerrado automáticamente después de descarga');
+                    }
+                }, 2000);
+
+                // Remover alerta después de 3 segundos
+                setTimeout(() => {
+                    if (alertDiv.parentNode) {
+                        alertDiv.parentNode.removeChild(alertDiv);
+                        console.log('🗑️ [MODAL] Alerta removida');
+                    }
+                }, 3000);
+            }
+        }
+        
+        // =====================================================
+        // FUNCIONES COMPLEJAS ELIMINADAS - SISTEMA SIMPLIFICADO CON ALERTS
+        // =====================================================
+        
+        // =====================================================
+        // FUNCIONES DE OVERLAY Y COOKIES ELIMINADAS - SISTEMA SIMPLIFICADO CON ALERTS
+        // =====================================================
+        
+        /**
+         * Loading simple y confiable (basado en el patrón exitoso de printOrder)
+         */
+        function mostrarCargando(mostrar) {
+            console.log('🔄 Loading:', mostrar ? 'MOSTRAR' : 'OCULTAR');
+            
+            let overlay = document.getElementById('loadingOverlay');
+            
+            if (mostrar) {
+                // Crear overlay simple si no existe
+                if (!overlay) {
+                    overlay = document.createElement('div');
+                    overlay.id = 'loadingOverlay';
+                    overlay.innerHTML = `
+                        <div style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+                                    background: rgba(0,0,0,0.6); z-index: 9999; display: flex; 
+                                    justify-content: center; align-items: center;">
+                            <div style="background: white; padding: 25px; border-radius: 10px; 
+                                        box-shadow: 0 5px 20px rgba(0,0,0,0.3); text-align: center;">
+                                <div class="spinner-border text-primary mb-3" role="status">
+                                    <span class="visually-hidden">Cargando...</span>
+                                </div>
+                                <h6 class="mb-0">Procesando...</h6>
+                                <small class="text-muted">Por favor espera</small>
+                            </div>
+                        </div>
+                    `;
+                    document.body.appendChild(overlay);
+                }
+                overlay.style.display = 'flex';
+                
+            } else {
+                if (overlay) {
+                    overlay.style.display = 'none';
+                    // Remover después de un momento para limpiar DOM
+                    setTimeout(() => {
+                        if (overlay && overlay.parentNode) {
+                            document.body.removeChild(overlay);
+                        }
+                    }, 200);
+                }
+            }
+        }
+        
+        // Función legacy para compatibilidad (redirecciona a la simple)
+        function mostrarCargandoSimple(mostrar, formato = 'archivo') {
+            mostrarCargando(mostrar);
+        }
+        
+        function mostrarMensaje(tipo, mensaje) {
+            let alertClass, iconClass;
+            
+            switch (tipo) {
+                case 'success':
+                    alertClass = 'alert-success';
+                    iconClass = 'bi-check-circle-fill';
+                    break;
+                case 'warning':
+                    alertClass = 'alert-warning';
+                    iconClass = 'bi-exclamation-triangle-fill';
+                    break;
+                case 'error':
+                default:
+                    alertClass = 'alert-danger';
+                    iconClass = 'bi-x-circle-fill';
+                    break;
+            }
+            
+            const alert = document.createElement('div');
+            alert.className = `alert ${alertClass} alert-dismissible position-fixed fade show`;
+            alert.style.cssText = 'top: 20px; right: 20px; z-index: 10001; min-width: 350px; max-width: 500px;';
+            alert.innerHTML = `
+                <i class="${iconClass} me-2"></i><strong>${mensaje}</strong>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            `;
+            document.body.appendChild(alert);
+            
+            // Auto-remover después del tiempo apropiado
+            const timeout = tipo === 'success' ? 4000 : (tipo === 'warning' ? 6000 : 8000);
+            setTimeout(() => {
+                if (alert && alert.parentNode) {
+                    alert.classList.remove('show');
+                    setTimeout(() => alert.remove(), 150);
+                }
+            }, timeout);
+        }
+        
+        function editOrderStatus(pedidoId) {
+            console.log('🔧 Editando estado del pedido:', pedidoId);
+            
+            // Crear modal dinámico para edición
+            const modalHTML = `
+                <div class="modal fade" id="editStatusModal" tabindex="-1">
+                    <div class="modal-dialog modal-dialog-centered">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title">
+                                    <i class="bi bi-pencil-square me-2"></i>Cambiar Estado del Pedido
+                                </h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                            </div>
+                            <div class="modal-body">
+                                <form id="editStatusForm">
+                                    <div class="mb-3">
+                                        <label class="form-label">Nuevo Estado:</label>
+                                        <select class="form-select" id="nuevoEstado" required>
+                                            <option value="PENDIENTE">🟡 Pendiente</option>
+                                            <option value="CONFIRMADO">🟢 Confirmado</option>
+                                            <option value="PREPARANDO">🔵 Preparando</option>
+                                            <option value="ENVIADO">🚚 Enviado</option>
+                                            <option value="ENTREGADO">✅ Entregado</option>
+                                            <option value="CANCELADO">❌ Cancelado</option>
+                                        </select>
+                                    </div>
+                                    <div class="text-end">
+                                        <button type="button" class="btn btn-secondary me-2" data-bs-dismiss="modal">
+                                            Cancelar
+                                        </button>
+                                        <button type="submit" class="btn btn-primary">
+                                            <i class="bi bi-check-lg me-2"></i>Guardar Cambios
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            // Remover modal existente si existe
+            const existingModal = document.getElementById('editStatusModal');
+            if (existingModal) {
+                existingModal.remove();
+            }
+            
+            // Agregar nuevo modal
+            document.body.insertAdjacentHTML('beforeend', modalHTML);
+            
+            // Configurar formulario
+            const form = document.getElementById('editStatusForm');
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                const nuevoEstado = document.getElementById('nuevoEstado').value;
+                
+                // Enviar actualización al servidor
+                const formData = new FormData();
+                formData.append('estado', nuevoEstado);
+                
+                fetch(`/admin/pedidos/editar/${pedidoId}`, {
+                    method: 'POST',
+                    body: formData,
+                    credentials: 'same-origin'
+                })
+                .then(response => {
+                    if (response.ok) {
+                        mostrarMensaje('success', '✅ Estado del pedido actualizado correctamente');
+                        setTimeout(() => {
+                            window.location.reload();
+                        }, 1000);
+                    } else {
+                        throw new Error('Error al actualizar estado');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    mostrarMensaje('error', '❌ Error al actualizar el estado del pedido');
+                });
+                
+                // Cerrar modal con gestión de accesibilidad
+                const editModalElement = document.getElementById('editStatusModal');
+                const editModal = bootstrap.Modal.getInstance(editModalElement);
+                
+                if (editModal) {
+                    // Usar evento 'hidden.bs.modal' para asegurar que el modal esté completamente cerrado
+                    editModalElement.addEventListener('hidden.bs.modal', function handler() {
+                        // Mover foco después de que el modal esté completamente oculto
+                        const searchInput = document.getElementById('searchOrders');
+                        if (searchInput) {
+                            searchInput.focus();
+                        }
+                        // Remover el event listener para evitar memory leaks
+                        editModalElement.removeEventListener('hidden.bs.modal', handler);
+                    });
+                    
+                    editModal.hide();
+                }
+            });
+            
+            // Mostrar modal
+            const modal = new bootstrap.Modal(document.getElementById('editStatusModal'));
+            modal.show();
+        }
+        
+        function printOrder(pedidoId) {
+            console.log('🖨️ Imprimiendo pedido:', pedidoId);
+            
+            // Abrir página de impresión en nueva ventana
+            const printUrl = `/admin/pedidos/imprimir/${pedidoId}`;
+            
+            // Mostrar loading
+            mostrarCargando(true);
+            
+            // Abrir en nueva ventana
+            const printWindow = window.open(printUrl, '_blank', 'width=800,height=600,scrollbars=yes,resizable=yes');
+            
+            // Verificar si se abrió correctamente
+            if (printWindow) {
+                mostrarMensaje('success', '📄 Abriendo vista de impresión del pedido...');
+                
+                // Intentar enfocar la ventana después de un momento
+                setTimeout(() => {
+                    try {
+                        printWindow.focus();
+                    } catch (e) {
+                        console.log('No se pudo enfocar la ventana de impresión');
+                    }
+                    mostrarCargando(false);
+                }, 1500); // Más tiempo para cargar la ventana
+            } else {
+                mostrarCargando(false);
+                mostrarMensaje('error', '❌ Error: No se pudo abrir la ventana de impresión. Verifica que los popups estén habilitados.');
+            }
+        }
+        
+        /**
+         * Ver detalles del pedido - función para debugging
+         */
+        function verDetallePedido(pedidoId) {
+            console.log('👁️ Navegando a detalles del pedido:', pedidoId);
+            window.location.href = `/admin/pedidos/detalle/${pedidoId}`;
+        }
+
+        // =====================================================
+        // INICIALIZACIÓN
+        // =====================================================
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('🔄 Página de pedidos cargada');
+            
+            // Aplicar estilos a las tarjetas de métricas inmediatamente
+            setTimeout(() => {
+                const cards = document.querySelectorAll('.stats-card-1, .stats-card-2, .stats-card-3, .stats-card-4');
+                console.log('📊 Tarjetas encontradas:', cards.length);
+                
+                const backgrounds = [
+                    'linear-gradient(135deg, #007bff 0%, #0056b3 100%)',
+                    'linear-gradient(135deg, #28a745 0%, #20c997 100%)',  
+                    'linear-gradient(135deg, #17a2b8 0%, #138496 100%)',
+                    'linear-gradient(135deg, #ffc107 0%, #e0a800 100%)'
+                ];
+                const textColors = ['white', 'white', 'white', '#212529'];
+                
+                cards.forEach((card, index) => {
+                    if (backgrounds[index]) {
+                        // Aplicar background
+                        card.style.setProperty('background', backgrounds[index], 'important');
+                        card.style.setProperty('background-image', backgrounds[index], 'important');
+                        
+                        // Aplicar colores de texto
+                        const allElements = card.querySelectorAll('*');
+                        allElements.forEach(element => {
+                            element.style.setProperty('color', textColors[index], 'important');
+                        });
+                        
+                        // Icono especial
+                        const icon = card.querySelector('.force-visible-icon');
+                        if (icon) {
+                            icon.style.setProperty('color', textColors[index], 'important');
+                            icon.style.setProperty('font-size', '3rem', 'important');
+                            icon.style.setProperty('display', 'inline-block', 'important');
+                        }
+                        
+                        console.log(`✅ Tarjeta ${index + 1} configurada`);
+                    }
+                });
+                
+                // Verificar la tabla y acciones
+                const actionButtons = document.querySelectorAll('.btn-group .btn');
+                console.log('🔧 Botones de acción encontrados:', actionButtons.length);
+                
+                // Asegurar que las columnas sean visibles
+                const table = document.querySelector('#ordersTable');
+                if (table) {
+                    table.style.setProperty('width', '100%', 'important');
+                    table.style.setProperty('table-layout', 'auto', 'important');
+                }
+                
+            }, 100);
+            
+            // Configurar fechas por defecto en formulario de exportación
+            const today = new Date().toISOString().split('T')[0];
+            const lastMonth = new Date();
+            lastMonth.setMonth(lastMonth.getMonth() - 1);
+            const lastMonthStr = lastMonth.toISOString().split('T')[0];
+            
+            const fechaInicioExport = document.getElementById('fechaInicioExport');
+            const fechaFinExport = document.getElementById('fechaFinExport');
+            if (fechaInicioExport) fechaInicioExport.value = lastMonthStr;
+            if (fechaFinExport) fechaFinExport.value = today;
+        });
+        
+        /**
+         * Descargar PDF del pedido individual - SISTEMA SIMPLIFICADO CON ALERTS
+         */
+        function downloadOrderPDF(pedidoId) {
+            console.log('📄 Descargando PDF del pedido:', pedidoId);
+
+            const pdfUrl = `/admin/pedidos/imprimir/${pedidoId}/pdf`;
+
+            // SISTEMA SIMPLIFICADO: Mostrar alerta temporal y descargar directamente
+            const alertDiv = document.createElement('div');
+            alertDiv.className = 'alert alert-info alert-dismissible fade show position-fixed';
+            alertDiv.style.top = '20px';
+            alertDiv.style.right = '20px';
+            alertDiv.style.zIndex = '1050';
+            alertDiv.innerHTML = `
+                <i class="bi bi-file-earmark-pdf me-2"></i>
+                Generando PDF del pedido #${pedidoId}...
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            `;
+            document.body.appendChild(alertDiv);
+
+            // Crear enlace temporal para descarga
+            const link = document.createElement('a');
+            link.href = pdfUrl;
+            link.download = `pedido_${pedidoId}.pdf`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+
+            // Remover alerta después de 3 segundos
+            setTimeout(() => {
+                if (alertDiv.parentNode) {
+                    alertDiv.parentNode.removeChild(alertDiv);
+                }
+            }, 3000);
+        }
+        
+        // =====================================================
+        // FUNCIONES DE LIMPIEZA ELIMINADAS - NO SE NECESITAN CON SISTEMA SIMPLIFICADO
+        // =====================================================
+    </script>
+
+    <style>
+        /* ESTILOS PARA LAS TARJETAS DE ESTADÍSTICAS */
+        .stats-card-1 {
+            background: linear-gradient(135deg, #007bff 0%, #0056b3 100%) !important;
+        }
+        .stats-card-2 {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%) !important;
+        }
+        .stats-card-3 {
+            background: linear-gradient(135deg, #17a2b8 0%, #138496 100%) !important;
+        }
+        .stats-card-4 {
+            background: linear-gradient(135deg, #ffc107 0%, #e0a800 100%) !important;
+        }
+        .stats-card-white-text, .stats-card-white-text * {
+            color: white !important;
+        }
+        .stats-card-dark-text, .stats-card-dark-text * {
+            color: #212529 !important;
+        }
+
+        /* ============================================= */
+        /* ESTILOS DE OVERLAY ELIMINADOS - SISTEMA SIMPLIFICADO CON ALERTS */
+        /* ============================================= */
+
+        /* ESTILOS DE LA PÁGINA */
+        .eco-bg {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            min-height: 100vh;
+        }
+        
+        .table-hover tbody tr:hover {
+            background-color: rgba(40, 167, 69, 0.05);
+        }
+        
+        /* ESTILOS ADICIONALES PARA BOTONES Y TABLA */
+        .btn-group-sm .btn {
+            padding: 0.25rem 0.5rem;
+        }
+        
+        .badge {
+            font-size: 0.75rem;
+            font-weight: 600 !important;
+            min-width: 80px !important;
+            text-align: center !important;
+        }
+        
+        /* MEJORAR TABLA */
+        .table-responsive {
+            overflow-x: auto !important;
+        }
+        
+        .table th, .table td {
+            white-space: nowrap;
+        }
+    </style>
+    
+    <script>
+        // ===== DEBUGGING Y FUNCIONES GLOBALES =====
+        // Hacer funciones globales accesibles para debugging
+        window.debugPedidos = {
+            downloadOrderPDF,
+            printOrder,
+            editOrderStatus,
+            verDetallePedido,
+            exportarPedidos,
+            mostrarCargando
+        };
+        
+        // Función de debugging para botones
+        window.testButtons = function() {
+            console.log('🔧 Probando botones de acción...');
+            const buttons = document.querySelectorAll('.btn-group .btn');
+            console.log(`Botones encontrados: ${buttons.length}`);
+            buttons.forEach((btn, index) => {
+                console.log(`Botón ${index}:`, btn.outerHTML);
+            });
+        };
+        
+        // Auto-test al cargar
+        document.addEventListener('DOMContentLoaded', function() {
+            setTimeout(() => {
+                console.log('🧪 Test automático de botones...');
+                window.testButtons();
+            }, 2000);
+        });
+        
+        // =====================================================
+        // MANEJO DE ACCESIBILIDAD PARA MODALES
+        // =====================================================
+        // Mejorar accesibilidad del modal de exportación
+        document.getElementById('exportModal').addEventListener('shown.bs.modal', function () {
+            console.log('📂 [MODAL] Modal de exportación abierto');
+            // Enfocar el primer elemento enfocable cuando se abre el modal
+            const firstFocusable = this.querySelector('select, input, button:not(.btn-close)');
+            if (firstFocusable) {
+                firstFocusable.focus();
+                console.log('🎯 [MODAL] Foco establecido en:', firstFocusable.tagName);
+            }
+        });
+
+        // MOVER FOCO INMEDIATAMENTE cuando se inicia el hide para evitar problemas de aria-hidden
+        document.getElementById('exportModal').addEventListener('hide.bs.modal', function () {
+            console.log('🔒 [MODAL] Iniciando cierre del modal...');
+            // Mover foco inmediatamente al botón principal de exportar
+            const exportButton = document.querySelector('[data-bs-target="#exportModal"]');
+            if (exportButton) {
+                exportButton.focus();
+                console.log('🎯 [MODAL] Foco movido al botón principal');
+            }
+
+            // También remover cualquier foco de elementos dentro del modal
+            const modal = this;
+            const focusedElements = modal.querySelectorAll('button:focus, input:focus, select:focus');
+            focusedElements.forEach(element => {
+                element.blur(); // Remover foco explícitamente
+                console.log('🔇 [MODAL] Foco removido de elemento dentro del modal');
+            });
+        });
+
+        // Event listener para cuando el modal se oculta completamente
+        document.getElementById('exportModal').addEventListener('hidden.bs.modal', function () {
+            console.log('✅ [MODAL] Modal completamente cerrado y oculto');
+            // Ejecutar limpieza de overlays después de que el modal se cierre
+            setTimeout(() => {
+                window.limpiarOverlaysResiduales();
+            }, 200);
+        });
+
+        // LIMPIEZA DE OVERLAYS RESIDUALES - Previene capas semitransparentes que bloquean contenido
+        function limpiarOverlaysResiduales() {
+            console.log('🧹 [OVERLAY CLEANUP] Iniciando limpieza de overlays residuales...');
+
+            // Eliminar loadingOverlay dinámico si existe
+            const loadingOverlay = document.getElementById('loadingOverlay');
+            if (loadingOverlay && loadingOverlay.parentNode) {
+                console.log('❌ [OVERLAY CLEANUP] Eliminando loadingOverlay residual');
+                loadingOverlay.parentNode.removeChild(loadingOverlay);
+            } else if (loadingOverlay) {
+                console.log('⚠️ [OVERLAY CLEANUP] loadingOverlay encontrado pero sin parentNode');
+            } else {
+                console.log('✅ [OVERLAY CLEANUP] No se encontró loadingOverlay');
+            }
+
+            // Ocultar loadingIndicator estático si está visible
+            const loadingIndicator = document.getElementById('loadingIndicator');
+            if (loadingIndicator) {
+                loadingIndicator.style.display = 'none';
+                console.log('❌ [OVERLAY CLEANUP] Ocultando loadingIndicator residual');
+            } else {
+                console.log('✅ [OVERLAY CLEANUP] No se encontró loadingIndicator');
+            }
+
+            // Eliminar cualquier modal-backdrop residual de Bootstrap
+            const modalBackdrops = document.querySelectorAll('.modal-backdrop');
+            console.log(`🔍 [OVERLAY CLEANUP] Encontrados ${modalBackdrops.length} modal-backdrops`);
+            modalBackdrops.forEach((backdrop, index) => {
+                if (backdrop && backdrop.parentNode) {
+                    console.log(`❌ [OVERLAY CLEANUP] Eliminando modal-backdrop ${index + 1}`);
+                    backdrop.parentNode.removeChild(backdrop);
+                } else {
+                    console.log(`⚠️ [OVERLAY CLEANUP] modal-backdrop ${index + 1} sin parentNode`);
+                }
+            });
+
+            // Eliminar cualquier elemento con position fixed y alto z-index que pueda estar bloqueando
+            const elementosFixed = document.querySelectorAll('[style*="position: fixed"], [style*="position:fixed"]');
+            console.log(`🔍 [OVERLAY CLEANUP] Encontrados ${elementosFixed.length} elementos con position fixed`);
+            elementosFixed.forEach((elemento, index) => {
+                const zIndex = window.getComputedStyle(elemento).zIndex;
+                if (zIndex && parseInt(zIndex) > 1000) {
+                    // Solo eliminar si tiene z-index muy alto y parece ser un overlay
+                    const background = window.getComputedStyle(elemento).background;
+                    if (background && (background.includes('rgba') || background.includes('opacity'))) {
+                        console.log(`❌ [OVERLAY CLEANUP] Eliminando elemento fixed ${index + 1} con alto z-index y fondo semitransparente`);
+                        if (elemento.parentNode) {
+                            elemento.parentNode.removeChild(elemento);
+                        }
+                    } else {
+                        console.log(`ℹ️ [OVERLAY CLEANUP] Elemento fixed ${index + 1} tiene alto z-index pero no parece overlay`);
+                    }
+                }
+            });
+
+            // Remover clase 'show' de cualquier modal que pueda estar abierto
+            const modalsAbiertos = document.querySelectorAll('.modal.show');
+            console.log(`🔍 [OVERLAY CLEANUP] Encontrados ${modalsAbiertos.length} modals abiertos`);
+            modalsAbiertos.forEach((modal, index) => {
+                console.log(`❌ [OVERLAY CLEANUP] Cerrando modal abierto ${index + 1}: ${modal.id}`);
+                const bsModal = bootstrap.Modal.getInstance(modal);
+                if (bsModal) {
+                    bsModal.hide();
+                } else {
+                    modal.classList.remove('show');
+                    modal.style.display = 'none';
+                    console.log(`⚠️ [OVERLAY CLEANUP] Modal ${index + 1} cerrado manualmente (sin instancia Bootstrap)`);
+                }
+            });
+
+            // RESTAURAR SCROLL DE LA PÁGINA - Bootstrap añade overflow: hidden al body cuando abre modals
+            if (document.body.classList.contains('modal-open')) {
+                document.body.classList.remove('modal-open');
+                console.log('❌ [OVERLAY CLEANUP] Removiendo clase modal-open del body');
+            }
+
+            // Restaurar overflow del body si está bloqueado
+            const bodyOverflow = document.body.style.overflow;
+            const htmlOverflow = document.documentElement.style.overflow;
+            const bodyOverflowY = document.body.style.overflowY;
+            const htmlOverflowY = document.documentElement.style.overflowY;
+
+            if (bodyOverflow === 'hidden' || bodyOverflowY === 'hidden') {
+                document.body.style.overflow = '';
+                document.body.style.overflowY = '';
+                console.log('❌ [OVERLAY CLEANUP] Restaurando overflow del body');
+            }
+
+            if (htmlOverflow === 'hidden' || htmlOverflowY === 'hidden') {
+                document.documentElement.style.overflow = '';
+                document.documentElement.style.overflowY = '';
+                console.log('❌ [OVERLAY CLEANUP] Restaurando overflow del html');
+            }
+
+            // Verificación final
+            const remainingOverlays = document.querySelectorAll('.loading-overlay, .modal-backdrop, .overlay');
+            console.log(`✅ [OVERLAY CLEANUP] Limpieza completada. Elementos restantes que podrían ser overlays: ${remainingOverlays.length}`);
+            if (remainingOverlays.length > 0) {
+                console.warn('⚠️ [OVERLAY CLEANUP] Elementos potencialmente problemáticos restantes:', remainingOverlays);
+            }
+        }
+
+        // Ejecutar limpieza inmediatamente y después de un pequeño delay
+        limpiarOverlaysResiduales();
+        setTimeout(limpiarOverlaysResiduales, 100);
+        setTimeout(limpiarOverlaysResiduales, 500);
+
+        console.log('✅ Scripts de pedidos cargados correctamente');
+    </script>
+</body>
+</html>

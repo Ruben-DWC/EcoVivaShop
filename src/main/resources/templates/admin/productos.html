@@ -1,0 +1,910 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/head :: head('Productos | EcoVivaShop')}">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Productos | EcoVivaShop</title>
+</head>
+<body class="eco-bg">
+    <!-- Admin Navbar Fragment -->
+    <div th:replace="~{fragments/admin-navbar :: admin-navbar}"></div>
+    
+    <main class="container-fluid py-4">
+        <!-- Header -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h1 class="h3 mb-1 fw-bold text-dark">
+                            <i class="bi bi-box-seam text-primary me-2"></i>
+                            Gestión de Productos
+                        </h1>
+                        <p class="text-muted mb-0">Administrar catálogo de productos eco-sustentables</p>
+                    </div>
+                    <div class="d-flex gap-2">
+                        <!-- Dropdown para generar reportes -->
+                        <div class="dropdown">
+                            <button class="btn btn-outline-info" type="button" id="reportesDropdownBtn" onclick="toggleReportesDropdown()" title="Generar reportes de productos">
+                                <i class="bi bi-file-earmark-bar-graph me-1"></i>
+                                Generar Reporte
+                            </button>
+                            <ul class="dropdown-menu" id="reportesDropdownMenu">
+                                <li>
+                                    <a class="dropdown-item" href="/admin/productos/exportar/pdf" target="_blank">
+                                        <i class="bi bi-file-earmark-pdf text-danger me-2"></i>
+                                        Exportar PDF
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item" href="/admin/productos/exportar/excel" target="_blank">
+                                        <i class="bi bi-file-earmark-excel text-success me-2"></i>
+                                        Exportar Excel
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                        
+                        <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#modalNuevoProducto" title="Crear nuevo producto">
+                            <i class="bi bi-plus-circle me-1"></i>
+                            Agregar Producto
+                        </button>
+                        
+                        <button class="btn btn-secondary" title="Carga masiva de productos" onclick="window.location.href='#cargaMasiva'">
+                            <i class="bi bi-upload me-1"></i>
+                            Carga Masiva
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>        <!-- Filters and Search -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-body bg-white">
+                        <div class="row g-3 align-items-end">
+                            <div class="col-md-4">
+                                <label for="buscarProducto" class="form-label text-dark fw-medium">Buscar Producto</label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light">
+                                        <i class="bi bi-search text-dark"></i>
+                                    </span>
+                                    <input type="text" class="form-control" id="buscarProducto" placeholder="Nombre o descripción...">
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <label for="filtroCategoria" class="form-label text-dark fw-medium">Categoría</label>
+                                <select class="form-select" id="filtroCategoria">
+                                    <option value="">Todas las categorías</option>
+                                    <option value="hogar">Hogar Eco</option>
+                                    <option value="personal">Cuidado Personal</option>
+                                    <option value="alimentacion">Alimentación</option>
+                                    <option value="textil">Textil Sostenible</option>
+                                </select>
+                            </div>
+                            <div class="col-md-3">
+                                <label for="filtroEstado" class="form-label text-dark fw-medium">Estado</label>
+                                <select class="form-select" id="filtroEstado">
+                                    <option value="">Todos los estados</option>
+                                    <option value="disponible">Disponible</option>
+                                    <option value="agotado">Agotado</option>
+                                    <option value="descontinuado">Descontinuado</option>
+                                </select>
+                            </div>
+                            <div class="col-md-2">
+                                <button class="btn btn-primary w-100" onclick="aplicarFiltros()">
+                                    <i class="bi bi-funnel me-1"></i>Filtrar
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>        <!-- Product Statistics -->
+        <div class="row g-4 mb-4">
+            <div class="col-lg-3 col-md-6">
+                <div class="card border-0 shadow-sm bg-success">
+                    <div class="card-body text-white">
+                        <div class="d-flex align-items-center">
+                            <div class="flex-shrink-0">
+                                <i class="bi bi-box-seam display-6 text-white"></i>
+                            </div>
+                            <div class="flex-grow-1 ms-3">
+                                <div class="small fw-bold text-white">Total Productos</div>
+                                <div class="h4 mb-0 text-white" id="totalProductos">4</div>
+                                <div class="small text-light">En el catálogo</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-3 col-md-6">
+                <div class="card border-0 shadow-sm bg-primary">
+                    <div class="card-body text-white">
+                        <div class="d-flex align-items-center">
+                            <div class="flex-shrink-0">
+                                <i class="bi bi-check-circle display-6 text-white"></i>
+                            </div>
+                            <div class="flex-grow-1 ms-3">
+                                <div class="small fw-bold text-white">Disponibles</div>
+                                <div class="h4 mb-0 text-white" id="productosDisponibles">3</div>
+                                <div class="small text-light">En stock</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-3 col-md-6">
+                <div class="card border-0 shadow-sm bg-warning">
+                    <div class="card-body text-dark">
+                        <div class="d-flex align-items-center">
+                            <div class="flex-shrink-0">
+                                <i class="bi bi-exclamation-triangle display-6 text-dark"></i>
+                            </div>
+                            <div class="flex-grow-1 ms-3">
+                                <div class="small fw-bold text-dark">Stock Bajo</div>
+                                <div class="h4 mb-0 text-dark" id="stockBajo">1</div>
+                                <div class="small text-muted">Requieren atención</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-3 col-md-6">
+                <div class="card border-0 shadow-sm bg-danger">
+                    <div class="card-body text-white">
+                        <div class="d-flex align-items-center">
+                            <div class="flex-shrink-0">
+                                <i class="bi bi-x-circle display-6 text-white"></i>
+                            </div>
+                            <div class="flex-grow-1 ms-3">
+                                <div class="small fw-bold text-white">Sin Stock</div>
+                                <div class="h4 mb-0 text-white" id="sinStock">1</div>
+                                <div class="small text-light">Agotados</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>        <!-- Products Table -->
+        <div class="row">
+            <div class="col-12">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-header bg-white border-bottom">
+                        <h5 class="card-title mb-0 text-dark">
+                            <i class="bi bi-table text-primary me-2"></i>
+                            Lista de Productos
+                        </h5>
+                    </div>
+                    <div class="card-body p-0 bg-white">
+                        <div class="table-responsive">
+                            <table class="table table-hover mb-0 bg-white">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th class="text-dark fw-bold">Producto</th>
+                                        <th class="text-dark fw-bold">Categoría</th>
+                                        <th class="text-dark fw-bold">Precio</th>
+                                        <th class="text-dark fw-bold">Stock</th>
+                                        <th class="text-dark fw-bold">Estado</th>
+                                        <th class="text-dark fw-bold">Ventas</th>
+                                        <th class="text-center text-dark fw-bold">Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tablaProductos">
+                                    <!-- Los productos se cargarán dinámicamente SIN BUCLES -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Modal Nuevo Producto -->
+    <div class="modal fade" id="modalNuevoProducto" tabindex="-1" aria-labelledby="modalNuevoProductoLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalNuevoProductoLabel">
+                        <i class="bi bi-plus-circle text-success me-2"></i>
+                        Nuevo Producto Eco-Sustentable
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form id="formNuevoProducto">
+                    <div class="modal-body">
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label for="nombreProducto" class="form-label">Nombre del Producto</label>
+                                <input type="text" class="form-control" id="nombreProducto" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="categoriaProducto" class="form-label">Categoría</label>
+                                <select class="form-select" id="categoriaProducto" required>
+                                    <option value="">Seleccionar categoría</option>
+                                    <option value="hogar">Hogar Eco</option>
+                                    <option value="personal">Cuidado Personal</option>
+                                    <option value="alimentacion">Alimentación</option>
+                                    <option value="textil">Textil Sostenible</option>
+                                </select>
+                            </div>
+                            <div class="col-12">
+                                <label for="descripcionProducto" class="form-label">Descripción</label>
+                                <textarea class="form-control" id="descripcionProducto" rows="3" required></textarea>
+                            </div>
+                            <div class="col-md-4">
+                                <label for="precioProducto" class="form-label">Precio (S/)</label>
+                                <input type="number" class="form-control" id="precioProducto" step="0.01" min="0" required>
+                            </div>
+                            <div class="col-md-4">
+                                <label for="stockProducto" class="form-label">Stock Inicial</label>
+                                <input type="number" class="form-control" id="stockProducto" min="0" required>
+                            </div>
+                            <div class="col-md-4">
+                                <label for="stockMinimo" class="form-label">Stock Mínimo</label>
+                                <input type="number" class="form-control" id="stockMinimo" min="0" value="5">
+                            </div>
+                            <div class="col-md-6">
+                                <label for="codigoProducto" class="form-label">Código/SKU</label>
+                                <input type="text" class="form-control" id="codigoProducto" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="pesoProducto" class="form-label">Peso (gr)</label>
+                                <input type="number" class="form-control" id="pesoProducto" min="0">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" title="Cancelar y cerrar">Cancelar</button>
+                        <button type="submit" class="btn btn-success" title="Guardar nuevo producto">
+                            <i class="bi bi-check-circle me-1"></i>
+                            Crear Producto
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Editar Producto -->
+    <div class="modal fade" id="modalEditarProducto" tabindex="-1" aria-labelledby="modalEditarProductoLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalEditarProductoLabel">
+                        <i class="bi bi-pencil text-primary me-2"></i>
+                        Editar Producto
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form id="formEditarProducto">
+                    <div class="modal-body">
+                        <input type="hidden" id="editId">
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label for="editNombre" class="form-label">Nombre del Producto</label>
+                                <input type="text" class="form-control" id="editNombre" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="editCategoria" class="form-label">Categoría</label>
+                                <select class="form-select" id="editCategoria" required>
+                                    <option value="">Seleccionar categoría</option>
+                                    <option value="hogar">Hogar Eco</option>
+                                    <option value="personal">Cuidado Personal</option>
+                                    <option value="alimentacion">Alimentación</option>
+                                    <option value="textil">Textil Sostenible</option>
+                                </select>
+                            </div>
+                            <div class="col-12">
+                                <label for="editDescripcion" class="form-label">Descripción</label>
+                                <textarea class="form-control" id="editDescripcion" rows="3" required></textarea>
+                            </div>
+                            <div class="col-md-4">
+                                <label for="editPrecio" class="form-label">Precio (S/)</label>
+                                <input type="number" class="form-control" id="editPrecio" step="0.01" min="0" required>
+                            </div>
+                            <div class="col-md-4">
+                                <label for="editStock" class="form-label">Stock Actual</label>
+                                <input type="number" class="form-control" id="editStock" min="0" required>
+                            </div>
+                            <div class="col-md-4">
+                                <label for="editStockMinimo" class="form-label">Stock Mínimo</label>
+                                <input type="number" class="form-control" id="editStockMinimo" min="0">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" title="Cancelar y cerrar">Cancelar</button>
+                        <button type="submit" class="btn btn-primary" title="Guardar cambios del producto">
+                            <i class="bi bi-check-circle me-1"></i>
+                            Actualizar Producto
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div th:replace="~{fragments/footer :: footer}"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // ✅ SOLUCIÓN DEFINITIVA HÍBRIDA - FUNCIONAL SIN BUCLES INFINITOS
+        
+        let paginaInicializada = false;
+        
+        // Base de datos local de productos
+        let productos = [
+            {
+                id: 1,
+                nombre: "Botella Eco Bambú",
+                categoria: "hogar",
+                descripcion: "Botella reutilizable hecha de bambú 100% natural",
+                precio: 45.90,
+                stock: 25,
+                stockMinimo: 5,
+                codigo: "ECO-BOT-001",
+                ventas: 245
+            },
+            {
+                id: 2,
+                nombre: "Bolsas Reutilizables Set x3",
+                categoria: "hogar",
+                descripcion: "Set de 3 bolsas reutilizables de algodón orgánico",
+                precio: 25.00,
+                stock: 45,
+                stockMinimo: 10,
+                codigo: "ECO-BOL-002",
+                ventas: 189
+            },
+            {
+                id: 3,
+                nombre: "Cepillo de Dientes Bambú",
+                categoria: "personal",
+                descripcion: "Cepillo dental ecológico con cerdas naturales",
+                precio: 18.50,
+                stock: 3,
+                stockMinimo: 5,
+                codigo: "ECO-CEP-003",
+                ventas: 132
+            },
+            {
+                id: 4,
+                nombre: "Kit Eco Hogar Completo",
+                categoria: "hogar",
+                descripcion: "Kit completo para un hogar sustentable",
+                precio: 89.90,
+                stock: 0,
+                stockMinimo: 3,
+                codigo: "ECO-KIT-004",
+                ventas: 156
+            }
+        ];
+
+        // ✅ FUNCIÓN PRINCIPAL - RENDERIZAR PRODUCTOS SIN BUCLES
+        function renderizarProductos() {
+            const tbody = document.getElementById('tablaProductos');
+            if (!tbody) return;
+            
+            tbody.innerHTML = '';
+
+            productos.forEach(producto => {
+                const stockAlert = producto.stock <= producto.stockMinimo ? 'text-danger' : 
+                                  producto.stock <= producto.stockMinimo * 2 ? 'text-warning' : 'text-success';
+                
+                const estadoBadge = producto.stock === 0 ? 
+                    '<span class="badge bg-danger">Sin Stock</span>' :
+                    producto.stock <= producto.stockMinimo ?
+                    '<span class="badge bg-warning">Stock Bajo</span>' :
+                    '<span class="badge bg-success">Disponible</span>';
+
+                const categoryBadge = getCategoryBadge(producto.categoria);
+
+                const row = document.createElement('tr');                row.innerHTML = `
+                    <td class="bg-white">
+                        <div class="d-flex align-items-center">
+                            <div class="flex-shrink-0">
+                                ${getIconoProducto(producto.categoria)}
+                            </div>
+                            <div class="flex-grow-1 ms-3">
+                                <div class="fw-medium text-dark">${producto.nombre}</div>
+                                <small class="text-muted">${producto.codigo}</small>
+                            </div>
+                        </div>
+                    </td>
+                    <td class="bg-white">${categoryBadge}</td>
+                    <td class="fw-bold text-dark bg-white">S/ ${producto.precio.toFixed(2)}</td>
+                    <td class="${stockAlert} fw-bold bg-white">${producto.stock}</td>
+                    <td class="bg-white">${estadoBadge}</td>
+                    <td class="bg-white"><span class="text-muted">${producto.ventas} unidades</span></td>
+                    <td class="text-center bg-white">
+                        <div class="btn-group btn-group-sm">
+                            <button class="btn btn-outline-primary" onclick="editarProducto(${producto.id})" title="Editar">
+                                <i class="bi bi-pencil"></i>
+                            </button>
+                            <button class="btn btn-outline-info" onclick="verDetalles(${producto.id})" title="Ver detalles">
+                                <i class="bi bi-eye"></i>
+                            </button>
+                            <button class="btn btn-outline-danger" onclick="eliminarProducto(${producto.id})" title="Eliminar">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </div>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        // ✅ FUNCIÓN ESTADÍSTICAS - SIN BUCLES
+        function actualizarEstadisticas() {
+            const total = productos.length;
+            const disponibles = productos.filter(p => p.stock > 0).length;
+            const stockBajo = productos.filter(p => p.stock > 0 && p.stock <= p.stockMinimo).length;
+            const sinStock = productos.filter(p => p.stock === 0).length;
+
+            document.getElementById('totalProductos').textContent = total;
+            document.getElementById('productosDisponibles').textContent = disponibles;
+            document.getElementById('stockBajo').textContent = stockBajo;
+            document.getElementById('sinStock').textContent = sinStock;
+        }
+
+        // ✅ FUNCIONES AUXILIARES
+        function getCategoryBadge(categoria) {
+            const badges = {
+                'hogar': '<span class="badge category-badge bg-success">Hogar Eco</span>',
+                'personal': '<span class="badge category-badge bg-primary">Cuidado Personal</span>',
+                'alimentacion': '<span class="badge category-badge bg-warning">Alimentación</span>',
+                'textil': '<span class="badge category-badge bg-info">Textil Sostenible</span>'
+            };
+            return badges[categoria] || '<span class="badge category-badge bg-secondary">Otro</span>';
+        }
+
+        function getIconoProducto(categoria) {
+            const iconos = {
+                'hogar': '<div class="bg-success rounded d-flex align-items-center justify-content-center" style="width: 50px; height: 50px;"><i class="bi bi-house text-white"></i></div>',
+                'personal': '<div class="bg-primary rounded d-flex align-items-center justify-content-center" style="width: 50px; height: 50px;"><i class="bi bi-brush text-white"></i></div>',
+                'alimentacion': '<div class="bg-warning rounded d-flex align-items-center justify-content-center" style="width: 50px; height: 50px;"><i class="bi bi-cup text-white"></i></div>',
+                'textil': '<div class="bg-info rounded d-flex align-items-center justify-content-center" style="width: 50px; height: 50px;"><i class="bi bi-shirt text-white"></i></div>'
+            };
+            return iconos[categoria] || '<div class="bg-secondary rounded d-flex align-items-center justify-content-center" style="width: 50px; height: 50px;"><i class="bi bi-box text-white"></i></div>';
+        }
+
+        // ✅ ACCIONES DE PRODUCTOS - SIN BUCLES INFINITOS
+        function editarProducto(id) {
+            const producto = productos.find(p => p.id === id);
+            if (producto) {
+                document.getElementById('editId').value = producto.id;
+                document.getElementById('editNombre').value = producto.nombre;
+                document.getElementById('editCategoria').value = producto.categoria;
+                document.getElementById('editDescripcion').value = producto.descripcion;
+                document.getElementById('editPrecio').value = producto.precio;
+                document.getElementById('editStock').value = producto.stock;
+                document.getElementById('editStockMinimo').value = producto.stockMinimo;
+                
+                new bootstrap.Modal(document.getElementById('modalEditarProducto')).show();
+            }
+        }
+
+        function verDetalles(id) {
+            const producto = productos.find(p => p.id === id);
+            if (producto) {
+                alert(`Detalles del producto:\n\nNombre: ${producto.nombre}\nCódigo: ${producto.codigo}\nPrecio: S/ ${producto.precio}\nStock: ${producto.stock}\nVentas: ${producto.ventas} unidades`);
+            }
+        }
+
+        function eliminarProducto(id) {
+            const producto = productos.find(p => p.id === id);
+            if (producto && confirm(`¿Estás seguro de que deseas eliminar "${producto.nombre}"?`)) {
+                productos = productos.filter(p => p.id !== id);
+                // ✅ SOLO ACTUALIZAR UNA VEZ - SIN BUCLES
+                renderizarProductos();
+                actualizarEstadisticas();
+                mostrarMensaje('Producto eliminado exitosamente', 'success');
+            }
+        }
+
+        function aplicarFiltros() {
+            const busqueda = document.getElementById('buscarProducto').value.toLowerCase();
+            const categoria = document.getElementById('filtroCategoria').value;
+            const estado = document.getElementById('filtroEstado').value;
+            
+            // Implementar filtrado sin bucles
+            mostrarMensaje('Filtros aplicados', 'info');
+        }
+
+        function mostrarMensaje(mensaje, tipo) {
+            const alertDiv = document.createElement('div');
+            alertDiv.className = `alert alert-${tipo} alert-dismissible fade show position-fixed`;
+            alertDiv.style.top = '20px';
+            alertDiv.style.right = '20px';
+            alertDiv.style.zIndex = '1050';
+            alertDiv.innerHTML = `
+                <i class="bi bi-check-circle me-2"></i>
+                ${mensaje}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            `;
+            document.body.appendChild(alertDiv);
+            
+            setTimeout(() => {
+                if (alertDiv.parentNode) {
+                    alertDiv.parentNode.removeChild(alertDiv);
+                }
+            }, 3000);
+        }
+
+        // ✅ INICIALIZACIÓN ÚNICA Y CONTROLADA
+        document.addEventListener('DOMContentLoaded', function() {
+            if (paginaInicializada) return;
+            paginaInicializada = true;
+            
+            console.log('🎉 Productos cargados SIN bucles infinitos - Versión híbrida funcional!');
+            
+            // Cargar una sola vez
+            renderizarProductos();
+            actualizarEstadisticas();
+
+            // ✅ EVENT LISTENERS SEGUROS
+            const formNuevo = document.getElementById('formNuevoProducto');
+            if (formNuevo) {
+                formNuevo.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    
+                    const nuevoProducto = {
+                        id: Date.now(),
+                        nombre: document.getElementById('nombreProducto').value,
+                        categoria: document.getElementById('categoriaProducto').value,
+                        descripcion: document.getElementById('descripcionProducto').value,
+                        precio: parseFloat(document.getElementById('precioProducto').value),
+                        stock: parseInt(document.getElementById('stockProducto').value),
+                        stockMinimo: parseInt(document.getElementById('stockMinimo').value),
+                        codigo: document.getElementById('codigoProducto').value,
+                        ventas: 0
+                    };
+                    
+                    productos.push(nuevoProducto);
+                    renderizarProductos();
+                    actualizarEstadisticas();
+                    
+                    bootstrap.Modal.getInstance(document.getElementById('modalNuevoProducto')).hide();
+                    this.reset();
+                    mostrarMensaje('Producto creado exitosamente', 'success');
+                });
+            }
+
+            const formEditar = document.getElementById('formEditarProducto');
+            if (formEditar) {
+                formEditar.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    
+                    const id = parseInt(document.getElementById('editId').value);
+                    const productoIndex = productos.findIndex(p => p.id === id);
+                    
+                    if (productoIndex !== -1) {
+                        productos[productoIndex] = {
+                            ...productos[productoIndex],
+                            nombre: document.getElementById('editNombre').value,
+                            categoria: document.getElementById('editCategoria').value,
+                            descripcion: document.getElementById('editDescripcion').value,
+                            precio: parseFloat(document.getElementById('editPrecio').value),
+                            stock: parseInt(document.getElementById('editStock').value),
+                            stockMinimo: parseInt(document.getElementById('editStockMinimo').value)
+                        };
+                        
+                        renderizarProductos();
+                        actualizarEstadisticas();
+                        bootstrap.Modal.getInstance(document.getElementById('modalEditarProducto')).hide();
+                        mostrarMensaje('Producto actualizado exitosamente', 'success');
+                    }
+                });
+            }
+        });
+    </script>
+
+    <!-- LIMPIEZA DE OVERLAYS RESIDUALES - Previene capas semitransparentes que bloquean contenido -->
+    <script>
+        // LIMPIEZA DE OVERLAYS RESIDUALES - Previene capas semitransparentes que bloquean contenido
+        function limpiarOverlaysResiduales() {
+            console.log('🧹 [OVERLAY CLEANUP] Iniciando limpieza de overlays residuales...');
+
+            // Eliminar loadingOverlay dinámico si existe
+            const loadingOverlay = document.getElementById('loadingOverlay');
+            if (loadingOverlay && loadingOverlay.parentNode) {
+                console.log('❌ [OVERLAY CLEANUP] Eliminando loadingOverlay residual');
+                loadingOverlay.parentNode.removeChild(loadingOverlay);
+            } else if (loadingOverlay) {
+                console.log('⚠️ [OVERLAY CLEANUP] loadingOverlay encontrado pero sin parentNode');
+            } else {
+                console.log('✅ [OVERLAY CLEANUP] No se encontró loadingOverlay');
+            }
+
+            // Ocultar loadingIndicator estático si está visible
+            const loadingIndicator = document.getElementById('loadingIndicator');
+            if (loadingIndicator) {
+                loadingIndicator.style.display = 'none';
+                console.log('❌ [OVERLAY CLEANUP] Ocultando loadingIndicator residual');
+            } else {
+                console.log('✅ [OVERLAY CLEANUP] No se encontró loadingIndicator');
+            }
+
+            // Eliminar cualquier modal-backdrop residual de Bootstrap
+            const modalBackdrops = document.querySelectorAll('.modal-backdrop');
+            console.log(`🔍 [OVERLAY CLEANUP] Encontrados ${modalBackdrops.length} modal-backdrops`);
+            modalBackdrops.forEach((backdrop, index) => {
+                if (backdrop && backdrop.parentNode) {
+                    console.log(`❌ [OVERLAY CLEANUP] Eliminando modal-backdrop ${index + 1}`);
+                    backdrop.parentNode.removeChild(backdrop);
+                } else {
+                    console.log(`⚠️ [OVERLAY CLEANUP] modal-backdrop ${index + 1} sin parentNode`);
+                }
+            });
+
+            // Eliminar cualquier elemento con position fixed y alto z-index que pueda estar bloqueando
+            const elementosFixed = document.querySelectorAll('[style*="position: fixed"], [style*="position:fixed"]');
+            console.log(`🔍 [OVERLAY CLEANUP] Encontrados ${elementosFixed.length} elementos con position fixed`);
+            elementosFixed.forEach((elemento, index) => {
+                const zIndex = window.getComputedStyle(elemento).zIndex;
+                if (zIndex && parseInt(zIndex) > 1000) {
+                    // Solo eliminar si tiene z-index muy alto y parece ser un overlay
+                    const background = window.getComputedStyle(elemento).background;
+                    if (background && (background.includes('rgba') || background.includes('opacity'))) {
+                        console.log(`❌ [OVERLAY CLEANUP] Eliminando elemento fixed ${index + 1} con alto z-index y fondo semitransparente`);
+                        if (elemento.parentNode) {
+                            elemento.parentNode.removeChild(elemento);
+                        }
+                    } else {
+                        console.log(`ℹ️ [OVERLAY CLEANUP] Elemento fixed ${index + 1} tiene alto z-index pero no parece overlay`);
+                    }
+                }
+            });
+
+            // Remover clase 'show' de cualquier modal que pueda estar abierto
+            const modalsAbiertos = document.querySelectorAll('.modal.show');
+            console.log(`🔍 [OVERLAY CLEANUP] Encontrados ${modalsAbiertos.length} modals abiertos`);
+            modalsAbiertos.forEach((modal, index) => {
+                console.log(`❌ [OVERLAY CLEANUP] Cerrando modal abierto ${index + 1}: ${modal.id}`);
+                const bsModal = bootstrap.Modal.getInstance(modal);
+                if (bsModal) {
+                    bsModal.hide();
+                } else {
+                    modal.classList.remove('show');
+                    modal.style.display = 'none';
+                    console.log(`⚠️ [OVERLAY CLEANUP] Modal ${index + 1} cerrado manualmente (sin instancia Bootstrap)`);
+                }
+            });
+
+            // RESTAURAR SCROLL DE LA PÁGINA - Bootstrap añade overflow: hidden al body cuando abre modals
+            if (document.body.classList.contains('modal-open')) {
+                document.body.classList.remove('modal-open');
+                console.log('❌ [OVERLAY CLEANUP] Removiendo clase modal-open del body');
+            }
+
+            // Restaurar overflow del body si está bloqueado
+            const bodyOverflow = document.body.style.overflow;
+            const htmlOverflow = document.documentElement.style.overflow;
+            const bodyOverflowY = document.body.style.overflowY;
+            const htmlOverflowY = document.documentElement.style.overflowY;
+
+            if (bodyOverflow === 'hidden' || bodyOverflowY === 'hidden') {
+                document.body.style.overflow = '';
+                document.body.style.overflowY = '';
+                console.log('❌ [OVERLAY CLEANUP] Restaurando overflow del body');
+            }
+
+            if (htmlOverflow === 'hidden' || htmlOverflowY === 'hidden') {
+                document.documentElement.style.overflow = '';
+                document.documentElement.style.overflowY = '';
+                console.log('❌ [OVERLAY CLEANUP] Restaurando overflow del html');
+            }
+
+            // Verificación final
+            const remainingOverlays = document.querySelectorAll('.loading-overlay, .modal-backdrop, .overlay');
+            console.log(`✅ [OVERLAY CLEANUP] Limpieza completada. Elementos restantes que podrían ser overlays: ${remainingOverlays.length}`);
+            if (remainingOverlays.length > 0) {
+                console.warn('⚠️ [OVERLAY CLEANUP] Elementos potencialmente problemáticos restantes:', remainingOverlays);
+            }
+        }
+
+        // Ejecutar limpieza inmediatamente y después de un pequeño delay
+        limpiarOverlaysResiduales();
+        setTimeout(limpiarOverlaysResiduales, 100);
+        setTimeout(limpiarOverlaysResiduales, 500);
+
+        // DEPURACIÓN ESPECÍFICA PARA EL DROPDOWN DE REPORTES
+        setTimeout(() => {
+            const dropdownButton = document.querySelector('.btn-outline-info.dropdown-toggle[data-bs-toggle="dropdown"]');
+            if (dropdownButton) {
+                console.log('🔍 [DROPDOWN DEBUG] Botón encontrado:', dropdownButton);
+                console.log('🔍 [DROPDOWN DEBUG] Clases:', dropdownButton.className);
+                console.log('🔍 [DROPDOWN DEBUG] pointer-events:', window.getComputedStyle(dropdownButton).pointerEvents);
+                console.log('🔍 [DROPDOWN DEBUG] cursor:', window.getComputedStyle(dropdownButton).cursor);
+                console.log('🔍 [DROPDOWN DEBUG] z-index:', window.getComputedStyle(dropdownButton).zIndex);
+                console.log('🔍 [DROPDOWN DEBUG] position:', window.getComputedStyle(dropdownButton).position);
+
+                // Verificar si hay elementos encima
+                const rect = dropdownButton.getBoundingClientRect();
+                const elementsAtPoint = document.elementsFromPoint(rect.left + rect.width/2, rect.top + rect.height/2);
+                console.log('🔍 [DROPDOWN DEBUG] Elementos en la posición del botón:', elementsAtPoint);
+
+                // Verificar overlays específicamente en el área del botón
+                const allOverlays = document.querySelectorAll('.modal-backdrop, .loading-overlay, [style*="position: fixed"], [style*="position:fixed"]');
+                console.log('🔍 [DROPDOWN DEBUG] Overlays encontrados:', allOverlays.length);
+                
+                allOverlays.forEach((overlay, index) => {
+                    const overlayRect = overlay.getBoundingClientRect();
+                    const buttonRect = dropdownButton.getBoundingClientRect();
+                    
+                    // Verificar si el overlay cubre el botón
+                    const overlaps = !(overlayRect.right < buttonRect.left || 
+                                     overlayRect.left > buttonRect.right || 
+                                     overlayRect.bottom < buttonRect.top || 
+                                     overlayRect.top > buttonRect.bottom);
+                    
+                    if (overlaps) {
+                        console.warn(`⚠️ [DROPDOWN DEBUG] Overlay ${index} cubre el botón:`, overlay);
+                        console.warn(`⚠️ [DROPDOWN DEBUG] Overlay styles:`, window.getComputedStyle(overlay));
+                        
+                        // Remover overlay problemático
+                        if (overlay.parentNode) {
+                            overlay.parentNode.removeChild(overlay);
+                            console.log(`❌ [DROPDOWN DEBUG] Overlay ${index} removido`);
+                        }
+                    }
+                });
+
+                // Forzar estilos si es necesario
+                dropdownButton.style.pointerEvents = 'auto';
+                dropdownButton.style.cursor = 'pointer';
+                dropdownButton.style.position = 'relative';
+                dropdownButton.style.zIndex = '1050';
+
+                // Añadir event listener de prueba
+                dropdownButton.addEventListener('click', function(e) {
+                    console.log('🎯 [DROPDOWN DEBUG] Click detectado en el botón!');
+                    console.log('🎯 [DROPDOWN DEBUG] Event:', e);
+                    e.stopPropagation();
+                    // Llamar a la función manualmente
+                    toggleReportesDropdown();
+                }, true); // Usar capture phase
+
+                // También añadir listener normal
+                dropdownButton.addEventListener('click', function(e) {
+                    console.log('🎯 [DROPDOWN DEBUG] Click normal detectado');
+                });
+
+                // Añadir indicador visual de que el botón está activo
+                dropdownButton.style.border = '2px solid #0d6efd';
+                dropdownButton.style.boxShadow = '0 0 0 0.2rem rgba(13, 110, 253, 0.25)';
+                
+                setTimeout(() => {
+                    dropdownButton.style.border = '';
+                    dropdownButton.style.boxShadow = '';
+                }, 2000);
+            } else {
+                console.warn('⚠️ [DROPDOWN DEBUG] Botón dropdown no encontrado');
+            }
+        }, 1000);
+
+        // FUNCIÓN PERSONALIZADA PARA EL DROPDOWN DE REPORTES
+        function toggleReportesDropdown() {
+            console.log('🎯 [DROPDOWN] Toggle manual activado');
+            
+            const button = document.getElementById('reportesDropdownBtn');
+            const menu = document.getElementById('reportesDropdownMenu');
+            
+            if (!button || !menu) {
+                console.error('❌ [DROPDOWN] Elementos del dropdown no encontrados');
+                return;
+            }
+            
+            console.log('🔍 [DROPDOWN] Estado actual - Button classes:', button.className);
+            console.log('🔍 [DROPDOWN] Estado actual - Menu classes:', menu.className);
+            
+            // Toggle manual del menú
+            const isOpen = menu.classList.contains('show');
+            
+            if (isOpen) {
+                // Cerrar el menú
+                menu.classList.remove('show');
+                button.setAttribute('aria-expanded', 'false');
+                console.log('🔒 [DROPDOWN] Menú cerrado manualmente');
+            } else {
+                // Abrir el menú
+                menu.classList.add('show');
+                button.setAttribute('aria-expanded', 'true');
+                console.log('🔓 [DROPDOWN] Menú abierto manualmente');
+                
+                // Cerrar el menú cuando se hace click fuera
+                setTimeout(() => {
+                    document.addEventListener('click', function closeDropdown(e) {
+                        if (!button.contains(e.target) && !menu.contains(e.target)) {
+                            menu.classList.remove('show');
+                            button.setAttribute('aria-expanded', 'false');
+                            document.removeEventListener('click', closeDropdown);
+                            console.log('🔒 [DROPDOWN] Menú cerrado por click fuera');
+                        }
+                    });
+                }, 1);
+            }
+        }
+
+        // VERIFICACIÓN FINAL - Asegurar que no hay bloqueos globales
+        setTimeout(() => {
+            console.log('🔍 [GLOBAL CHECK] Verificando estado global...');
+            console.log('🔍 [GLOBAL CHECK] Body overflow:', document.body.style.overflow, document.body.style.overflowY);
+            console.log('🔍 [GLOBAL CHECK] HTML overflow:', document.documentElement.style.overflow, document.documentElement.style.overflowY);
+            console.log('🔍 [GLOBAL CHECK] Body classes:', document.body.className);
+            
+            // Forzar restauración si es necesario
+            if (document.body.classList.contains('modal-open')) {
+                document.body.classList.remove('modal-open');
+                console.log('❌ [GLOBAL CHECK] Clase modal-open removida del body');
+            }
+            
+            if (document.body.style.overflow === 'hidden' || document.body.style.overflowY === 'hidden') {
+                document.body.style.overflow = '';
+                document.body.style.overflowY = '';
+                console.log('❌ [GLOBAL CHECK] Overflow del body restaurado');
+            }
+            
+            if (document.documentElement.style.overflow === 'hidden' || document.documentElement.style.overflowY === 'hidden') {
+                document.documentElement.style.overflow = '';
+                document.documentElement.style.overflowY = '';
+                console.log('❌ [GLOBAL CHECK] Overflow del html restaurado');
+            }
+            
+            console.log('✅ [GLOBAL CHECK] Verificación global completada');
+        }, 1500);
+    </script>
+
+    <style>
+        .category-badge {
+            font-size: 0.75rem;
+        }
+        
+        .table td {
+            vertical-align: middle;
+        }
+        
+        .btn-group-sm .btn {
+            padding: 0.25rem 0.5rem;
+        }
+
+        /* FIX ESPECÍFICO PARA EL BOTÓN DE REPORTES */
+        #reportesDropdownBtn {
+            pointer-events: auto !important;
+            cursor: pointer !important;
+            position: relative !important;
+            z-index: 1050 !important;
+            user-select: none;
+        }
+
+        #reportesDropdownBtn:hover {
+            pointer-events: auto !important;
+            cursor: pointer !important;
+        }
+
+        #reportesDropdownBtn:focus {
+            pointer-events: auto !important;
+            cursor: pointer !important;
+        }
+
+        /* Asegurar que el contenedor dropdown no bloquee */
+        .dropdown {
+            position: relative !important;
+            z-index: 1040 !important;
+        }
+
+        /* Asegurar que el menú aparezca correctamente */
+        #reportesDropdownMenu {
+            z-index: 1060 !important;
+            position: absolute !important;
+        }
+    </style>
+    
+    <!-- Bootstrap JavaScript -->
+    <script src="/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

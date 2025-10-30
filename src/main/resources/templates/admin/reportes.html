@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/head :: head('Reportes | EcoVivaShop')}">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Reportes | EcoVivaShop</title>
+</head>
+<body class="eco-bg">
+    <!-- Admin Navbar -->
+    <div th:replace="~{fragments/admin-navbar :: admin-navbar}"></div>
+    
+    <div style="display: none"><!-- Mantener las clases y estructura para CSS -->
+        <nav class="navbar navbar-expand-lg navbar-dark bg-dark shadow-sm">
+            <div class="container-fluid">            
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarAdmin" title="Alternar navegación">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarAdmin">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/admin/portal">
+                            <i class="bi bi-speedometer2 me-1"></i>Panel de Control
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/admin/clientes">
+                            <i class="bi bi-people me-1"></i>Clientes
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/admin/productos">
+                            <i class="bi bi-box-seam me-1"></i>Productos
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/admin/pedidos">
+                            <i class="bi bi-cart-check me-1"></i>Pedidos
+                        </a>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle active" href="#" role="button" data-bs-toggle="dropdown">
+                            <i class="bi bi-gear me-1"></i>Gestión
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="/admin/registro-admin">
+                                <i class="bi bi-person-plus me-2"></i>Nuevo Admin
+                            </a></li>
+                            <li><a class="dropdown-item active" href="/admin/reportes">
+                                <i class="bi bi-graph-up me-2"></i>Reportes
+                            </a></li>
+                            <li><a class="dropdown-item" href="/admin/configuracion">
+                                <i class="bi bi-sliders me-2"></i>Configuración
+                            </a></li>
+                        </ul>
+                    </li>
+                </ul>
+                <ul class="navbar-nav">
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                            <i class="bi bi-person-circle me-1"></i>Admin
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li><a class="dropdown-item" href="/admin/perfil">Mi Perfil</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="/logout">Cerrar Sesión</a></li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+    </div><!-- Fin de estructura oculta para CSS -->
+
+    <main class="container-fluid py-4">
+        <!-- Header -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h1 class="h3 mb-1 fw-bold text-dark">
+                            <i class="bi bi-graph-up text-primary me-2"></i>
+                            Reportes y Estadísticas
+                        </h1>
+                        <p class="text-muted mb-0">Análisis completo del desempeño de EcoVivaShop</p>
+                    </div>
+                    <div>                        <div class="btn-group" role="group">
+                            <button type="button" class="btn btn-outline-primary" onclick="exportarReporte('pdf')" title="Exportar reporte en formato PDF">
+                                <i class="bi bi-file-pdf me-1"></i>Exportar PDF
+                            </button>
+                            <button type="button" class="btn btn-outline-success" onclick="exportarReporte('excel')" title="Exportar reporte en formato Excel">
+                                <i class="bi bi-file-excel me-1"></i>Exportar Excel
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Filter Controls -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-body">
+                        <div class="row g-3 align-items-end">
+                            <div class="col-md-3">
+                                <label for="fechaInicio" class="form-label">Fecha Inicio</label>
+                                <input type="date" class="form-control" id="fechaInicio">
+                            </div>
+                            <div class="col-md-3">
+                                <label for="fechaFin" class="form-label">Fecha Fin</label>
+                                <input type="date" class="form-control" id="fechaFin">
+                            </div>
+                            <div class="col-md-3">
+                                <label for="tipoReporte" class="form-label">Tipo de Reporte</label>
+                                <select class="form-select" id="tipoReporte">
+                                    <option value="general">General</option>
+                                    <option value="ventas">Ventas</option>
+                                    <option value="productos">Productos</option>
+                                    <option value="clientes">Clientes</option>
+                                </select>
+                            </div>                            <div class="col-md-3">
+                                <button class="btn btn-primary w-100" onclick="actualizarReportes()" title="Generar y actualizar reportes con filtros seleccionados">
+                                    <i class="bi bi-search me-1"></i>Generar Reporte
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>        <!-- Key Metrics -->
+        <div class="row g-4 mb-4">
+            <div class="col-xl-3 col-md-6">
+                <div class="card border-0 shadow-sm bg-success">
+                    <div class="card-body text-white">
+                        <div class="d-flex align-items-center">
+                            <div class="flex-shrink-0">
+                                <i class="bi bi-currency-dollar display-6 text-dark"></i>
+                            </div>
+                            <div class="flex-grow-1 ms-3">
+                                <div class="small fw-bold text-white">Ingresos Totales</div>
+                                <div class="h4 mb-0 text-dark">S/ 45,890</div>
+                                <div class="small text-light">
+                                    <i class="bi bi-arrow-up me-1"></i>+12.5% vs mes anterior
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-xl-3 col-md-6">
+                <div class="card border-0 shadow-sm bg-primary">
+                    <div class="card-body text-white">
+                        <div class="d-flex align-items-center">
+                            <div class="flex-shrink-0">
+                                <i class="bi bi-cart-check display-6 text-dark"></i>
+                            </div>
+                            <div class="flex-grow-1 ms-3">
+                                <div class="small fw-bold text-white">Pedidos Completados</div>
+                                <div class="h4 mb-0 text-dark">1,248</div>
+                                <div class="small text-light">
+                                    <i class="bi bi-arrow-up me-1"></i>+8.3% vs mes anterior
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-xl-3 col-md-6">
+                <div class="card border-0 shadow-sm bg-warning">
+                    <div class="card-body text-dark">
+                        <div class="d-flex align-items-center">
+                            <div class="flex-shrink-0">
+                                <i class="bi bi-people display-6 text-dark"></i>
+                            </div>
+                            <div class="flex-grow-1 ms-3">
+                                <div class="small fw-bold text-dark">Nuevos Clientes</div>
+                                <div class="h4 mb-0 text-dark">342</div>
+                                <div class="small text-muted">
+                                    <i class="bi bi-arrow-up me-1"></i>+15.2% vs mes anterior
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-xl-3 col-md-6">
+                <div class="card border-0 shadow-sm bg-info">
+                    <div class="card-body text-white">
+                        <div class="d-flex align-items-center">
+                            <div class="flex-shrink-0">
+                                <i class="bi bi-box-seam display-6 text-dark"></i>
+                            </div>
+                            <div class="flex-grow-1 ms-3">
+                                <div class="small fw-bold text-white">Productos Vendidos</div>
+                                <div class="h4 mb-0 text-dark">2,156</div>
+                                <div class="small text-light">
+                                    <i class="bi bi-arrow-up me-1"></i>+5.8% vs mes anterior
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Charts Row -->
+        <div class="row g-4 mb-4">            <!-- Sales Chart -->
+            <div class="col-lg-8">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-header bg-white border-bottom">
+                        <h5 class="card-title mb-0 text-dark">
+                            <i class="bi bi-graph-up text-primary me-2"></i>
+                            Tendencia de Ventas (Últimos 6 Meses)
+                        </h5>
+                    </div>
+                    <div class="card-body bg-light">
+                        <div class="bg-white p-3 rounded shadow-sm">
+                            <canvas id="salesChart" height="300"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>            <!-- Top Products -->
+            <div class="col-lg-4">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-header bg-white border-bottom">
+                        <h5 class="card-title mb-0 text-dark">
+                            <i class="bi bi-star text-warning me-2"></i>
+                            Productos Más Vendidos
+                        </h5>
+                    </div>                    <div class="card-body bg-light">
+                        <div class="bg-white p-3 rounded shadow-sm">
+                            <div class="list-group list-group-flush">
+                                <div class="list-group-item border-0 px-0">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <h6 class="mb-1 text-dark fw-bold">Botella Eco Bambú</h6>
+                                            <small class="text-muted">245 unidades vendidas</small>
+                                        </div>
+                                        <span class="badge bg-success rounded-pill">S/ 12,250</span>
+                                    </div>
+                                </div>
+                                <div class="list-group-item border-0 px-0">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <h6 class="mb-1 text-dark fw-bold">Bolsas Reutilizables</h6>
+                                            <small class="text-muted">189 unidades vendidas</small>
+                                        </div>
+                                        <span class="badge bg-success rounded-pill">S/ 3,780</span>
+                                    </div>
+                                </div>
+                                <div class="list-group-item border-0 px-0">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <h6 class="mb-1 text-dark fw-bold">Kit Eco Hogar</h6>
+                                            <small class="text-muted">156 unidades vendidas</small>
+                                        </div>
+                                        <span class="badge bg-success rounded-pill">S/ 9,360</span>
+                                    </div>
+                                </div>
+                                <div class="list-group-item border-0 px-0">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <h6 class="mb-1 text-dark fw-bold">Cepillo Bambú</h6>
+                                            <small class="text-muted">132 unidades vendidas</small>
+                                        </div>
+                                        <span class="badge bg-success rounded-pill">S/ 2,640</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Detailed Reports -->
+        <div class="row g-4">            <!-- Customer Analytics -->
+            <div class="col-lg-6">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-header bg-white border-bottom">
+                        <h5 class="card-title mb-0 text-dark">
+                            <i class="bi bi-people text-info me-2"></i>
+                            Análisis de Clientes
+                        </h5>
+                    </div>
+                    <div class="card-body bg-light">
+                        <div class="bg-white p-3 rounded shadow-sm">
+                            <canvas id="customerChart" height="200"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>            <!-- Environmental Impact -->
+            <div class="col-lg-6">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-header bg-white border-bottom">
+                        <h5 class="card-title mb-0 text-dark">
+                            <i class="bi bi-globe-americas text-success me-2"></i>
+                            Impacto Ambiental
+                        </h5>
+                    </div>
+                    <div class="card-body bg-light">
+                        <div class="row text-center">
+                            <div class="col-6 mb-3">
+                                <div class="p-3 rounded bg-white shadow-sm">
+                                    <i class="bi bi-tree-fill text-success display-4"></i>
+                                    <h4 class="fw-bold text-success mt-2">1,247</h4>
+                                    <p class="text-muted mb-0 small">Árboles salvados</p>
+                                </div>
+                            </div>
+                            <div class="col-6 mb-3">
+                                <div class="p-3 rounded bg-white shadow-sm">
+                                    <i class="bi bi-droplet-fill text-primary display-4"></i>
+                                    <h4 class="fw-bold text-primary mt-2">15,680L</h4>
+                                    <p class="text-muted mb-0 small">Agua ahorrada</p>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="p-3 rounded bg-white shadow-sm">
+                                    <i class="bi bi-recycle text-warning display-4"></i>
+                                    <h4 class="fw-bold text-warning mt-2">892kg</h4>
+                                    <p class="text-muted mb-0 small">Residuos reducidos</p>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="p-3 rounded bg-white shadow-sm">
+                                    <i class="bi bi-heart-fill text-danger display-4"></i>
+                                    <h4 class="fw-bold text-danger mt-2">2,456</h4>
+                                    <p class="text-muted mb-0 small">Familias beneficiadas</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <div th:replace="~{fragments/footer :: footer}"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <script>
+        // Initialize charts
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeSalesChart();
+            initializeCustomerChart();
+            setDefaultDates();
+        });
+
+        function setDefaultDates() {
+            const today = new Date();
+            const firstDay = new Date(today.getFullYear(), today.getMonth(), 1);
+            
+            document.getElementById('fechaInicio').value = firstDay.toISOString().split('T')[0];
+            document.getElementById('fechaFin').value = today.toISOString().split('T')[0];
+        }        function initializeSalesChart() {
+            const ctx = document.getElementById('salesChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio'],
+                    datasets: [{
+                        label: 'Ventas (S/)',
+                        data: [32000, 35000, 28000, 42000, 38000, 45890],
+                        borderColor: '#28a745',
+                        backgroundColor: 'rgba(40, 167, 69, 0.15)',
+                        tension: 0.4,
+                        fill: true,
+                        borderWidth: 3,
+                        pointBackgroundColor: '#28a745',
+                        pointBorderColor: '#ffffff',
+                        pointBorderWidth: 2,
+                        pointRadius: 6
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    backgroundColor: '#ffffff',
+                    plugins: {
+                        legend: {
+                            display: true,
+                            position: 'top',
+                            labels: {
+                                color: '#333333',
+                                font: {
+                                    size: 14,
+                                    weight: 'bold'
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: {
+                                color: '#e9ecef',
+                                borderColor: '#dee2e6'
+                            },
+                            ticks: {
+                                color: '#495057',
+                                font: {
+                                    size: 12,
+                                    weight: '500'
+                                },
+                                callback: function(value) {
+                                    return 'S/ ' + value.toLocaleString();
+                                }
+                            }
+                        },
+                        x: {
+                            grid: {
+                                color: '#e9ecef',
+                                borderColor: '#dee2e6'
+                            },
+                            ticks: {
+                                color: '#495057',
+                                font: {
+                                    size: 12,
+                                    weight: '500'
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function initializeCustomerChart() {
+            const ctx = document.getElementById('customerChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Nuevos Clientes', 'Clientes Recurrentes', 'Clientes Inactivos'],
+                    datasets: [{
+                        data: [342, 856, 123],
+                        backgroundColor: ['#28a745', '#007bff', '#ffc107'],
+                        borderColor: ['#ffffff', '#ffffff', '#ffffff'],
+                        borderWidth: 3,
+                        hoverBorderWidth: 4,
+                        hoverBorderColor: '#333333'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    backgroundColor: '#ffffff',
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                color: '#333333',
+                                font: {
+                                    size: 12,
+                                    weight: '500'
+                                },
+                                padding: 15,
+                                usePointStyle: true,
+                                pointStyle: 'circle'
+                            }
+                        },
+                        tooltip: {
+                            backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                            titleColor: '#ffffff',
+                            bodyColor: '#ffffff',
+                            borderColor: '#333333',
+                            borderWidth: 1,
+                            cornerRadius: 8,
+                            displayColors: true,
+                            callbacks: {
+                                label: function(context) {
+                                    const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                    const percentage = Math.round((context.parsed / total) * 100);
+                                    return `${context.label}: ${context.parsed} (${percentage}%)`;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function actualizarReportes() {
+            // Simular actualización de reportes
+            const alertDiv = document.createElement('div');
+            alertDiv.className = 'alert alert-info alert-dismissible fade show position-fixed';
+            alertDiv.style.top = '20px';
+            alertDiv.style.right = '20px';
+            alertDiv.style.zIndex = '1050';
+            alertDiv.innerHTML = `
+                <i class="bi bi-info-circle me-2"></i>
+                Actualizando reportes...
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            `;
+            document.body.appendChild(alertDiv);
+            
+            setTimeout(() => {
+                alertDiv.innerHTML = `
+                    <i class="bi bi-check-circle me-2"></i>
+                    Reportes actualizados exitosamente
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                `;
+                alertDiv.className = 'alert alert-success alert-dismissible fade show position-fixed';
+            }, 2000);
+            
+            setTimeout(() => {
+                if (alertDiv.parentNode) {
+                    alertDiv.parentNode.removeChild(alertDiv);
+                }
+            }, 5000);
+        }
+
+        function exportarReporte(tipo) {
+            const alertDiv = document.createElement('div');
+            alertDiv.className = 'alert alert-success alert-dismissible fade show position-fixed';
+            alertDiv.style.top = '20px';
+            alertDiv.style.right = '20px';
+            alertDiv.style.zIndex = '1050';
+            alertDiv.innerHTML = `
+                <i class="bi bi-download me-2"></i>
+                Exportando reporte en formato ${tipo.toUpperCase()}...
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            `;
+            document.body.appendChild(alertDiv);
+            
+            // Crear URL de descarga
+            const url = `/admin/reportes/exportar/${tipo}`;
+            
+            // Crear enlace temporal para descarga
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = true;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            
+            setTimeout(() => {
+                if (alertDiv.parentNode) {
+                    alertDiv.parentNode.removeChild(alertDiv);
+                }
+            }, 3000);
+        }
+    </script>
+</body>
+</html>

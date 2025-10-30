@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/head :: head('Detalle Cliente | EcoVivaShop Admin')}">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Detalle Cliente | EcoVivaShop Admin</title>
+</head>
+<body class="eco-bg">
+    <!-- Admin Navbar -->
+    <div th:replace="~{fragments/admin-navbar :: admin-navbar}"></div>
+
+    <main class="container-fluid py-4">
+        <!-- Header -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h1 class="h3 mb-0 text-dark fw-bold">
+                            <i class="bi bi-person-circle text-success me-2"></i>
+                            Perfil del Cliente
+                        </h1>
+                        <p class="text-muted mb-0">Información detallada del cliente</p>
+                    </div>
+                    <div class="d-flex gap-2">
+                        <a th:href="@{/admin/clientes/editar/{id}(id=${cliente.idUsuario})}" class="btn btn-warning">
+                            <i class="bi bi-pencil me-2"></i>Editar
+                        </a>
+                        <a href="/admin/clientes" class="btn btn-primary">
+                            <i class="bi bi-arrow-left me-2"></i>Volver a Lista
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <!-- Información Personal -->
+            <div class="col-lg-4">
+                <div class="card border-0 shadow-sm mb-4">
+                    <div class="card-header bg-white border-bottom">
+                        <h5 class="card-title mb-0 text-dark fw-bold">
+                            <i class="bi bi-person-fill me-2"></i>Información Personal
+                        </h5>
+                    </div>
+                    <div class="card-body text-center">
+                        <!-- Foto de perfil -->
+                        <div class="mb-3">
+                            <img th:src="${cliente.fotoPerfil != null ? cliente.fotoPerfil : '/img/default-profile.svg'}" 
+                                 alt="Avatar" class="rounded-circle border" width="120" height="120">
+                        </div>
+                        
+                        <!-- Nombre -->
+                        <h4 class="fw-bold text-dark" th:text="${cliente.nombre + ' ' + cliente.apellido}">Nombre Cliente</h4>
+                        
+                        <!-- Estado -->
+                        <div class="mb-3">
+                            <span th:class="${cliente.estado ? 'badge bg-success fs-6' : 'badge bg-danger fs-6'}"
+                                  th:text="${cliente.estado ? 'Cliente Activo' : 'Cliente Inactivo'}">Estado</span>
+                        </div>
+
+                        <!-- Información básica -->
+                        <div class="text-start">
+                            <div class="row mb-2">
+                                <div class="col-4 text-muted">
+                                    <i class="bi bi-envelope me-1"></i>Email:
+                                </div>
+                                <div class="col-8">
+                                    <small th:text="${cliente.email}">email@ejemplo.com</small>
+                                </div>
+                            </div>
+                            
+                            <div class="row mb-2" th:if="${cliente.telefono}">
+                                <div class="col-4 text-muted">
+                                    <i class="bi bi-phone me-1"></i>Teléfono:
+                                </div>
+                                <div class="col-8">
+                                    <small th:text="${cliente.telefono}">000-000-000</small>
+                                </div>
+                            </div>
+                            
+                            <div class="row mb-2" th:if="${cliente.dni}">
+                                <div class="col-4 text-muted">
+                                    <i class="bi bi-card-text me-1"></i>DNI:
+                                </div>
+                                <div class="col-8">
+                                    <small th:text="${cliente.dni}">00000000</small>
+                                </div>
+                            </div>
+                            
+                            <div class="row mb-2">
+                                <div class="col-4 text-muted">
+                                    <i class="bi bi-calendar me-1"></i>Registro:
+                                </div>
+                                <div class="col-8">
+                                    <small th:text="${#temporals.format(cliente.fechaRegistro, 'dd/MM/yyyy')}">00/00/0000</small>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Acciones -->
+                        <div class="mt-3 d-grid gap-2">
+                            <div th:if="${cliente.estado}">
+                                <form th:action="@{/admin/clientes/eliminar/{id}(id=${cliente.idUsuario})}" 
+                                      method="post" style="display: inline;">
+                                    <button type="submit" class="btn btn-outline-danger btn-sm w-100" 
+                                            onclick="return confirm('¿Está seguro de desactivar este cliente?')">
+                                        <i class="bi bi-person-x me-2"></i>Desactivar Cliente
+                                    </button>
+                                </form>
+                            </div>
+                            <div th:unless="${cliente.estado}">
+                                <form th:action="@{/admin/clientes/activar/{id}(id=${cliente.idUsuario})}" 
+                                      method="post" style="display: inline;">
+                                    <button type="submit" class="btn btn-outline-success btn-sm w-100">
+                                        <i class="bi bi-person-check me-2"></i>Activar Cliente
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Información Adicional -->
+            <div class="col-lg-8">
+                <!-- Dirección -->
+                <div class="card border-0 shadow-sm mb-4" th:if="${cliente.direccion}">
+                    <div class="card-header bg-white border-bottom">
+                        <h5 class="card-title mb-0 text-dark fw-bold">
+                            <i class="bi bi-geo-alt me-2"></i>Dirección
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <p class="mb-0" th:text="${cliente.direccion}">Dirección del cliente</p>
+                    </div>
+                </div>
+
+                <!-- Estadísticas de Pedidos -->
+                <div class="card border-0 shadow-sm mb-4">
+                    <div class="card-header bg-white border-bottom">
+                        <h5 class="card-title mb-0 text-dark fw-bold">
+                            <i class="bi bi-graph-up me-2"></i>Estadísticas de Compras
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row text-center">
+                            <div class="col-md-3">
+                                <div class="border-end">
+                                    <h4 class="text-primary mb-0">0</h4>
+                                    <small class="text-muted">Total Pedidos</small>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="border-end">
+                                    <h4 class="text-success mb-0">S/ 0.00</h4>
+                                    <small class="text-muted">Total Gastado</small>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="border-end">
+                                    <h4 class="text-warning mb-0">S/ 0.00</h4>
+                                    <small class="text-muted">Promedio Pedido</small>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <h4 class="text-info mb-0">-</h4>
+                                <small class="text-muted">Último Pedido</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Historial de Pedidos -->
+                <div class="card border-0 shadow-sm">
+                    <div class="card-header bg-white border-bottom">
+                        <h5 class="card-title mb-0 text-dark fw-bold">
+                            <i class="bi bi-cart-check me-2"></i>Historial de Pedidos
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="text-center py-4">
+                            <i class="bi bi-cart-x text-muted" style="font-size: 3rem;"></i>
+                            <p class="text-muted mt-2">Este cliente aún no ha realizado pedidos</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <div th:replace="~{fragments/footer :: footer}"></div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <style>
+        .card {
+            border-radius: 1rem;
+        }
+        
+        .border-end:last-child {
+            border-right: none !important;
+        }
+        
+        .text-muted {
+            font-size: 0.875rem;
+        }
+        
+        .btn-outline-danger:hover {
+            background-color: #dc3545;
+            border-color: #dc3545;
+        }
+        
+        .btn-outline-success:hover {
+            background-color: #28a745;
+            border-color: #28a745;
+        }
+    </style>
+</body>
+</html>

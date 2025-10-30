@@ -1,0 +1,6 @@
+nombre,descripcion,precio,categoria,marca,modelo,color,peso,dimensiones,material,garantia_meses,eficiencia_energetica,impacto_ambiental,puntuacion_eco,imagen_url,stock_inicial,stock_minimo,stock_maximo
+Camiseta Organica Bambu,Camiseta 100% fibra de bambu organico suave y transpirable,45.90,Ropa Ecologica,EcoWear,Bamboo Basic,Blanco,0.15,S: 40x60cm,Fibra de bambu,6,N/A,Bajo,9,https://example.com/camiseta-bambu.jpg,50,10,200
+Pantalon Canamo Organico,Pantalon de canamo organico resistente y comodo,89.90,Ropa Ecologica,HempStyle,Eco Classic,Azul,0.45,32x34 pulgadas,Canamo organico,12,N/A,Bajo,8,https://example.com/pantalon-canamo.jpg,30,5,150
+Zapatillas Corcho Reciclado,Zapatillas deportivas con suela de corcho reciclado,125.00,Calzado Sostenible,CorkFeet,Sport Eco,Negro,0.6,Talla 42,Corcho reciclado,24,N/A,Bajo,9,https://example.com/zapatillas-corcho.jpg,40,8,120
+Botella Acero Inoxidable,Botella termica de acero inoxidable libre de BPA,35.50,Accesorios Ecologicos,EcoBottle,Thermo Pro,Plateado,0.3,500ml,Acero inoxidable,36,N/A,Bajo,8,https://example.com/botella-acero.jpg,100,20,300
+Mochila Plastico Reciclado,Mochila impermeable hecha de botellas PET recicladas,75.00,Accesorios Ecologicos,ReNew,Ocean Pack,Verde,0.8,45x30x15cm,PET reciclado,18,N/A,Bajo,7,https://example.com/mochila-pet.jpg,25,5,80

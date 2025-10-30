@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/head :: head('Configuración | EcoVivaShop')}">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Configuración | EcoVivaShop</title>
+</head>
+<body class="eco-bg">
+    <div th:replace="~{fragments/client-navbar :: client-navbar}"></div>
+    
+    <main class="container my-5">
+        <!-- CONTENEDOR PRINCIPAL MODERNO -->
+        <div class="client-profile-container">
+            <!-- ENCABEZADO DE CONFIGURACIÓN -->
+            <div class="client-profile-header">
+                <div class="client-profile-avatar" style="cursor: pointer;" onclick="document.getElementById('profileImageInput').click();">
+                    <img id="profileImage" th:src="@{/api/imagenes/perfil/{id}(id=${usuario != null ? usuario.idUsuario : 0})}" 
+                         alt="Foto de perfil" 
+                         class="w-100 h-100 rounded-circle" 
+                         style="object-fit: cover;"
+                         onerror="this.style.display='none'; this.nextElementSibling.style.display='flex'">
+                    <i class="bi bi-camera-fill" style="display: none; font-size: 3rem;"></i>
+                </div>
+                <h2 class="client-profile-name">⚙️ Configuración de Cuenta</h2>
+                <p class="client-profile-email">Actualiza tu información personal y preferencias</p>
+            </div>
+
+            <!-- FORMULARIO DE INFORMACIÓN PERSONAL -->
+            <div class="client-info-section">
+                <h3 class="client-section-title">
+                    <i class="bi bi-pencil-square"></i>
+                    Información Personal
+                </h3>
+                <form id="profileForm" th:action="@{/client/configuracion}" method="post" enctype="multipart/form-data" th:object="${usuario}">
+                    <!-- Input oculto para la imagen -->
+                    <input type="file" id="profileImageInput" name="profileImage" accept="image/*" style="display: none;" onchange="previewImage(this)">
+                    
+                    <div class="row g-4">
+                        <div class="col-md-6">
+                            <label for="nombre" class="client-form-label">
+                                <i class="bi bi-person me-1"></i>Nombre
+                            </label>
+                            <input type="text" class="client-form-control" id="nombre" name="nombre"
+                                   th:field="*{nombre}"
+                                   th:value="${usuario != null ? usuario.nombre : 'Juan'}" 
+                                   required>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="apellido" class="client-form-label">
+                                <i class="bi bi-person-badge me-1"></i>Apellido
+                            </label>
+                            <input type="text" class="client-form-control" id="apellido" name="apellido"
+                                   th:field="*{apellido}"
+                                   th:value="${usuario != null ? usuario.apellido : 'Pérez'}" 
+                                   required>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="email" class="client-form-label">
+                                <i class="bi bi-envelope me-1"></i>Email
+                            </label>
+                            <input type="email" class="client-form-control" id="email" name="email"
+                                   th:field="*{email}"
+                                   th:value="${usuario != null ? usuario.email : 'juan.perez@email.com'}" 
+                                   required readonly style="background: rgba(240, 248, 255, 0.7); opacity: 0.8;">
+                            <small class="text-muted">El email no se puede cambiar</small>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="telefono" class="client-form-label">
+                                <i class="bi bi-telephone me-1"></i>Teléfono
+                            </label>
+                            <input type="tel" class="client-form-control" id="telefono" name="telefono"
+                                   th:field="*{telefono}"
+                                   th:value="${usuario != null ? usuario.telefono : '+51 999 123 456'}" 
+                                   required>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="dni" class="client-form-label">
+                                <i class="bi bi-card-text me-1"></i>DNI
+                            </label>
+                            <input type="text" class="client-form-control" id="dni" name="dni"
+                                   th:field="*{dni}"
+                                   th:value="${usuario != null ? usuario.dni : '12345678'}" 
+                                   required>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="direccion" class="client-form-label">
+                                <i class="bi bi-geo-alt me-1"></i>Dirección
+                            </label>
+                            <input type="text" class="client-form-control" id="direccion" name="direccion"
+                                   th:field="*{direccion}"
+                                   th:value="${usuario != null ? usuario.direccion : 'Lima, Perú'}" 
+                                   required>
+                        </div>
+                    </div>
+                    
+                    <div class="client-form-actions">
+                        <button type="submit" class="client-btn-primary">
+                            <i class="bi bi-check-circle me-2"></i>Guardar Cambios
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- CAMBIAR CONTRASEÑA -->
+            <div class="client-info-section">
+                <h3 class="client-section-title">
+                    <i class="bi bi-shield-lock"></i>
+                    Cambiar Contraseña
+                </h3>
+                <form id="passwordForm">
+                    <div class="row g-4">
+                        <div class="col-md-4">
+                            <label for="currentPassword" class="client-form-label">
+                                <i class="bi bi-lock me-1"></i>Contraseña Actual
+                            </label>
+                            <input type="password" class="client-form-control" id="currentPassword" required>
+                        </div>
+                        <div class="col-md-4">
+                            <label for="newPassword" class="client-form-label">
+                                <i class="bi bi-key me-1"></i>Nueva Contraseña
+                            </label>
+                            <input type="password" class="client-form-control" id="newPassword" required minlength="8">
+                        </div>
+                        <div class="col-md-4">
+                            <label for="confirmPassword" class="client-form-label">
+                                <i class="bi bi-check2-circle me-1"></i>Confirmar Contraseña
+                            </label>
+                            <input type="password" class="client-form-control" id="confirmPassword" required>
+                        </div>
+                    </div>
+                    
+                    <div class="client-form-actions">
+                        <button type="submit" class="client-btn-secondary">
+                            <i class="bi bi-arrow-repeat me-2"></i>Cambiar Contraseña
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- PREFERENCIAS DE NOTIFICACIONES -->
+            <div class="client-info-section">
+                <h3 class="client-section-title">
+                    <i class="bi bi-bell"></i>
+                    Preferencias de Notificaciones
+                </h3>
+                <form id="notificationForm">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <div class="client-checkbox-group">
+                                <input type="checkbox" class="client-checkbox" id="emailNotifications" checked>
+                                <label for="emailNotifications" class="client-checkbox-label">
+                                    <i class="bi bi-envelope me-2"></i>Notificaciones por email
+                                </label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="client-checkbox-group">
+                                <input type="checkbox" class="client-checkbox" id="orderUpdates" checked>
+                                <label for="orderUpdates" class="client-checkbox-label">
+                                    <i class="bi bi-box-seam me-2"></i>Actualizaciones de pedidos
+                                </label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="client-checkbox-group">
+                                <input type="checkbox" class="client-checkbox" id="promotions">
+                                <label for="promotions" class="client-checkbox-label">
+                                    <i class="bi bi-gift me-2"></i>Promociones y ofertas
+                                </label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="client-checkbox-group">
+                                <input type="checkbox" class="client-checkbox" id="newsletter">
+                                <label for="newsletter" class="client-checkbox-label">
+                                    <i class="bi bi-newspaper me-2"></i>Newsletter semanal
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="client-form-actions">
+                        <button type="submit" class="client-btn-primary">
+                            <i class="bi bi-check-circle me-2"></i>Guardar Preferencias
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </main>
+    
+    <div th:replace="~{fragments/footer :: footer}"></div>
+    
+    <!-- Toast para notificaciones -->
+    <div class="toast-container position-fixed bottom-0 end-0 p-3">
+        <div id="successToast" class="toast align-items-center text-white bg-success border-0" role="alert">
+            <div class="d-flex">
+                <div class="toast-body">
+                    <i class="bi bi-check-circle me-2"></i>
+                    <span id="toastMessage">Cambios guardados exitosamente</span>
+                </div>
+                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"
+                        title="Cerrar notificación" aria-label="Cerrar notificación de éxito"></button>
+            </div>
+        </div>
+    </div>
+
+    <style>
+        .eco-bg {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            min-height: 100vh;
+        }
+        
+        .client-profile-container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        .client-profile-header {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            color: white;
+            text-align: center;
+            padding: 3rem 2rem;
+        }
+        
+        .client-profile-avatar {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            margin: 0 auto 1.5rem;
+            border: 4px solid rgba(255,255,255,0.3);
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+        
+        .client-profile-avatar:hover {
+            transform: scale(1.05);
+            border-color: white;
+        }
+        
+        .client-profile-name {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+        
+        .client-profile-email {
+            opacity: 0.9;
+            font-size: 1.1rem;
+        }
+        
+        .client-info-section {
+            padding: 2rem;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .client-info-section:last-child {
+            border-bottom: none;
+        }
+        
+        .client-section-title {
+            color: #28a745;
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+        }
+        
+        .client-section-title i {
+            margin-right: 0.5rem;
+        }
+        
+        .client-form-label {
+            font-weight: 600;
+            color: #2d3436;
+            margin-bottom: 0.5rem;
+            display: block;
+        }
+        
+        .client-form-control {
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            padding: 0.75rem 1rem;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            width: 100%;
+        }
+        
+        .client-form-control:focus {
+            border-color: #28a745;
+            box-shadow: 0 0 0 0.2rem rgba(40, 167, 69, 0.25);
+            outline: none;
+        }
+        
+        .client-form-actions {
+            margin-top: 2rem;
+            text-align: center;
+        }
+        
+        .client-btn-primary, .client-btn-secondary {
+            padding: 0.75rem 2rem;
+            border-radius: 25px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+            font-size: 1rem;
+        }
+        
+        .client-btn-primary {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            color: white;
+        }
+        
+        .client-btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(40, 167, 69, 0.3);
+        }
+        
+        .client-btn-secondary {
+            background: linear-gradient(135deg, #6c757d 0%, #495057 100%);
+            color: white;
+        }
+        
+        .client-btn-secondary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(108, 117, 125, 0.3);
+        }
+        
+        .client-checkbox-group {
+            display: flex;
+            align-items: center;
+            padding: 1rem;
+            background: #f8f9fa;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+        
+        .client-checkbox-group:hover {
+            background: #e9ecef;
+        }
+        
+        .client-checkbox {
+            margin-right: 1rem;
+        }
+        
+        .client-checkbox-label {
+            margin: 0;
+            font-weight: 500;
+            cursor: pointer;
+        }
+        
+        .is-invalid {
+            border-color: #dc3545;
+            animation: shake 0.5s ease;
+        }
+        
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+    </style>
+
+    <script>
+        // Función para previsualizar imagen de perfil
+        function previewImage(input) {
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    document.getElementById('profileImage').src = e.target.result;
+                }
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            // Guardar información del perfil
+            document.getElementById('profileForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                const submitBtn = this.querySelector('button[type="submit"]');
+                const originalText = submitBtn.innerHTML;
+                submitBtn.innerHTML = '<i class="bi bi-hourglass-split me-2"></i>Guardando...';
+                submitBtn.disabled = true;
+                
+                setTimeout(() => {
+                    submitBtn.innerHTML = originalText;
+                    submitBtn.disabled = false;
+                    showSuccessToast('Información del perfil actualizada exitosamente');
+                }, 1500);
+            });
+
+            // Cambiar contraseña
+            document.getElementById('passwordForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                const currentPassword = document.getElementById('currentPassword').value;
+                const newPassword = document.getElementById('newPassword').value;
+                const confirmPassword = document.getElementById('confirmPassword').value;
+                
+                if (!currentPassword) {
+                    alert('Por favor ingresa tu contraseña actual');
+                    return;
+                }
+                
+                if (newPassword !== confirmPassword) {
+                    alert('Las contraseñas no coinciden');
+                    return;
+                }
+                
+                if (newPassword.length < 8) {
+                    alert('La contraseña debe tener al menos 8 caracteres');
+                    return;
+                }
+                
+                const submitBtn = this.querySelector('button[type="submit"]');
+                const originalText = submitBtn.innerHTML;
+                submitBtn.innerHTML = '<i class="bi bi-hourglass-split me-2"></i>Cambiando...';
+                submitBtn.disabled = true;
+                
+                setTimeout(() => {
+                    submitBtn.innerHTML = originalText;
+                    submitBtn.disabled = false;
+                    showSuccessToast('Contraseña cambiada exitosamente');
+                    this.reset();
+                }, 1500);
+            });
+
+            // Guardar preferencias de notificaciones
+            document.getElementById('notificationForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                const submitBtn = this.querySelector('button[type="submit"]');
+                const originalText = submitBtn.innerHTML;
+                submitBtn.innerHTML = '<i class="bi bi-hourglass-split me-2"></i>Guardando...';
+                submitBtn.disabled = true;
+                
+                setTimeout(() => {
+                    submitBtn.innerHTML = originalText;
+                    submitBtn.disabled = false;
+                    showSuccessToast('Preferencias de notificaciones guardadas');
+                }, 1000);
+            });
+
+            // Validación en tiempo real para contraseñas
+            document.getElementById('confirmPassword').addEventListener('input', function() {
+                const newPassword = document.getElementById('newPassword').value;
+                const confirmPassword = this.value;
+                
+                if (confirmPassword && newPassword !== confirmPassword) {
+                    this.setCustomValidity('Las contraseñas no coinciden');
+                    this.classList.add('is-invalid');
+                } else {
+                    this.setCustomValidity('');
+                    this.classList.remove('is-invalid');
+                }
+            });
+        });
+
+        // Función para mostrar toast de éxito
+        function showSuccessToast(message) {
+            document.getElementById('toastMessage').textContent = message;
+            const toast = new bootstrap.Toast(document.getElementById('successToast'));
+            toast.show();
+        }
+    </script>
+</body>
+</html>

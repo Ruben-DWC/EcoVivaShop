@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/head :: head('Detalle Producto | EcoVivaShop')}">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Detalle Producto | EcoVivaShop</title>
+</head>
+<body class="eco-bg">
+    <div th:replace="~{fragments/client-navbar :: client-navbar}"></div>
+    
+    <main class="container my-5">
+        <!-- CONTENEDOR DEL PRODUCTO -->
+        <div class="product-detail-container">
+            <div class="row g-5">
+                <!-- IMAGEN DEL PRODUCTO -->
+                <div class="col-md-6">
+                    <img id="productMainImage" 
+                         th:src="${producto.imagenUrl != null and producto.imagenUrl != ''} ? ${producto.imagenUrl} : '/img/eco-kit-hogar.jpg'"
+                         th:alt="${producto.nombre}" 
+                         class="product-detail-image w-100 rounded shadow">
+                    
+                    <!-- Miniaturas -->
+                    <div class="d-flex gap-3 mt-4 justify-content-center">
+                        <img th:src="${producto.imagenUrl != null and producto.imagenUrl != ''} ? ${producto.imagenUrl} : '/img/eco-kit-hogar.jpg'" 
+                             alt="Vista 1" class="img-thumbnail" style="width: 80px; height: 80px; cursor: pointer;" 
+                             onclick="changeMainImage(this.src)">
+                        <img th:src="${producto.imagenUrl != null and producto.imagenUrl != ''} ? ${producto.imagenUrl} : '/img/eco-kit-hogar.jpg'" 
+                             alt="Vista 2" class="img-thumbnail" style="width: 80px; height: 80px; cursor: pointer;" 
+                             onclick="changeMainImage(this.src)">
+                        <img th:src="${producto.imagenUrl != null and producto.imagenUrl != ''} ? ${producto.imagenUrl} : '/img/eco-kit-hogar.jpg'" 
+                             alt="Vista 3" class="img-thumbnail" style="width: 80px; height: 80px; cursor: pointer;" 
+                             onclick="changeMainImage(this.src)">
+                    </div>
+                </div>
+                
+                <!-- INFORMACIÓN DEL PRODUCTO -->
+                <div class="col-md-6 product-detail-info">
+                    <div class="mb-3">
+                        <span class="badge bg-success rounded-pill px-3 py-2" th:text="${producto.categoria}">Categoría</span>
+                    </div>
+                    
+                    <h1 class="product-detail-title display-5 fw-bold mb-3" th:text="${producto.nombre}">Producto EcoVivaShop</h1>
+                    
+                    <div class="product-detail-price h2 text-success fw-bold mb-4">
+                        <div>S/ <span th:text="${#numbers.formatDecimal(producto.precio, 1, 2)}">0.00</span> <small class="text-muted fs-6">por unidad</small></div>
+                        <div class="h3 mt-2" id="totalPrice" style="display: none;">
+                            Total: S/ <span id="totalAmount">0.00</span>
+                        </div>
+                    </div>
+                    
+                    <div class="product-detail-description mb-4 lead" th:text="${producto.descripcion}">
+                        Descripción del producto ecológico.
+                    </div>
+
+                    <!-- INFORMACIÓN ADICIONAL -->
+                    <div class="mb-4">
+                        <div class="row">
+                            <div class="col-6" th:if="${producto.stockDisponible != null and producto.stockDisponible > 0}">
+                                <p class="mb-1"><strong>Stock:</strong></p>
+                                <p class="text-muted"><span th:text="${producto.stockDisponible}">0</span> unidades</p>
+                            </div>
+                            <div class="col-6">
+                                <p class="mb-1"><strong>Envío:</strong></p>
+                                <p class="text-success">Gratis en pedidos > S/ 120</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- SELECTOR DE CANTIDAD -->
+                    <div class="quantity-selector mb-4">
+                        <label class="form-label fw-bold">Cantidad:</label>
+                        <div class="d-flex align-items-center gap-2">
+                            <button type="button" class="btn btn-outline-success btn-sm" onclick="decreaseQuantity()" 
+                                    title="Disminuir cantidad" aria-label="Disminuir cantidad">
+                                <i class="bi bi-dash"></i>
+                            </button>
+                            <input type="number" class="form-control text-center" id="quantity" value="1" min="1" 
+                                   th:max="${producto.stockDisponible != null ? producto.stockDisponible : 50}"
+                                   aria-label="Cantidad de productos" title="Cantidad a comprar" style="width: 80px;">
+                            <button type="button" class="btn btn-outline-success btn-sm" onclick="increaseQuantity()"
+                                    title="Aumentar cantidad" aria-label="Aumentar cantidad">
+                                <i class="bi bi-plus"></i>
+                            </button>
+                        </div>
+                        <small class="text-muted" th:if="${producto.stockDisponible != null and producto.stockDisponible > 0}">
+                            Stock disponible: <span th:text="${producto.stockDisponible}">0</span> unidades
+                        </small>
+                    </div>
+
+                    <!-- BOTONES DE ACCIÓN -->
+                    <div class="d-grid gap-3">
+                        <button class="btn btn-success btn-lg" id="addToCartBtn">
+                            <i class="bi bi-cart-plus me-2"></i>
+                            Agregar al Carrito
+                        </button>
+                        <button class="btn btn-outline-success btn-lg" id="buyNowBtn">
+                            <i class="bi bi-lightning-fill me-2"></i>
+                            Comprar Ahora
+                        </button>
+                    </div>
+
+                    <!-- INFORMACIÓN ADICIONAL -->
+                    <div class="mt-4 pt-4 border-top">
+                        <div class="row g-3">
+                            <div class="col-12">
+                                <div class="d-flex align-items-center">
+                                    <i class="bi bi-truck text-success me-3" style="font-size: 1.5rem;"></i>
+                                    <div>
+                                        <strong class="text-dark">Envío Gratis</strong><br>
+                                        <small class="text-muted">En pedidos mayores a S/ 120</small>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-12">
+                                <div class="d-flex align-items-center">
+                                    <i class="bi bi-shield-check text-success me-3" style="font-size: 1.5rem;"></i>
+                                    <div>
+                                        <strong class="text-dark">Garantía EcoAmiga</strong><br>
+                                        <small class="text-muted">30 días de garantía total</small>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-12">
+                                <div class="d-flex align-items-center">
+                                    <i class="bi bi-award text-success me-3" style="font-size: 1.5rem;"></i>
+                                    <div>
+                                        <strong class="text-dark">Producto Certificado</strong><br>
+                                        <small class="text-muted">100% orgánico y sostenible</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Estilos adicionales -->
+    <style>
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1); }
+        }
+        
+        .quantity-selector input:focus {
+            box-shadow: 0 0 0 0.2rem rgba(40, 167, 69, 0.25);
+            border-color: #28a745;
+        }
+        
+        .badge {
+            min-width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+        }
+        
+        .btn:active {
+            transform: scale(0.98);
+        }
+        
+        .toast {
+            min-width: 300px;
+        }
+    </style>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/js/client-global.js"></script>
+    <script>
+        let productoData = {
+            id: window.location.pathname.split('/').pop(),
+            nombre: '',
+            precio: 0,
+            stockDisponible: 0
+        };
+        
+        // Esperar a que Bootstrap y el DOM estén listos
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('🔧 Producto-detalle cargado');
+            
+            // Inicializar datos del producto
+            initializeProductData();
+            
+            // Actualizar contador del carrito al cargar
+            updateCartCounter();
+            
+            // Configurar botones del carrito
+            setupCartButtons();
+            
+            // Inicializar dropdown
+            setTimeout(function() {
+                if (typeof initializeUserDropdown === 'function') {
+                    console.log('🔧 Inicializando dropdown desde producto-detalle');
+                    initializeUserDropdown();
+                }
+            }, 100);
+        });
+
+        function initializeProductData() {
+            // Obtener nombre del producto
+            const nombreElement = document.querySelector('h1');
+            if (nombreElement) {
+                productoData.nombre = nombreElement.textContent.trim();
+            }
+            
+            // Obtener precio - buscar en elementos que contengan "S/"
+            const precioElements = document.querySelectorAll('*');
+            for (let el of precioElements) {
+                if (el.textContent && el.textContent.includes('S/')) {
+                    const precioMatch = el.textContent.match(/S\/\s*(\d+(?:\.\d+)?)/);
+                    if (precioMatch) {
+                        productoData.precio = parseFloat(precioMatch[1]);
+                        break;
+                    }
+                }
+            }
+            
+            // Obtener stock disponible
+            const stockElements = document.querySelectorAll('*');
+            for (let el of stockElements) {
+                if (el.textContent && el.textContent.includes('unidades')) {
+                    const stockMatch = el.textContent.match(/(\d+)\s*unidades/);
+                    if (stockMatch) {
+                        productoData.stockDisponible = parseInt(stockMatch[1]);
+                        break;
+                    }
+                }
+            }
+            
+            console.log('📦 Datos del producto:', productoData);
+            
+            // Configurar límites del input
+            const quantityInput = document.getElementById('quantity');
+            if (quantityInput && productoData.stockDisponible > 0) {
+                quantityInput.max = productoData.stockDisponible;
+            }
+            
+            // Inicializar el precio total
+            updatePriceDisplay(1);
+        }
+
+        function setupCartButtons() {
+            const addToCartBtn = document.getElementById('addToCartBtn');
+            const buyNowBtn = document.getElementById('buyNowBtn');
+            
+            if (addToCartBtn) {
+                addToCartBtn.onclick = function() {
+                    console.log('🛒 Botón Agregar al Carrito clickeado');
+                    addToCart();
+                };
+            }
+            
+            if (buyNowBtn) {
+                buyNowBtn.onclick = function() {
+                    console.log('🛒 Botón Comprar Ahora clickeado');
+                    buyNow();
+                };
+            }
+        }
+
+        // Funciones para cambio de imagen
+        function changeMainImage(newSrc) {
+            const mainImage = document.getElementById('productMainImage');
+            if (mainImage) {
+                mainImage.style.opacity = '0.5';
+                setTimeout(() => {
+                    mainImage.src = newSrc;
+                    mainImage.style.opacity = '1';
+                }, 150);
+            }
+        }
+
+        // Funciones de cantidad - manteniendo la compatibilidad con onclick inline
+        function increaseQuantity() {
+            console.log('➕ Incrementar cantidad');
+            const input = document.getElementById('quantity');
+            if (!input) {
+                console.error('❌ No se encontró el input quantity');
+                return;
+            }
+            
+            const currentValue = parseInt(input.value) || 1;
+            console.log('Current value:', currentValue, 'Stock disponible:', productoData.stockDisponible);
+            
+            if (currentValue < productoData.stockDisponible) {
+                input.value = currentValue + 1;
+                console.log('✅ Cantidad incrementada a:', input.value);
+                updatePriceDisplay(currentValue + 1);
+            } else {
+                console.log('⚠️ Stock máximo alcanzado');
+                showAlert(`Stock máximo disponible: ${productoData.stockDisponible}`, 'warning');
+            }
+        }
+
+        function decreaseQuantity() {
+            console.log('➖ Decrementar cantidad');
+            const input = document.getElementById('quantity');
+            if (!input) {
+                console.error('❌ No se encontró el input quantity');
+                return;
+            }
+            
+            const currentValue = parseInt(input.value) || 1;
+            if (currentValue > 1) {
+                input.value = currentValue - 1;
+                console.log('✅ Cantidad decrementada a:', input.value);
+                updatePriceDisplay(currentValue - 1);
+            }
+        }
+
+        function updatePriceDisplay(quantity) {
+            console.log('💰 Actualizando precio para cantidad:', quantity);
+            const totalPriceElement = document.getElementById('totalPrice');
+            const totalAmountElement = document.getElementById('totalAmount');
+            
+            if (productoData.precio > 0) {
+                const total = (productoData.precio * quantity).toFixed(2);
+                console.log('💰 Precio total calculado: S/ ' + total);
+                
+                if (totalAmountElement) {
+                    totalAmountElement.textContent = total;
+                }
+                
+                if (totalPriceElement) {
+                    if (quantity > 1) {
+                        totalPriceElement.style.display = 'block';
+                    } else {
+                        totalPriceElement.style.display = 'none';
+                    }
+                }
+            }
+        }
+
+        function addToCart() {
+            const quantityInput = document.getElementById('quantity');
+            const quantity = quantityInput ? parseInt(quantityInput.value) : 1;
+            
+            console.log('🛒 Agregando al carrito:', {
+                id: productoData.id,
+                nombre: productoData.nombre,
+                cantidad: quantity
+            });
+            
+            console.log('🔍 DEBUG - URL actual:', window.location.pathname);
+            console.log('🔍 DEBUG - productoData completo:', productoData);
+            console.log('🔍 DEBUG - Body que se enviará:', `productoId=${productoData.id}&cantidad=${quantity}`);
+            
+            if (quantity > productoData.stockDisponible) {
+                showAlert('Cantidad no disponible en stock', 'danger');
+                return;
+            }
+
+            // Intentar usar el endpoint del servidor
+            fetchWithCSRF('/client/agregar-al-carrito', {
+                method: 'POST',
+                body: `productoId=${productoData.id}&cantidad=${quantity}`
+            })
+            .then(response => {
+                console.log('📡 Respuesta del servidor:', response.status);
+                return response.json();
+            })
+            .then(data => {
+                console.log('📡 Datos recibidos:', data);
+                if (data.success) {
+                    showAlert(`${productoData.nombre} (${quantity} unidades) agregado al carrito`, 'success');
+                    updateCartCounter(data.totalItems);
+                } else {
+                    throw new Error(data.message || 'Error al agregar al carrito');
+                }
+            })
+            .catch(error => {
+                console.log('⚠️ Error con servidor, usando localStorage:', error);
+                addToCartLocalStorage(quantity);
+            });
+        }
+
+        function addToCartLocalStorage(quantity) {
+            try {
+                let cart = JSON.parse(localStorage.getItem('cart') || '[]');
+                
+                const existingIndex = cart.findIndex(item => item.id === productoData.id);
+                
+                if (existingIndex > -1) {
+                    cart[existingIndex].cantidad += quantity;
+                    cart[existingIndex].total = (cart[existingIndex].precio * cart[existingIndex].cantidad).toFixed(2);
+                } else {
+                    cart.push({
+                        id: productoData.id,
+                        nombre: productoData.nombre,
+                        precio: productoData.precio,
+                        cantidad: quantity,
+                        total: (productoData.precio * quantity).toFixed(2)
+                    });
+                }
+                
+                localStorage.setItem('cart', JSON.stringify(cart));
+                const totalItems = cart.reduce((sum, item) => sum + item.cantidad, 0);
+                updateCartCounter(totalItems);
+                showAlert(`${productoData.nombre} (${quantity} unidades) agregado al carrito`, 'success');
+                
+            } catch (error) {
+                console.error('Error al manejar localStorage:', error);
+                showAlert('Error al agregar al carrito', 'danger');
+            }
+        }
+
+        function buyNow() {
+            console.log('🚀 Comprar ahora');
+            const quantityInput = document.getElementById('quantity');
+            const quantity = quantityInput ? parseInt(quantityInput.value) : 1;
+            
+            if (quantity > productoData.stockDisponible) {
+                showAlert('Cantidad no disponible en stock', 'danger');
+                return;
+            }
+            
+            // Agregar al carrito primero
+            fetchWithCSRF('/client/agregar-al-carrito', {
+                method: 'POST',
+                body: `productoId=${productoData.id}&cantidad=${quantity}`
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showAlert('Producto agregado. Redirigiendo al carrito...', 'success');
+                    // Redirigir inmediatamente
+                    window.location.href = '/client/carrito';
+                } else {
+                    throw new Error(data.message || 'Error al agregar al carrito');
+                }
+            })
+            .catch(error => {
+                console.log('⚠️ Error al comprar:', error);
+                // Agregar a localStorage como fallback y redirigir
+                addToCartLocalStorage(quantity);
+                showAlert('Redirigiendo al carrito...', 'info');
+                setTimeout(() => {
+                    window.location.href = '/client/carrito';
+                }, 1000);
+            });
+        }
+
+        function updateCartCounter(totalItems) {
+            console.log('🔢 Actualizando contador a:', totalItems);
+            
+            // Buscar el badge del carrito
+            const badges = document.querySelectorAll('.badge');
+            badges.forEach(badge => {
+                if (badge.closest('a') && badge.closest('a').textContent.includes('Carrito')) {
+                    badge.textContent = totalItems || 0;
+                    badge.style.display = totalItems > 0 ? 'inline' : 'none';
+                    if (totalItems > 0) {
+                        badge.style.animation = 'pulse 0.5s ease-out';
+                        setTimeout(() => badge.style.animation = '', 500);
+                    }
+                }
+            });
+            
+            // También buscar otros selectores posibles
+            const cartCounts = document.querySelectorAll('.carrito-count, .cart-count');
+            cartCounts.forEach(counter => {
+                counter.textContent = totalItems || 0;
+                if (totalItems > 0) {
+                    counter.style.animation = 'pulse 0.5s ease-out';
+                    setTimeout(() => counter.style.animation = '', 500);
+                }
+            });
+        }
+
+        function showAlert(message, type) {
+            console.log(`📢 ${type.toUpperCase()}: ${message}`);
+            
+            if (typeof bootstrap !== 'undefined') {
+                const toastContainer = document.getElementById('toast-container') || createToastContainer();
+                const toast = createToast(message, type);
+                toastContainer.appendChild(toast);
+                const bsToast = new bootstrap.Toast(toast);
+                bsToast.show();
+                
+                toast.addEventListener('hidden.bs.toast', () => {
+                    toast.remove();
+                });
+            } else {
+                alert(message);
+            }
+        }
+
+        function createToastContainer() {
+            const container = document.createElement('div');
+            container.id = 'toast-container';
+            container.className = 'toast-container position-fixed top-0 end-0 p-3';
+            container.style.zIndex = '9999';
+            document.body.appendChild(container);
+            return container;
+        }
+
+        function createToast(message, type) {
+            const typeClass = type === 'success' ? 'success' : 
+                            type === 'warning' ? 'warning' : 
+                            type === 'info' ? 'info' : 'danger';
+                            
+            const toast = document.createElement('div');
+            toast.className = `toast align-items-center text-white bg-${typeClass} border-0`;
+            toast.setAttribute('role', 'alert');
+            toast.innerHTML = `
+                <div class="d-flex">
+                    <div class="toast-body">${message}</div>
+                    <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+                </div>
+            `;
+            return toast;
+        }
+    </script>
+</body>
+</html>

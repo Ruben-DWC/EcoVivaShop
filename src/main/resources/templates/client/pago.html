@@ -1,0 +1,798 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/head :: head('Pago Seguro | EcoVivaShop')}">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Pago Seguro | EcoVivaShop</title>
+</head>
+<style>
+    :root {
+        --primary-green: #20c997;
+        --secondary-green: #28a745;
+        --accent-teal: #17a2b8;
+        --warm-orange: #ff6b6b;
+        --eco-gold: #ffd700;
+    }
+
+    body {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 25%, #20c997 50%, #28a745 75%, #17a2b8 100%);
+        background-size: 400% 400%;
+        animation: gradientMove 20s ease infinite;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        min-height: 100vh;
+    }
+
+    @keyframes gradientMove {
+        0% { background-position: 0% 50%; }
+        50% { background-position: 100% 50%; }
+        100% { background-position: 0% 50%; }
+    }
+
+    .checkout-container {
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(20px);
+        border-radius: 30px;
+        box-shadow: 0 25px 50px rgba(0, 0, 0, 0.2);
+        margin: 2rem auto;
+        max-width: 1200px;
+        overflow: hidden;
+        border: 1px solid rgba(255, 255, 255, 0.3);
+    }
+
+    .checkout-header {
+        background: linear-gradient(135deg, var(--primary-green), var(--secondary-green));
+        color: white;
+        padding: 2.5rem;
+        text-align: center;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .checkout-header::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        left: -50%;
+        width: 200%;
+        height: 200%;
+        background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+        transform: rotate(45deg);
+        animation: shimmer 3s infinite;
+    }
+
+    @keyframes shimmer {
+        0% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
+        100% { transform: translateX(100%) translateY(100%) rotate(45deg); }
+    }
+
+    .checkout-title {
+        font-size: 2.5rem;
+        font-weight: 700;
+        margin-bottom: 1rem;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        position: relative;
+        z-index: 1;
+    }
+
+    .checkout-subtitle {
+        font-size: 1.1rem;
+        opacity: 0.9;
+        position: relative;
+        z-index: 1;
+    }
+
+    .checkout-content {
+        padding: 2rem;
+    }
+
+    .checkout-card {
+        background: white;
+        border-radius: 20px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        margin-bottom: 1.5rem;
+        overflow: hidden;
+        border: 1px solid rgba(32, 201, 151, 0.2);
+        transition: all 0.3s ease;
+    }
+
+    .checkout-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 15px 40px rgba(32, 201, 151, 0.2);
+    }
+
+    .checkout-card-header {
+        background: linear-gradient(135deg, var(--accent-teal), var(--primary-green));
+        color: white;
+        padding: 1.5rem;
+        border: none;
+        position: relative;
+    }
+
+    .checkout-card-header::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: linear-gradient(45deg, rgba(255, 255, 255, 0.1), transparent);
+        border-radius: 20px 20px 0 0;
+    }
+
+    .checkout-card-body {
+        padding: 2rem;
+        position: relative;
+        z-index: 1;
+    }
+
+    .btn-eco-primary {
+        background: linear-gradient(135deg, var(--primary-green), var(--secondary-green));
+        border: none;
+        color: white;
+        padding: 0.75rem 2rem;
+        border-radius: 50px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 15px rgba(32, 201, 151, 0.3);
+    }
+
+    .btn-eco-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(32, 201, 151, 0.4);
+        color: white;
+    }
+
+    .btn-eco-secondary {
+        background: linear-gradient(135deg, var(--accent-teal), var(--primary-green));
+        border: none;
+        color: white;
+        padding: 0.75rem 2rem;
+        border-radius: 50px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 15px rgba(23, 162, 184, 0.3);
+    }
+
+    .btn-eco-secondary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(23, 162, 184, 0.4);
+        color: white;
+    }
+
+    .form-control:focus {
+        border-color: var(--primary-green);
+        box-shadow: 0 0 0 0.2rem rgba(32, 201, 151, 0.25);
+    }
+
+    .payment-option .card {
+        border: 2px solid transparent;
+        transition: all 0.3s ease;
+        cursor: pointer;
+    }
+
+    .payment-option input[type="radio"]:checked + label .card {
+        border-color: var(--primary-green);
+        box-shadow: 0 0 20px rgba(32, 201, 151, 0.3);
+        transform: scale(1.02);
+    }
+
+    .summary-card {
+        background: linear-gradient(135deg, rgba(32, 201, 151, 0.1), rgba(40, 167, 69, 0.1));
+        border: 1px solid rgba(32, 201, 151, 0.3);
+        border-radius: 20px;
+    }
+
+    .summary-item {
+        padding: 1rem 0;
+        border-bottom: 1px solid rgba(32, 201, 151, 0.2);
+    }
+
+    .summary-item:last-child {
+        border-bottom: none;
+        font-size: 1.2rem;
+        font-weight: 700;
+        color: var(--primary-green);
+    }
+
+    .eco-badge {
+        background: linear-gradient(135deg, var(--eco-gold), var(--warm-orange));
+        color: #333;
+        padding: 0.25rem 0.75rem;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+</style>
+<body class="eco-bg">
+    <div th:replace="~{fragments/client-navbar :: client-navbar}"></div>
+    <main class="checkout-container">
+        <div class="checkout-header">
+            <h1 class="checkout-title">Pago Seguro</h1>
+            <p class="checkout-subtitle">Completa tu compra de manera segura y confiable</p>
+        </div>
+        <div class="checkout-content">
+            <div class="row">
+                <!-- Formulario de pago -->
+                <div class="col-lg-8">
+                    <!-- Información de envío -->
+                    <div class="checkout-card">
+                        <div class="checkout-card-header">
+                            <h5 class="mb-0"><i class="bi bi-truck me-2"></i>Información de Envío</h5>
+                        </div>
+                        <div class="checkout-card-body">
+                        <form id="shippingForm">
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label for="firstName" class="client-form-label">Nombre *</label>
+                                    <input type="text" class="client-form-control" id="firstName" placeholder="Tu nombre" required
+                                           th:value="${usuario?.nombre ?: ''}" th:placeholder="${usuario?.nombre ?: 'Tu nombre'}">
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="lastName" class="client-form-label">Apellidos *</label>
+                                    <input type="text" class="client-form-control" id="lastName" placeholder="Tus apellidos" required>
+                                </div>
+                                <div class="col-12">
+                                    <label for="email" class="client-form-label">Correo Electrónico *</label>                                    <input type="email" class="client-form-control" id="email" placeholder="tu@email.com" required
+                                           th:value="${usuario?.email ?: ''}" th:placeholder="${usuario?.email ?: 'tu@email.com'}">
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="phone" class="client-form-label">Teléfono *</label>
+                                    <input type="tel" class="client-form-control" id="phone" placeholder="+51 999 999 999" required
+                                           th:value="${usuario?.telefono ?: ''}" th:placeholder="${usuario?.telefono ?: '+51 999 999 999'}">
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="country" class="form-label fw-bold">País *</label>
+                                    <select class="form-select" id="country" required>
+                                        <option value="">Selecciona tu país</option>
+                                        <option value="PE" selected>Perú</option>
+                                        <option value="PE" selected>Perú</option>
+                                        <option value="CO">Colombia</option>
+                                        <option value="MX">México</option>
+                                        <option value="AR">Argentina</option>
+                                        <option value="CL">Chile</option>
+                                    </select>
+                                </div>
+                                <div class="col-12">
+                                    <label for="address" class="form-label fw-bold">Dirección *</label>
+                                    <input type="text" class="form-control" id="address" placeholder="Av. Principal 123" required>
+                                </div>
+                                <div class="col-md-4">
+                                    <label for="city" class="form-label fw-bold">Ciudad *</label>
+                                    <input type="text" class="form-control" id="city" placeholder="Lima" required>
+                                </div>
+                                <div class="col-md-4">
+                                    <label for="state" class="form-label fw-bold">Región/Estado *</label>
+                                    <input type="text" class="form-control" id="state" placeholder="Lima" required>
+                                </div>
+                                <div class="col-md-4">
+                                    <label for="zipCode" class="form-label fw-bold">Código Postal *</label>
+                                    <input type="text" class="form-control" id="zipCode" placeholder="15001" required>
+                                </div>
+                                <div class="col-12">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="saveAddress">
+                                        <label class="form-check-label" for="saveAddress">
+                                            Guardar esta dirección para futuras compras
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Información de pago -->
+                <div class="checkout-card">
+                    <div class="checkout-card-header">
+                        <h5 class="mb-0"><i class="bi bi-credit-card-2-front me-2"></i>Método de Pago</h5>
+                    </div>
+                    <div class="checkout-card-body">
+                        <!-- Opciones de pago -->
+                        <div class="row g-3 mb-4">
+                            <div class="col-md-4">
+                                <div class="form-check payment-option">
+                                    <input class="form-check-input" type="radio" name="paymentMethod" id="creditCard" value="creditCard" checked>
+                                    <label class="form-check-label w-100" for="creditCard">
+                                        <div class="card border-2 h-100">
+                                            <div class="card-body text-center">
+                                                <i class="bi bi-credit-card text-primary fs-3"></i>
+                                                <div class="fw-bold mt-2">Tarjeta de Crédito</div>
+                                                <small class="text-muted">Visa, Mastercard, American Express</small>
+                                            </div>
+                                        </div>
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-check payment-option">
+                                    <input class="form-check-input" type="radio" name="paymentMethod" id="paypal" value="paypal">
+                                    <label class="form-check-label w-100" for="paypal">
+                                        <div class="card border-2 h-100">
+                                            <div class="card-body text-center">
+                                                <i class="bi bi-paypal text-primary fs-3"></i>
+                                                <div class="fw-bold mt-2">PayPal</div>
+                                                <small class="text-muted">Pago rápido y seguro</small>
+                                            </div>
+                                        </div>
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-check payment-option">
+                                    <input class="form-check-input" type="radio" name="paymentMethod" id="bankTransfer" value="bankTransfer">
+                                    <label class="form-check-label w-100" for="bankTransfer">
+                                        <div class="card border-2 h-100">
+                                            <div class="card-body text-center">
+                                                <i class="bi bi-bank text-primary fs-3"></i>
+                                                <div class="fw-bold mt-2">Transferencia</div>
+                                                <small class="text-muted">Depósito bancario</small>
+                                            </div>
+                                        </div>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Formulario de tarjeta de crédito -->
+                        <div id="creditCardForm">
+                            <form id="paymentForm">
+                                <div class="row g-3">
+                                    <div class="col-12">
+                                        <label for="cardNumber" class="form-label fw-bold">Número de Tarjeta *</label>
+                                        <input type="text" class="form-control" id="cardNumber" placeholder="1234 5678 9012 3456" 
+                                               maxlength="19" required>
+                                    </div>
+                                    <div class="col-12">
+                                        <label for="cardName" class="form-label fw-bold">Nombre en la Tarjeta *</label>
+                                        <input type="text" class="form-control" id="cardName" placeholder="Como aparece en la tarjeta" required>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="expiryDate" class="form-label fw-bold">Fecha de Vencimiento *</label>
+                                        <input type="text" class="form-control" id="expiryDate" placeholder="MM/AA" maxlength="5" required>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="cvv" class="form-label fw-bold">
+                                            CVV *
+                                            <i class="bi bi-question-circle" data-bs-toggle="tooltip" 
+                                               title="Código de 3 dígitos en el reverso de tu tarjeta"></i>
+                                        </label>
+                                        <input type="text" class="form-control" id="cvv" placeholder="123" maxlength="4" required>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+
+                        <!-- Información de PayPal -->
+                        <div id="paypalForm" class="payment-form-hidden">
+                            <div class="text-center p-4">
+                                <i class="bi bi-paypal display-1 text-primary"></i>
+                                <h5 class="mt-3">Serás redirigido a PayPal para completar el pago</h5>
+                                <p class="text-muted">PayPal es un método de pago seguro y confiable</p>
+                            </div>
+                        </div>
+
+                        <!-- Información de transferencia -->
+                        <div id="bankTransferForm" class="payment-form-hidden">
+                            <div class="alert alert-info">
+                                <h6><i class="bi bi-info-circle me-2"></i>Información para Transferencia Bancaria</h6>
+                                <p class="mb-2"><strong>Banco:</strong> Banco de Crédito del Perú (BCP)</p>
+                                <p class="mb-2"><strong>Cuenta Corriente:</strong> 1234-5678-9012-3456</p>
+                                <p class="mb-2"><strong>Titular:</strong> EcoVivaShop S.A.C.</p>
+                                <p class="mb-0"><strong>Referencia:</strong> <span class="text-primary fw-bold">ECO-2024-001</span></p>
+                            </div>
+                            <p class="text-muted small">
+                                Una vez realizada la transferencia, envía el comprobante a <strong>pagos@EcoVivaShop.com</strong> 
+                                para procesar tu pedido.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Términos y condiciones -->
+                <div class="checkout-card">
+                    <div class="checkout-card-body">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="acceptTerms" required>
+                            <label class="form-check-label" for="acceptTerms">
+                                Acepto los <a href="#" class="text-success">términos y condiciones</a> de EcoVivaShop 
+                                y la <a href="#" class="text-success">política de privacidad</a>
+                            </label>
+                        </div>
+                        <div class="form-check mt-2">
+                            <input class="form-check-input" type="checkbox" id="newsletter">
+                            <label class="form-check-label" for="newsletter">
+                                Quiero recibir ofertas especiales y noticias sobre productos eco-amigables
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Resumen del pedido -->
+            <div class="col-lg-4">
+                <div class="checkout-card summary-card">
+                    <div class="checkout-card-header">
+                        <h5 class="mb-0 fw-bold"><i class="bi bi-receipt me-2"></i>Resumen del Pedido</h5>
+                    </div>
+                    <div class="checkout-card-body">
+                        <!-- Productos -->
+                        <div class="mb-3">
+                            <h6 class="fw-bold">Productos (4 artículos):</h6>
+                            <div class="d-flex justify-content-between mb-2">
+                                <span class="small">Eco Kit Hogar x2</span>
+                                <span class="small">S/ 117.00</span>
+                            </div>
+                            <div class="d-flex justify-content-between mb-2">
+                                <span class="small">Shampoo Natural x1</span>
+                                <span class="small">S/ 40.00</span>
+                            </div>
+                            <div class="d-flex justify-content-between mb-2">
+                                <span class="small">Botella Reutilizable x1</span>
+                                <span class="small">S/ 50.00</span>
+                            </div>
+                        </div>
+
+                        <hr>
+
+                        <!-- Cálculos -->
+                        <div class="d-flex justify-content-between mb-2">
+                            <span>Subtotal:</span>
+                            <span>S/ 248.00</span>
+                        </div>
+                        <div class="d-flex justify-content-between mb-2">
+                            <span>Envío:</span>
+                            <span class="text-success fw-bold">GRATIS</span>
+                        </div>
+                        <div class="d-flex justify-content-between mb-2">
+                            <span>Descuento Eco-Friendly:</span>
+                            <span class="text-success eco-badge">-S/ 12.40</span>
+                        </div>
+                        <div class="d-flex justify-content-between mb-2">
+                            <span>IGV (18%):</span>
+                            <span>S/ 42.40</span>
+                        </div>
+
+                        <hr>
+
+                        <div class="d-flex justify-content-between mb-4">
+                            <h5 class="fw-bold">Total a Pagar:</h5>
+                            <h5 class="fw-bold text-success eco-badge">S/ 278.00</h5>
+                        </div>
+
+                        <!-- Botón de procesar pago -->
+                        <div class="d-grid gap-2">
+                            <button class="btn btn-eco-primary" onclick="processPayment()" id="processPaymentBtn">
+                                <i class="bi bi-shield-check me-2"></i>Procesar Pago Seguro
+                            </button>
+                            <a href="/client/carrito" class="btn btn-eco-secondary">
+                                <i class="bi bi-arrow-left me-2"></i>Volver al Carrito
+                            </a>
+                        </div>
+
+                        <!-- Garantías de seguridad -->
+                        <div class="mt-4 text-center">
+                            <div class="row g-2">
+                                <div class="col-4">
+                                    <i class="bi bi-shield-check text-success fs-5"></i>
+                                    <div class="small text-muted">Pago Seguro</div>
+                                </div>
+                                <div class="col-4">
+                                    <i class="bi bi-truck text-success fs-5"></i>
+                                    <div class="small text-muted">Envío Gratis</div>
+                                </div>
+                                <div class="col-4">
+                                    <i class="bi bi-arrow-repeat text-success fs-5"></i>
+                                    <div class="small text-muted">Devoluciones</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+    <div th:replace="~{fragments/footer :: footer}"></div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Formatear número de tarjeta
+        document.getElementById('cardNumber').addEventListener('input', function(e) {
+            let value = e.target.value.replace(/\s+/g, '').replace(/[^0-9]/gi, '');
+            let formattedValue = value.match(/.{1,4}/g)?.join(' ') || value;
+            if (formattedValue.length > 19) formattedValue = formattedValue.substr(0, 19);
+            this.value = formattedValue;
+        });
+
+        // Formatear fecha de vencimiento
+        document.getElementById('expiryDate').addEventListener('input', function(e) {
+            let value = e.target.value.replace(/\D/g, '');
+            if (value.length >= 2) {
+                value = value.substring(0, 2) + '/' + value.substring(2, 4);
+            }
+            this.value = value;
+        });
+
+        // Solo números para CVV
+        document.getElementById('cvv').addEventListener('input', function(e) {
+            this.value = this.value.replace(/[^0-9]/g, '');
+        });
+
+        // Cambiar formulario según método de pago
+        document.querySelectorAll('input[name="paymentMethod"]').forEach(radio => {
+            radio.addEventListener('change', function() {
+                const creditCardForm = document.getElementById('creditCardForm');
+                const paypalForm = document.getElementById('paypalForm');
+                const bankTransferForm = document.getElementById('bankTransferForm');
+                const processBtn = document.getElementById('processPaymentBtn');
+
+                // Ocultar todos los formularios
+                creditCardForm.style.display = 'none';
+                paypalForm.style.display = 'none';
+                bankTransferForm.style.display = 'none';
+
+                // Mostrar el formulario correspondiente
+                if (this.value === 'creditCard') {
+                    creditCardForm.style.display = 'block';
+                    processBtn.innerHTML = '<i class="bi bi-shield-check me-2"></i>Procesar Pago Seguro';
+                } else if (this.value === 'paypal') {
+                    paypalForm.style.display = 'block';
+                    processBtn.innerHTML = '<i class="bi bi-paypal me-2"></i>Pagar con PayPal';
+                } else if (this.value === 'bankTransfer') {
+                    bankTransferForm.style.display = 'block';
+                    processBtn.innerHTML = '<i class="bi bi-bank me-2"></i>Confirmar Transferencia';
+                }
+
+                // Actualizar estilos de las tarjetas de pago
+                document.querySelectorAll('.payment-option .card').forEach(card => {
+                    card.classList.remove('border-success');
+                });
+                this.closest('.payment-option').querySelector('.card').classList.add('border-success');
+            });
+        });        // Procesar pago
+        function processPayment() {
+            const paymentMethod = document.querySelector('input[name="paymentMethod"]:checked').value;
+            const acceptTerms = document.getElementById('acceptTerms').checked;
+
+            if (!acceptTerms) {
+                alert('Debes aceptar los términos y condiciones para continuar.');
+                return;
+            }
+
+            // Validar formularios según el método de pago
+            if (paymentMethod === 'creditCard') {
+                if (!validateCreditCardForm()) {
+                    return;
+                }
+            }
+
+            if (!validateShippingForm()) {
+                return;
+            }
+
+            // Crear FormData para enviar como formulario
+            const formData = new FormData();
+            
+            // Agregar datos de envío
+            formData.append('firstName', document.getElementById('firstName').value);
+            formData.append('lastName', document.getElementById('lastName').value);
+            formData.append('email', document.getElementById('email').value);
+            formData.append('phone', document.getElementById('phone').value);
+            formData.append('country', document.getElementById('country').value);
+            formData.append('address', document.getElementById('address').value);
+            formData.append('city', document.getElementById('city').value);
+            formData.append('state', document.getElementById('state').value);
+            formData.append('zipCode', document.getElementById('zipCode').value);
+            
+            // Método de pago
+            formData.append('paymentMethod', paymentMethod);
+            
+            // Datos específicos del método de pago
+            if (paymentMethod === 'creditCard') {
+                formData.append('cardNumber', document.getElementById('cardNumber').value.replace(/\s/g, ''));
+                formData.append('cardName', document.getElementById('cardName').value);
+                formData.append('expiryDate', document.getElementById('expiryDate').value);
+                formData.append('cvv', document.getElementById('cvv').value);
+            }
+            
+            // Términos
+            formData.append('acceptTerms', acceptTerms);
+            formData.append('newsletter', document.getElementById('newsletter').checked);
+
+            // Enviar solicitud POST al backend
+            fetch('/client/procesar-pago', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => {
+                if (!response.ok) {
+                    return response.text().then(text => {
+                        throw new Error(text || 'Error en el procesamiento del pago');
+                    });
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.success) {
+                    // Redirigir a la URL especificada
+                    window.location.href = data.redirectUrl || '/client/confirmacion';
+                } else {
+                    throw new Error(data.message || 'Error desconocido en el procesamiento');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Error al procesar el pago: ' + error.message);
+
+                // Restaurar botón
+                processBtn.disabled = false;
+                processBtn.innerHTML = originalText;
+            });
+        }
+
+        // Mostrar modal de éxito de pago
+        function showPaymentSuccessModal() {
+            // Crear modal dinámicamente
+            const modalHtml = `
+                <div class="modal fade" id="paymentSuccessModal" tabindex="-1" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
+                    <div class="modal-dialog modal-dialog-centered">
+                        <div class="modal-content border-0 shadow">
+                            <div class="modal-body text-center p-5">
+                                <div class="mb-4">
+                                    <i class="bi bi-check-circle-fill text-success payment-success-icon"></i>
+                                </div>
+                                <h3 class="fw-bold text-success mb-3">¡Pago Exitoso!</h3>
+                                <p class="lead mb-4">Tu pago ha sido procesado correctamente.<br>Tu pedido está siendo preparado.</p>
+                                
+                                <div class="alert alert-success border-0 mb-4">
+                                    <div class="fw-bold mb-2">
+                                        <i class="bi bi-receipt me-2"></i>Número de Pedido: <strong>ECO-2024-001234</strong>
+                                    </div>
+                                    <div class="small">Guarda este número para rastrear tu pedido</div>
+                                </div>
+                                  <div class="countdown-container mb-4">
+                                    <div class="progress mb-2 redirect-progress">
+                                        <div class="progress-bar bg-success progress-bar-animated redirect-progress-bar" role="progressbar" 
+                                             aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" id="redirectProgress"></div>
+                                    </div>
+                                    <p class="small text-muted mb-0">
+                                        Redirigiendo al área de cliente en <span id="countdown" class="fw-bold text-success">5</span> segundos...
+                                    </p>
+                                </div>
+                                
+                                <div class="d-grid gap-2">
+                                    <button class="btn btn-success" onclick="redirectToHome()">
+                                        <i class="bi bi-house me-2"></i>Ir a Mi Área Ahora
+                                    </button>
+                                    <button class="btn btn-outline-success" onclick="viewOrderDetails()">
+                                        <i class="bi bi-eye me-2"></i>Ver Detalles del Pedido
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            // Agregar modal al DOM
+            document.body.insertAdjacentHTML('beforeend', modalHtml);
+            
+            // Mostrar modal
+            const modal = new bootstrap.Modal(document.getElementById('paymentSuccessModal'));
+            modal.show();
+            
+            // Iniciar countdown
+            startRedirectCountdown();
+        }
+
+        // Iniciar countdown para redirección
+        function startRedirectCountdown() {
+            let timeLeft = 5;
+            const countdownElement = document.getElementById('countdown');
+            const progressBar = document.getElementById('redirectProgress');
+            
+            const timer = setInterval(function() {
+                timeLeft--;
+                countdownElement.textContent = timeLeft;
+                
+                // Actualizar barra de progreso
+                const progressWidth = (timeLeft / 5) * 100;
+                progressBar.style.width = progressWidth + '%';
+                
+                if (timeLeft <= 0) {
+                    clearInterval(timer);
+                    redirectToHome();
+                }
+            }, 1000);
+        }
+
+        // Redireccionar al área de cliente
+        function redirectToHome() {
+            // Guardar información del pedido en localStorage para mostrar en home
+            const orderInfo = {
+                orderNumber: 'ECO-2024-001234',
+                orderDate: new Date().toISOString(),
+                total: 'S/ 278.00',
+                status: 'confirmed',
+                items: 4
+            };
+            localStorage.setItem('recentOrder', JSON.stringify(orderInfo));
+            
+            // Redireccionar
+            window.location.href = '/client/home?orderSuccess=true';
+        }
+
+        // Ver detalles del pedido
+        function viewOrderDetails() {
+            window.location.href = '/client/confirmacion';
+        }
+
+        // Validar formulario de tarjeta de crédito
+        function validateCreditCardForm() {
+            const cardNumber = document.getElementById('cardNumber').value.replace(/\s/g, '');
+            const cardName = document.getElementById('cardName').value;
+            const expiryDate = document.getElementById('expiryDate').value;
+            const cvv = document.getElementById('cvv').value;
+
+            if (cardNumber.length < 16) {
+                alert('Ingresa un número de tarjeta válido.');
+                return false;
+            }
+
+            if (!cardName.trim()) {
+                alert('Ingresa el nombre que aparece en la tarjeta.');
+                return false;
+            }
+
+            if (expiryDate.length < 5) {
+                alert('Ingresa una fecha de vencimiento válida.');
+                return false;
+            }
+
+            if (cvv.length < 3) {
+                alert('Ingresa un CVV válido.');
+                return false;
+            }
+
+            return true;
+        }
+
+        // Validar formulario de envío
+        function validateShippingForm() {
+            const requiredFields = ['firstName', 'lastName', 'email', 'phone', 'country', 'address', 'city', 'state', 'zipCode'];
+            
+            for (let fieldId of requiredFields) {
+                const field = document.getElementById(fieldId);
+                if (!field.value.trim()) {
+                    alert(`Por favor, completa el campo: ${field.previousElementSibling.textContent}`);
+                    field.focus();
+                    return false;
+                }
+            }
+
+            // Validar email
+            const email = document.getElementById('email').value;
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(email)) {
+                alert('Ingresa un correo electrónico válido.');
+                return false;
+            }
+
+            return true;
+        }
+
+        // Inicializar tooltips
+        document.addEventListener('DOMContentLoaded', function() {
+            var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+            var tooltipList = tooltipTriggerList.map(function(tooltipTriggerEl) {
+                return new bootstrap.Tooltip(tooltipTriggerEl);
+            });
+
+            // Marcar la primera opción de pago como seleccionada
+            document.querySelector('.payment-option .card').classList.add('border-success');
+        });
+    </script>
+</body>
+</html>

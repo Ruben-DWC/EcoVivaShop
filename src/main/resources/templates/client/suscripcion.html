@@ -1,0 +1,1550 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/head :: head('Suscripción | EcoVivaShop')}">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Suscripción | EcoVivaShop</title>
+</head>
+<body class="eco-bg">
+    <div th:replace="~{fragments/client-navbar :: client-navbar}"></div>
+    
+    <!-- Hero Section -->
+    <section class="subscription-hero py-5">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-lg-6">
+                    <div class="hero-content">
+                        <h1 class="display-4 fw-bold text-white mb-3">
+                            <i class="bi bi-star-fill text-warning me-3"></i>
+                            Planes de Suscripción
+                        </h1>
+                        <p class="lead text-white-50 mb-4">
+                            Suscríbete a nuestros productos ecológicos y recibe productos premium directamente en tu hogar. 
+                            Planes flexibles con beneficios exclusivos para un estilo de vida sostenible.
+                        </p>
+                        <div class="hero-stats d-flex gap-4">
+                            <div class="stat-item">
+                                <h3 class="text-warning mb-0">2500+</h3>
+                                <small class="text-white-50">Clientes Activos</small>
+                            </div>
+                            <div class="stat-item">
+                                <h3 class="text-warning mb-0">99%</h3>
+                                <small class="text-white-50">Satisfacción</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-6">
+                    <div class="hero-image text-center">
+                        <i class="bi bi-box-seam subscription-hero-icon"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <main class="container py-5">
+        <!-- Productos Disponibles Section -->
+        <section class="products-section mb-5">
+            <div class="row">
+                <div class="col-12">
+                    <div class="section-header text-center mb-5">
+                        <h2 class="h1 fw-bold text-dark mb-3">
+                            <i class="bi bi-bag-check text-success me-2"></i>
+                            Productos Disponibles
+                        </h2>
+                        <p class="lead text-muted">
+                            Selecciona y personaliza tu kit de productos ecológicos
+                        </p>
+                    </div>
+                    
+                    <div class="products-card shadow-lg border-0 rounded-4 overflow-hidden">
+                        <div class="card-header bg-gradient-success text-white py-4">
+                            <div class="d-flex align-items-center justify-content-between">
+                                <h5 class="mb-0 fw-bold">
+                                    <i class="bi bi-cart-plus me-2"></i>
+                                    Mi Kit Personalizado
+                                </h5>
+                                <div class="kit-total">
+                                    <span class="badge bg-light text-dark fs-6">
+                                        Total: <span id="totalGeneral" class="fw-bold">S/ 58.50</span>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="card-body p-4">
+                            <div class="table-responsive">
+                                <table class="table table-hover align-middle">
+                                    <thead>
+                                        <tr class="border-bottom border-2 border-success">
+                                            <th class="text-success fw-bold fs-6">Producto</th>
+                                            <th class="text-success fw-bold fs-6">Precio Unitario</th>
+                                            <th class="text-success fw-bold fs-6">Cantidad</th>
+                                            <th class="text-success fw-bold fs-6">Subtotal</th>
+                                            <th class="text-success fw-bold fs-6">Acciones</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr class="product-row" data-product-id="eco-kit">
+                                            <td>
+                                                <div class="product-info d-flex align-items-center">
+                                                    <div class="product-icon me-3">
+                                                        <div class="icon-circle bg-success bg-opacity-10 p-3 rounded-circle">
+                                                            <i class="bi bi-box-seam text-success fs-4"></i>
+                                                        </div>
+                                                    </div>
+                                                    <div>
+                                                        <h6 class="mb-1 fw-bold">Eco Kit Hogar Premium</h6>
+                                                        <small class="text-muted">Productos biodegradables para el hogar</small>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <span class="price fw-bold text-success">S/ 11.70</span>
+                                            </td>
+                                            <td>
+                                                <div class="quantity-controls">
+                                                    <div class="input-group quantity-input-group">
+                                                        <button class="btn btn-outline-success btn-decrease" 
+                                                                type="button" onclick="cambiarCantidad('eco-kit', -1)">
+                                                            <i class="bi bi-dash"></i>
+                                                        </button>
+                                                        <input type="number" class="form-control text-center quantity-input" 
+                                                               id="cantidad-eco-kit" value="5" min="1" readonly
+                                                               title="Cantidad de Eco Kit Hogar" aria-label="Cantidad de Eco Kit Hogar">
+                                                        <button class="btn btn-outline-success btn-increase" 
+                                                                type="button" onclick="cambiarCantidad('eco-kit', 1)">
+                                                            <i class="bi bi-plus"></i>
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <span class="subtotal fw-bold text-dark" id="subtotal-eco-kit">S/ 58.50</span>
+                                            </td>
+                                            <td>
+                                                <div class="action-buttons">
+                                                    <button class="btn btn-success btn-sm me-2" onclick="agregarProducto('eco-kit')" 
+                                                            title="Añadir al carrito">
+                                                        <i class="bi bi-plus-circle"></i>
+                                                    </button>
+                                                    <button class="btn btn-outline-danger btn-sm" onclick="eliminarProducto('eco-kit')" 
+                                                            title="Eliminar producto">
+                                                        <i class="bi bi-trash"></i>
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        
+                                        <!-- Producto adicional de ejemplo -->
+                                        <tr class="product-row" data-product-id="eco-limpieza">
+                                            <td>
+                                                <div class="product-info d-flex align-items-center">
+                                                    <div class="product-icon me-3">
+                                                        <div class="icon-circle bg-info bg-opacity-10 p-3 rounded-circle">
+                                                            <i class="bi bi-droplet text-info fs-4"></i>
+                                                        </div>
+                                                    </div>
+                                                    <div>
+                                                        <h6 class="mb-1 fw-bold">Kit Limpieza Ecológica</h6>
+                                                        <small class="text-muted">Productos de limpieza naturales</small>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <span class="price fw-bold text-info">S/ 15.50</span>
+                                            </td>
+                                            <td>
+                                                <div class="quantity-controls">
+                                                    <div class="input-group quantity-input-group">
+                                                        <button class="btn btn-outline-info btn-decrease" 
+                                                                type="button" onclick="cambiarCantidad('eco-limpieza', -1)">
+                                                            <i class="bi bi-dash"></i>
+                                                        </button>
+                                                        <input type="number" class="form-control text-center quantity-input" 
+                                                               id="cantidad-eco-limpieza" value="2" min="1" readonly
+                                                               title="Cantidad de Kit Limpieza" aria-label="Cantidad de Kit Limpieza">
+                                                        <button class="btn btn-outline-info btn-increase" 
+                                                                type="button" onclick="cambiarCantidad('eco-limpieza', 1)">
+                                                            <i class="bi bi-plus"></i>
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <span class="subtotal fw-bold text-dark" id="subtotal-eco-limpieza">S/ 31.00</span>
+                                            </td>
+                                            <td>
+                                                <div class="action-buttons">
+                                                    <button class="btn btn-info btn-sm me-2" onclick="agregarProducto('eco-limpieza')" 
+                                                            title="Añadir al carrito">
+                                                        <i class="bi bi-plus-circle"></i>
+                                                    </button>
+                                                    <button class="btn btn-outline-danger btn-sm" onclick="eliminarProducto('eco-limpieza')" 
+                                                            title="Eliminar producto">
+                                                        <i class="bi bi-trash"></i>
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            
+                            <div class="total-section bg-light rounded-3 p-4 mt-4">
+                                <div class="row align-items-center">
+                                    <div class="col-md-8">
+                                        <div class="total-info">
+                                            <h6 class="text-muted mb-1">Total de productos seleccionados</h6>
+                                            <small class="text-muted">Precio base para todos los planes de suscripción</small>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4 text-md-end">
+                                        <h3 class="mb-0 text-success fw-bold">
+                                            <span id="totalFinal">S/ 89.50</span>
+                                        </h3>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Planes de Suscripción Section -->
+        <section class="subscription-plans mb-5">
+            <div class="row">
+                <div class="col-12">
+                    <div class="section-header text-center mb-5">
+                        <h2 class="h1 fw-bold text-dark mb-3">
+                            <i class="bi bi-calendar-check text-success me-2"></i>
+                            Planes de Suscripción
+                        </h2>
+                        <p class="lead text-muted">
+                            Elige el plan que mejor se adapte a tu estilo de vida sostenible
+                        </p>
+                    </div>
+                    
+                    <div class="row g-4 justify-content-center">
+                        <!-- Plan Mensual -->
+                        <div class="col-lg-3 col-md-6">
+                            <div class="subscription-plan-card h-100" data-plan="mensual" data-price="89.50">
+                                <div class="plan-header bg-gradient text-white p-4 text-center">
+                                    <div class="plan-icon mb-3">
+                                        <i class="bi bi-calendar-month fs-1"></i>
+                                    </div>
+                                    <h4 class="fw-bold mb-2">Plan Mensual</h4>
+                                    <p class="mb-0 opacity-75">Ideal para comenzar</p>
+                                </div>
+                                
+                                <div class="plan-body p-4">
+                                    <div class="plan-price text-center mb-4">
+                                        <div class="price-amount">
+                                            <span class="currency">S/</span>
+                                            <span class="amount" data-base-price="89.50">89.50</span>
+                                            <span class="period">/mes</span>
+                                        </div>
+                                        <small class="text-muted">Precio base calculado automáticamente</small>
+                                    </div>
+                                    
+                                    <ul class="plan-features list-unstyled mb-4">
+                                        <li class="feature-item">
+                                            <i class="bi bi-check-circle-fill text-success me-2"></i>
+                                            Envío gratuito mensual
+                                        </li>
+                                        <li class="feature-item">
+                                            <i class="bi bi-check-circle-fill text-success me-2"></i>
+                                            Productos seleccionados
+                                        </li>
+                                        <li class="feature-item">
+                                            <i class="bi bi-check-circle-fill text-success me-2"></i>
+                                            Cancela cuando quieras
+                                        </li>
+                                        <li class="feature-item">
+                                            <i class="bi bi-check-circle-fill text-success me-2"></i>
+                                            Soporte por email
+                                        </li>
+                                    </ul>
+                                    
+                                    <button class="btn btn-outline-primary w-100 plan-select-btn">
+                                        Seleccionar Plan
+                                    </button>
+                                </div>
+                                
+                                <div class="plan-badge">
+                                    <span class="badge bg-warning">Más Popular</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Plan Bimestral -->
+                        <div class="col-lg-3 col-md-6">
+                            <div class="subscription-plan-card h-100" data-plan="bimestral" data-price="170.05">
+                                <div class="plan-header bg-gradient text-white p-4 text-center">
+                                    <div class="plan-icon mb-3">
+                                        <i class="bi bi-calendar3 fs-1"></i>
+                                    </div>
+                                    <h4 class="fw-bold mb-2">Plan Bimestral</h4>
+                                    <p class="mb-0 opacity-75">Ahorra con flexibilidad</p>
+                                </div>
+                                
+                                <div class="plan-body p-4">
+                                    <div class="plan-price text-center mb-4">
+                                        <div class="price-amount">
+                                            <span class="currency">S/</span>
+                                            <span class="amount" data-base-price="170.05">170.05</span>
+                                            <span class="period">/2 meses</span>
+                                        </div>
+                                        <small class="text-success fw-bold">Ahorra 5%</small>
+                                    </div>
+                                    
+                                    <ul class="plan-features list-unstyled mb-4">
+                                        <li class="feature-item">
+                                            <i class="bi bi-check-circle-fill text-success me-2"></i>
+                                            Envío gratuito bimestral
+                                        </li>
+                                        <li class="feature-item">
+                                            <i class="bi bi-check-circle-fill text-success me-2"></i>
+                                            5% de descuento
+                                        </li>
+                                        <li class="feature-item">
+                                            <i class="bi bi-check-circle-fill text-success me-2"></i>
+                                            Productos premium
+                                        </li>
+                                        <li class="feature-item">
+                                            <i class="bi bi-check-circle-fill text-success me-2"></i>
+                                            Soporte prioritario
+                                        </li>
+                                    </ul>
+                                    
+                                    <button class="btn btn-outline-primary w-100 plan-select-btn">
+                                        Seleccionar Plan
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Plan Trimestral -->
+                        <div class="col-lg-3 col-md-6">
+                            <div class="subscription-plan-card subscription-featured h-100" data-plan="trimestral" data-price="241.65">
+                                <div class="plan-header bg-gradient text-white p-4 text-center">
+                                    <div class="plan-icon mb-3">
+                                        <i class="bi bi-calendar4-range fs-1"></i>
+                                    </div>
+                                    <h4 class="fw-bold mb-2">Plan Trimestral</h4>
+                                    <p class="mb-0 opacity-75">Máximo valor</p>
+                                </div>
+                                
+                                <div class="plan-body p-4">
+                                    <div class="plan-price text-center mb-4">
+                                        <div class="price-amount">
+                                            <span class="currency">S/</span>
+                                            <span class="amount" data-base-price="241.65">241.65</span>
+                                            <span class="period">/3 meses</span>
+                                        </div>
+                                        <small class="text-success fw-bold">Ahorra 10%</small>
+                                    </div>
+                                    
+                                    <ul class="plan-features list-unstyled mb-4">
+                                        <li class="feature-item">
+                                            <i class="bi bi-check-circle-fill text-success me-2"></i>
+                                            Envío gratuito trimestral
+                                        </li>
+                                        <li class="feature-item">
+                                            <i class="bi bi-check-circle-fill text-success me-2"></i>
+                                            10% de descuento
+                                        </li>
+                                        <li class="feature-item">
+                                            <i class="bi bi-check-circle-fill text-success me-2"></i>
+                                            Productos exclusivos
+                                        </li>
+                                        <li class="feature-item">
+                                            <i class="bi bi-check-circle-fill text-success me-2"></i>
+                                            Consultor personal
+                                        </li>
+                                    </ul>
+                                    
+                                    <button class="btn btn-success w-100 plan-select-btn">
+                                        Seleccionar Plan
+                                    </button>
+                                </div>
+                                
+                                <div class="plan-badge">
+                                    <span class="badge bg-success">Mejor Valor</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Plan Anual -->
+                        <div class="col-lg-3 col-md-6">
+                            <div class="subscription-plan-card h-100" data-plan="anual" data-price="804.75">
+                                <div class="plan-header bg-gradient text-white p-4 text-center">
+                                    <div class="plan-icon mb-3">
+                                        <i class="bi bi-calendar4-week fs-1"></i>
+                                    </div>
+                                    <h4 class="fw-bold mb-2">Plan Anual</h4>
+                                    <p class="mb-0 opacity-75">Máximo compromiso</p>
+                                </div>
+                                
+                                <div class="plan-body p-4">
+                                    <div class="plan-price text-center mb-4">
+                                        <div class="price-amount">
+                                            <span class="currency">S/</span>
+                                            <span class="amount" data-base-price="804.75">804.75</span>
+                                            <span class="period">/año</span>
+                                        </div>
+                                        <small class="text-success fw-bold">Ahorra 25%</small>
+                                    </div>
+                                    
+                                    <ul class="plan-features list-unstyled mb-4">
+                                        <li class="feature-item">
+                                            <i class="bi bi-check-circle-fill text-success me-2"></i>
+                                            Envío gratuito anual
+                                        </li>
+                                        <li class="feature-item">
+                                            <i class="bi bi-check-circle-fill text-success me-2"></i>
+                                            25% de descuento
+                                        </li>
+                                        <li class="feature-item">
+                                            <i class="bi bi-check-circle-fill text-success me-2"></i>
+                                            Productos VIP
+                                        </li>
+                                        <li class="feature-item">
+                                            <i class="bi bi-check-circle-fill text-success me-2"></i>
+                                            Servicios premium
+                                        </li>
+                                    </ul>
+                                    
+                                    <button class="btn btn-outline-primary w-100 plan-select-btn">
+                                        Seleccionar Plan
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Configuración de Fechas Section -->
+        <section class="subscription-config" id="configSection" style="display: none;">
+            <div class="row justify-content-center">
+                <div class="col-lg-8">
+                    <div class="config-card shadow-lg border-0 rounded-4 overflow-hidden">
+                        <div class="config-header bg-gradient-success text-white p-4">
+                            <div class="d-flex align-items-center">
+                                <i class="bi bi-calendar-check fs-2 me-3"></i>
+                                <div>
+                                    <h4 class="fw-bold mb-1">Configurar Tu Suscripción</h4>
+                                    <p class="mb-0 opacity-75">Plan seleccionado: <span id="selectedPlanName"></span></p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="config-body p-5">
+                            <form id="subscriptionForm">
+                                <div class="row g-4">
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label for="fechaInicio" class="form-label fw-bold text-dark mb-3">
+                                                <i class="bi bi-calendar-plus text-success me-2"></i>
+                                                Fecha de Inicio
+                                            </label>
+                                            <input type="date" class="form-control form-control-lg" id="fechaInicio" 
+                                                   min="2025-08-28" required title="Selecciona la fecha de inicio de tu suscripción">
+                                            <small class="text-muted mt-2 d-block">Tu suscripción comenzará en esta fecha</small>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label for="fechaRenovacion" class="form-label fw-bold text-dark mb-3">
+                                                <i class="bi bi-arrow-repeat text-info me-2"></i>
+                                                Fecha de Renovación
+                                            </label>
+                                            <input type="date" class="form-control form-control-lg" id="fechaRenovacion" 
+                                                   readonly title="Fecha calculada automáticamente según el plan">
+                                            <small class="text-muted mt-2 d-block">Se calculará automáticamente según tu plan</small>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="col-12">
+                                        <div class="subscription-summary bg-light rounded-3 p-4">
+                                            <h6 class="fw-bold text-dark mb-3">
+                                                <i class="bi bi-clipboard-check text-success me-2"></i>
+                                                Resumen de tu Suscripción
+                                            </h6>
+                                            
+                                            <div class="row g-3">
+                                                <div class="col-md-6">
+                                                    <div class="summary-item">
+                                                        <strong>Plan:</strong> <span id="summaryPlan"></span>
+                                                    </div>
+                                                    <div class="summary-item">
+                                                        <strong>Productos:</strong> <span id="summaryProducts"></span>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <div class="summary-item">
+                                                        <strong>Precio base:</strong> <span id="summaryBasePrice"></span>
+                                                    </div>
+                                                    <div class="summary-item text-success">
+                                                        <strong>Total a pagar:</strong> <span id="summaryTotalPrice" class="fs-5 fw-bold"></span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="col-12">
+                                        <div class="d-flex gap-3 justify-content-center">
+                                            <button type="button" class="btn btn-outline-secondary btn-lg px-5" 
+                                                    onclick="volverAPlanes()">
+                                                <i class="bi bi-arrow-left me-2"></i>
+                                                Cambiar Plan
+                                            </button>
+                                            
+                                            <button type="button" class="btn btn-success btn-lg px-5" 
+                                                    id="proceedToPaymentBtn" onclick="abrirModalPago()">
+                                                <i class="bi bi-credit-card me-2"></i>
+                                                Continuar con el Pago
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Modal de Confirmación de Pago -->
+    <div class="modal fade" id="paymentModal" tabindex="-1" aria-labelledby="paymentModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content border-0 shadow-lg">
+                <div class="modal-header bg-gradient-success text-white border-0">
+                    <div class="d-flex align-items-center">
+                        <i class="bi bi-credit-card-fill fs-2 me-3"></i>
+                        <div>
+                            <h5 class="modal-title fw-bold mb-1" id="paymentModalLabel">Procesar Pago</h5>
+                            <small class="opacity-75">Confirma los detalles de tu suscripción</small>
+                        </div>
+                    </div>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                </div>
+                
+                <div class="modal-body p-4">
+                    <div class="row g-4">
+                        <!-- Información de la Suscripción -->
+                        <div class="col-md-6">
+                            <h6 class="fw-bold text-dark mb-3">
+                                <i class="bi bi-info-circle text-primary me-2"></i>
+                                Detalles de la Suscripción
+                            </h6>
+                            
+                            <div class="subscription-details">
+                                <div class="detail-row d-flex justify-content-between py-2 border-bottom">
+                                    <span class="text-muted">Plan:</span>
+                                    <span class="fw-bold" id="modalPlanName"></span>
+                                </div>
+                                <div class="detail-row d-flex justify-content-between py-2 border-bottom">
+                                    <span class="text-muted">Fecha de inicio:</span>
+                                    <span id="modalStartDate"></span>
+                                </div>
+                                <div class="detail-row d-flex justify-content-between py-2 border-bottom">
+                                    <span class="text-muted">Próxima renovación:</span>
+                                    <span id="modalRenewalDate"></span>
+                                </div>
+                                <div class="detail-row d-flex justify-content-between py-2 border-bottom">
+                                    <span class="text-muted">Productos incluidos:</span>
+                                    <span id="modalProductCount"></span>
+                                </div>
+                                <div class="detail-row d-flex justify-content-between py-3 bg-light rounded mt-3 px-3">
+                                    <span class="fw-bold text-dark">Total a pagar:</span>
+                                    <span class="fw-bold text-success fs-5" id="modalTotalAmount"></span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Formulario de Pago -->
+                        <div class="col-md-6">
+                            <h6 class="fw-bold text-dark mb-3">
+                                <i class="bi bi-credit-card text-success me-2"></i>
+                                Método de Pago
+                            </h6>
+                            
+                            <form id="paymentForm">
+                                <div class="payment-methods mb-4">
+                                    <div class="form-check mb-3">
+                                        <input class="form-check-input" type="radio" name="paymentMethod" id="creditCard" value="tarjeta" checked>
+                                        <label class="form-check-label fw-bold" for="creditCard">
+                                            <i class="bi bi-credit-card-2-front text-primary me-2"></i>
+                                            Tarjeta de Crédito/Débito
+                                        </label>
+                                    </div>
+                                    <div class="form-check mb-3">
+                                        <input class="form-check-input" type="radio" name="paymentMethod" id="paypal" value="paypal">
+                                        <label class="form-check-label fw-bold" for="paypal">
+                                            <i class="bi bi-paypal text-info me-2"></i>
+                                            PayPal
+                                        </label>
+                                    </div>
+                                    <div class="form-check mb-3">
+                                        <input class="form-check-input" type="radio" name="paymentMethod" id="yape" value="yape">
+                                        <label class="form-check-label fw-bold" for="yape">
+                                            <i class="bi bi-phone text-success me-2"></i>
+                                            Yape / Plin
+                                        </label>
+                                    </div>
+                                </div>
+                                
+                                <div class="card-details" id="cardDetails">
+                                    <div class="mb-3">
+                                        <label for="cardNumber" class="form-label">Número de tarjeta</label>
+                                        <input type="text" class="form-control" id="cardNumber" placeholder="1234 5678 9012 3456" 
+                                               title="Ingresa el número de tu tarjeta">
+                                    </div>
+                                    <div class="row g-3 mb-3">
+                                        <div class="col-6">
+                                            <label for="cardExpiry" class="form-label">Vencimiento</label>
+                                            <input type="text" class="form-control" id="cardExpiry" placeholder="MM/YY"
+                                                   title="Fecha de vencimiento de la tarjeta">
+                                        </div>
+                                        <div class="col-6">
+                                            <label for="cardCvv" class="form-label">CVV</label>
+                                            <input type="text" class="form-control" id="cardCvv" placeholder="123"
+                                                   title="Código de seguridad de la tarjeta">
+                                        </div>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="cardName" class="form-label">Nombre del titular</label>
+                                        <input type="text" class="form-control" id="cardName" placeholder="Nombre como aparece en la tarjeta"
+                                               title="Nombre del titular de la tarjeta">
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="modal-footer border-0 p-4">
+                    <button type="button" class="btn btn-outline-secondary btn-lg px-4" data-bs-dismiss="modal">
+                        <i class="bi bi-x-circle me-2"></i>
+                        Cancelar
+                    </button>
+                    <button type="button" class="btn btn-success btn-lg px-4" id="confirmPaymentBtn" onclick="procesarPago()">
+                        <i class="bi bi-check-circle me-2"></i>
+                        Confirmar Pago
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Toast de Notificación -->
+    <div class="toast-container position-fixed bottom-0 end-0 p-3">
+        <div id="subscriptionToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+            <div class="toast-header bg-success text-white">
+                <i class="bi bi-check-circle-fill me-2"></i>
+                <strong class="me-auto">Suscripción</strong>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+            <div class="toast-body" id="toastMessage">
+                Operación realizada exitosamente
+            </div>
+        </div>
+    </div>
+
+    <div th:replace="~{fragments/footer :: footer}"></div>
+    
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- CSS Personalizado -->
+    <style>
+        /* ========== VARIABLES Y CONFIGURACIÓN GLOBAL ========== */
+        :root {
+            --primary-color: #28a745;
+            --primary-gradient: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            --secondary-color: #6c757d;
+            --success-color: #28a745;
+            --info-color: #17a2b8;
+            --warning-color: #ffc107;
+            --danger-color: #dc3545;
+            --light-color: #f8f9fa;
+            --dark-color: #343a40;
+            --border-radius: 12px;
+            --box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+            --transition: all 0.3s ease;
+        }
+
+        /* ========== ESTILOS GLOBALES ========== */
+        body {
+            font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: var(--dark-color);
+        }
+
+        .eco-bg {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            min-height: 100vh;
+        }
+
+        /* ========== HERO SECTION ========== */
+        .subscription-hero {
+            background: var(--primary-gradient);
+            position: relative;
+            overflow: hidden;
+            margin-bottom: 2rem;
+        }
+
+        .subscription-hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.1);
+            z-index: 1;
+        }
+
+        .subscription-hero .container {
+            position: relative;
+            z-index: 2;
+        }
+
+        .subscription-hero-icon {
+            font-size: 8rem;
+            color: rgba(255, 255, 255, 0.2);
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+        }
+
+        .hero-stats .stat-item h3 {
+            font-size: 2.5rem;
+            font-weight: 700;
+        }
+
+        /* ========== SECCIONES ========== */
+        .section-header h2 {
+            position: relative;
+            display: inline-block;
+        }
+
+        .section-header h2::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 4px;
+            background: var(--primary-gradient);
+            border-radius: 2px;
+        }
+
+        /* ========== PRODUCTOS SECTION ========== */
+        .products-card {
+            background: white;
+            transition: var(--transition);
+        }
+
+        .products-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--box-shadow);
+        }
+
+        .bg-gradient-success {
+            background: var(--primary-gradient) !important;
+        }
+
+        .product-info .icon-circle {
+            width: 60px;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .quantity-controls .input-group {
+            width: 120px;
+        }
+
+        .quantity-input-group .btn {
+            border-color: #dee2e6;
+            transition: var(--transition);
+        }
+
+        .quantity-input-group .btn:hover {
+            background-color: var(--success-color);
+            border-color: var(--success-color);
+            color: white;
+        }
+
+        .quantity-input {
+            border-left: none;
+            border-right: none;
+            font-weight: 600;
+        }
+
+        .action-buttons .btn {
+            transition: var(--transition);
+        }
+
+        .action-buttons .btn:hover {
+            transform: scale(1.1);
+        }
+
+        .total-section {
+            border: 2px solid var(--success-color);
+            background: linear-gradient(135deg, #f8f9fa 0%, #e8f5e8 100%);
+        }
+
+        /* ========== PLANES DE SUSCRIPCIÓN ========== */
+        .subscription-plan-card {
+            background: white;
+            border-radius: var(--border-radius);
+            border: 2px solid transparent;
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+            cursor: pointer;
+        }
+
+        .subscription-plan-card:hover {
+            transform: translateY(-10px);
+            box-shadow: var(--box-shadow);
+            border-color: var(--success-color);
+        }
+
+        .subscription-plan-card.selected {
+            border-color: var(--success-color);
+            transform: translateY(-5px);
+            box-shadow: 0 12px 30px rgba(40, 167, 69, 0.2);
+        }
+
+        .subscription-featured {
+            border-color: var(--success-color);
+            transform: scale(1.05);
+            z-index: 2;
+        }
+
+        .plan-header {
+            background: var(--primary-gradient) !important;
+            position: relative;
+        }
+
+        .plan-icon {
+            display: inline-block;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        .plan-price .price-amount {
+            display: flex;
+            align-items: baseline;
+            justify-content: center;
+            gap: 0.25rem;
+        }
+
+        .plan-price .currency {
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+
+        .plan-price .amount {
+            font-size: 3rem;
+            font-weight: 700;
+            color: var(--success-color);
+        }
+
+        .plan-price .period {
+            font-size: 1.2rem;
+            color: var(--secondary-color);
+        }
+
+        .plan-features .feature-item {
+            padding: 0.5rem 0;
+            transition: var(--transition);
+        }
+
+        .plan-features .feature-item:hover {
+            background-color: rgba(40, 167, 69, 0.05);
+            padding-left: 1rem;
+            border-radius: 6px;
+        }
+
+        .plan-badge {
+            position: absolute;
+            top: -12px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 3;
+        }
+
+        .plan-select-btn {
+            transition: var(--transition);
+            border-width: 2px;
+        }
+
+        .plan-select-btn:hover {
+            transform: scale(1.05);
+        }
+
+        /* ========== CONFIGURACIÓN DE FECHAS ========== */
+        .config-card {
+            background: white;
+            transition: var(--transition);
+        }
+
+        .config-card:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--box-shadow);
+        }
+
+        .form-control-lg {
+            border-radius: var(--border-radius);
+            border-width: 2px;
+            transition: var(--transition);
+        }
+
+        .form-control-lg:focus {
+            border-color: var(--success-color);
+            box-shadow: 0 0 0 0.25rem rgba(40, 167, 69, 0.15);
+        }
+
+        .subscription-summary {
+            border: 2px dashed var(--success-color);
+        }
+
+        .summary-item {
+            margin-bottom: 0.5rem;
+            padding: 0.25rem 0;
+            border-bottom: 1px solid #dee2e6;
+        }
+
+        .summary-item:last-child {
+            border-bottom: none;
+            font-size: 1.1rem;
+        }
+
+        /* ========== MODAL PERSONALIZADO ========== */
+        .modal-content {
+            border-radius: var(--border-radius);
+            overflow: hidden;
+        }
+
+        .modal-header.bg-gradient-success {
+            background: var(--primary-gradient) !important;
+        }
+
+        .detail-row {
+            transition: var(--transition);
+        }
+
+        .detail-row:hover {
+            background-color: rgba(40, 167, 69, 0.05);
+            padding-left: 1rem !important;
+            padding-right: 1rem !important;
+            border-radius: 6px;
+        }
+
+        .payment-methods .form-check {
+            transition: var(--transition);
+            padding: 1rem;
+            border-radius: var(--border-radius);
+            border: 2px solid transparent;
+        }
+
+        .payment-methods .form-check:hover {
+            background-color: rgba(40, 167, 69, 0.05);
+            border-color: var(--success-color);
+        }
+
+        .payment-methods .form-check-input:checked + .form-check-label {
+            color: var(--success-color);
+        }
+
+        /* ========== RESPONSIVE DESIGN ========== */
+        /* Tablets */
+        @media (max-width: 992px) {
+            .subscription-hero-icon {
+                font-size: 6rem;
+            }
+            
+            .hero-stats {
+                justify-content: center;
+                text-align: center;
+                margin-top: 2rem;
+            }
+            
+            .subscription-featured {
+                transform: none;
+                margin-top: 2rem;
+            }
+            
+            .plan-price .amount {
+                font-size: 2.5rem;
+            }
+        }
+
+        /* Móviles */
+        @media (max-width: 768px) {
+            .subscription-hero {
+                text-align: center;
+                padding: 3rem 0;
+            }
+            
+            .subscription-hero-icon {
+                font-size: 4rem;
+                margin-top: 2rem;
+            }
+            
+            .hero-stats {
+                flex-direction: column;
+                gap: 1rem;
+            }
+            
+            .products-card .table-responsive {
+                font-size: 0.875rem;
+            }
+            
+            .quantity-controls .input-group {
+                width: 100px;
+            }
+            
+            .action-buttons {
+                display: flex;
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+            
+            .subscription-plan-card {
+                margin-bottom: 2rem;
+            }
+            
+            .plan-price .amount {
+                font-size: 2rem;
+            }
+            
+            .config-body {
+                padding: 2rem !important;
+            }
+            
+            .modal-lg {
+                max-width: 95%;
+            }
+            
+            .modal-body .row {
+                flex-direction: column;
+            }
+            
+            .modal-body .col-md-6:first-child {
+                margin-bottom: 2rem;
+            }
+        }
+
+        /* Móviles pequeños */
+        @media (max-width: 576px) {
+            .hero-content h1 {
+                font-size: 2rem;
+            }
+            
+            .section-header h2 {
+                font-size: 1.75rem;
+            }
+            
+            .products-card .card-body {
+                padding: 1.5rem;
+            }
+            
+            .plan-body {
+                padding: 2rem !important;
+            }
+            
+            .config-body {
+                padding: 1.5rem !important;
+            }
+            
+            .modal-body {
+                padding: 2rem !important;
+            }
+            
+            .btn-lg {
+                padding: 0.75rem 2rem;
+                font-size: 1rem;
+            }
+        }
+
+        /* ========== ANIMACIONES ADICIONALES ========== */
+        @keyframes slideInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .subscription-plan-card {
+            animation: slideInUp 0.6s ease forwards;
+        }
+
+        .subscription-plan-card:nth-child(1) { animation-delay: 0.1s; }
+        .subscription-plan-card:nth-child(2) { animation-delay: 0.2s; }
+        .subscription-plan-card:nth-child(3) { animation-delay: 0.3s; }
+        .subscription-plan-card:nth-child(4) { animation-delay: 0.4s; }
+
+        /* ========== UTILIDADES ========== */
+        .bg-gradient {
+            background: var(--primary-gradient) !important;
+        }
+        
+        .text-gradient {
+            background: var(--primary-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .border-gradient {
+            border: 2px solid;
+            border-image: var(--primary-gradient) 1;
+        }
+        
+        .shadow-success {
+            box-shadow: 0 8px 25px rgba(40, 167, 69, 0.15) !important;
+        }
+    </style>
+    
+    <!-- JavaScript Funcional -->
+    <script>
+        // ========== VARIABLES GLOBALES ==========
+        const productos = {
+            'eco-kit': { nombre: 'Eco Kit Hogar Premium', precio: 11.70 },
+            'eco-limpieza': { nombre: 'Kit Limpieza Ecológica', precio: 15.50 }
+        };
+        
+        const descuentos = {
+            'mensual': 0,
+            'bimestral': 0.05,
+            'trimestral': 0.10,
+            'anual': 0.25
+        };
+        
+        const duracionPlanes = {
+            'mensual': 1,
+            'bimestral': 2,
+            'trimestral': 3,
+            'anual': 12
+        };
+        
+        let planSeleccionado = null;
+        let cantidades = { 'eco-kit': 5, 'eco-limpieza': 2 };
+        
+        // ========== FUNCIONES PRINCIPALES ==========
+        
+        // Inicialización al cargar la página
+        document.addEventListener('DOMContentLoaded', function() {
+            actualizarTotales();
+            configurarEventListeners();
+            establecerFechaMinima();
+        });
+        
+        function configurarEventListeners() {
+            // Event listeners para los planes
+            document.querySelectorAll('.subscription-plan-card').forEach(card => {
+                card.addEventListener('click', function() {
+                    seleccionarPlan(this);
+                });
+            });
+            
+            // Event listeners para métodos de pago
+            document.querySelectorAll('input[name="paymentMethod"]').forEach(radio => {
+                radio.addEventListener('change', togglePaymentFields);
+            });
+            
+            // Event listener para fecha de inicio
+            document.getElementById('fechaInicio').addEventListener('change', calcularFechaRenovacion);
+            
+            // Formateo de campos de tarjeta
+            formatearCamposTarjeta();
+        }
+        
+        // ========== GESTIÓN DE PRODUCTOS ==========
+        
+        function cambiarCantidad(productId, delta) {
+            const cantidadInput = document.getElementById(`cantidad-${productId}`);
+            const nuevaCantidad = Math.max(1, cantidades[productId] + delta);
+            
+            cantidades[productId] = nuevaCantidad;
+            cantidadInput.value = nuevaCantidad;
+            
+            actualizarSubtotal(productId);
+            actualizarTotales();
+            
+            // Animación visual
+            const row = document.querySelector(`tr[data-product-id="${productId}"]`);
+            row.style.transform = 'scale(1.02)';
+            setTimeout(() => row.style.transform = 'scale(1)', 200);
+            
+            mostrarToast(`Cantidad actualizada: ${productos[productId].nombre}`, 'success');
+        }
+        
+        function actualizarSubtotal(productId) {
+            const subtotal = cantidades[productId] * productos[productId].precio;
+            document.getElementById(`subtotal-${productId}`).textContent = `S/ ${subtotal.toFixed(2)}`;
+        }
+        
+        function actualizarTotales() {
+            let total = 0;
+            Object.keys(productos).forEach(productId => {
+                total += cantidades[productId] * productos[productId].precio;
+                actualizarSubtotal(productId);
+            });
+            
+            document.getElementById('totalGeneral').textContent = `S/ ${total.toFixed(2)}`;
+            document.getElementById('totalFinal').textContent = `S/ ${total.toFixed(2)}`;
+            
+            // Actualizar precios de planes
+            actualizarPreciosPlanes(total);
+        }
+        
+        function actualizarPreciosPlanes(basePrice) {
+            Object.keys(descuentos).forEach(plan => {
+                const precio = calcularPrecioPlan(basePrice, plan);
+                const element = document.querySelector(`[data-plan="${plan}"] .amount`);
+                if (element) {
+                    element.textContent = precio.toFixed(2);
+                    element.setAttribute('data-base-price', precio.toFixed(2));
+                }
+            });
+        }
+        
+        function calcularPrecioPlan(basePrice, plan) {
+            const meses = duracionPlanes[plan];
+            const precioSinDescuento = basePrice * meses;
+            const descuento = descuentos[plan];
+            return precioSinDescuento * (1 - descuento);
+        }
+        
+        function agregarProducto(productId) {
+            // Simular agregado al carrito
+            mostrarToast(`✅ ${productos[productId].nombre} agregado al carrito`, 'success');
+            
+            // Animación visual
+            const btn = event.target;
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '<i class="bi bi-check-circle"></i>';
+            btn.classList.add('btn-success');
+            btn.classList.remove('btn-outline-success');
+            
+            setTimeout(() => {
+                btn.innerHTML = originalText;
+                btn.classList.remove('btn-success');
+                btn.classList.add('btn-outline-success');
+            }, 2000);
+        }
+        
+        function eliminarProducto(productId) {
+            if (confirm(`¿Estás seguro de que quieres eliminar ${productos[productId].nombre}?`)) {
+                cantidades[productId] = 1;
+                document.getElementById(`cantidad-${productId}`).value = 1;
+                actualizarTotales();
+                mostrarToast(`❌ ${productos[productId].nombre} eliminado`, 'warning');
+            }
+        }
+        
+        // ========== GESTIÓN DE PLANES ==========
+        
+        function seleccionarPlan(planCard) {
+            // Remover selección anterior
+            document.querySelectorAll('.subscription-plan-card').forEach(card => {
+                card.classList.remove('selected');
+                const btn = card.querySelector('.plan-select-btn');
+                btn.textContent = 'Seleccionar Plan';
+                btn.classList.remove('btn-success');
+                btn.classList.add('btn-outline-primary');
+            });
+            
+            // Agregar selección actual
+            planCard.classList.add('selected');
+            const btn = planCard.querySelector('.plan-select-btn');
+            btn.innerHTML = '<i class="bi bi-check-circle me-2"></i>Plan Seleccionado';
+            btn.classList.add('btn-success');
+            btn.classList.remove('btn-outline-primary');
+            
+            // Guardar datos del plan
+            planSeleccionado = {
+                nombre: planCard.dataset.plan,
+                precio: parseFloat(planCard.dataset.price),
+                titulo: planCard.querySelector('h4').textContent
+            };
+            
+            // Mostrar sección de configuración
+            mostrarConfiguracion();
+            
+            // Scroll suave a la configuración
+            document.getElementById('configSection').scrollIntoView({ 
+                behavior: 'smooth',
+                block: 'start'
+            });
+            
+            mostrarToast(`Plan ${planSeleccionado.titulo} seleccionado`, 'success');
+        }
+        
+        function mostrarConfiguracion() {
+            const configSection = document.getElementById('configSection');
+            configSection.style.display = 'block';
+            
+            // Animación de entrada
+            setTimeout(() => {
+                configSection.style.opacity = '0';
+                configSection.style.transform = 'translateY(30px)';
+                configSection.style.transition = 'all 0.5s ease';
+                
+                requestAnimationFrame(() => {
+                    configSection.style.opacity = '1';
+                    configSection.style.transform = 'translateY(0)';
+                });
+            }, 100);
+            
+            // Actualizar información del resumen
+            actualizarResumenSuscripcion();
+        }
+        
+        function actualizarResumenSuscripcion() {
+            if (!planSeleccionado) return;
+            
+            document.getElementById('selectedPlanName').textContent = planSeleccionado.titulo;
+            document.getElementById('summaryPlan').textContent = planSeleccionado.titulo;
+            document.getElementById('summaryProducts').textContent = `${Object.values(cantidades).reduce((a, b) => a + b, 0)} productos`;
+            
+            const totalBase = Object.keys(productos).reduce((total, productId) => 
+                total + (cantidades[productId] * productos[productId].precio), 0);
+            
+            document.getElementById('summaryBasePrice').textContent = `S/ ${totalBase.toFixed(2)}`;
+            document.getElementById('summaryTotalPrice').textContent = `S/ ${planSeleccionado.precio.toFixed(2)}`;
+        }
+        
+        function volverAPlanes() {
+            document.getElementById('configSection').style.display = 'none';
+            planSeleccionado = null;
+            
+            // Remover selecciones
+            document.querySelectorAll('.subscription-plan-card').forEach(card => {
+                card.classList.remove('selected');
+                const btn = card.querySelector('.plan-select-btn');
+                btn.textContent = 'Seleccionar Plan';
+                btn.classList.remove('btn-success');
+                btn.classList.add('btn-outline-primary');
+            });
+            
+            // Scroll a planes
+            document.querySelector('.subscription-plans').scrollIntoView({ 
+                behavior: 'smooth',
+                block: 'start'
+            });
+        }
+        
+        // ========== GESTIÓN DE FECHAS ==========
+        
+        function establecerFechaMinima() {
+            const today = new Date();
+            const tomorrow = new Date(today);
+            tomorrow.setDate(tomorrow.getDate() + 1);
+            
+            const fechaMinima = tomorrow.toISOString().split('T')[0];
+            document.getElementById('fechaInicio').min = fechaMinima;
+            document.getElementById('fechaInicio').value = fechaMinima;
+            
+            calcularFechaRenovacion();
+        }
+        
+        function calcularFechaRenovacion() {
+            if (!planSeleccionado) return;
+            
+            const fechaInicio = document.getElementById('fechaInicio').value;
+            if (!fechaInicio) return;
+            
+            const fecha = new Date(fechaInicio);
+            const meses = duracionPlanes[planSeleccionado.nombre];
+            fecha.setMonth(fecha.getMonth() + meses);
+            
+            const fechaRenovacion = fecha.toISOString().split('T')[0];
+            document.getElementById('fechaRenovacion').value = fechaRenovacion;
+        }
+        
+        // ========== GESTIÓN DEL MODAL DE PAGO ==========
+        
+        function abrirModalPago() {
+            if (!planSeleccionado) {
+                mostrarToast('Por favor selecciona un plan primero', 'error');
+                return;
+            }
+            
+            const fechaInicio = document.getElementById('fechaInicio').value;
+            if (!fechaInicio) {
+                mostrarToast('Por favor selecciona una fecha de inicio', 'error');
+                return;
+            }
+            
+            // Actualizar información del modal
+            document.getElementById('modalPlanName').textContent = planSeleccionado.titulo;
+            document.getElementById('modalStartDate').textContent = formatearFecha(fechaInicio);
+            document.getElementById('modalRenewalDate').textContent = formatearFecha(document.getElementById('fechaRenovacion').value);
+            document.getElementById('modalProductCount').textContent = `${Object.values(cantidades).reduce((a, b) => a + b, 0)} productos`;
+            document.getElementById('modalTotalAmount').textContent = `S/ ${planSeleccionado.precio.toFixed(2)}`;
+            
+            // Mostrar modal
+            const modal = new bootstrap.Modal(document.getElementById('paymentModal'));
+            modal.show();
+        }
+        
+        function togglePaymentFields() {
+            const paymentMethod = document.querySelector('input[name="paymentMethod"]:checked').value;
+            const cardDetails = document.getElementById('cardDetails');
+            
+            if (paymentMethod === 'tarjeta') {
+                cardDetails.style.display = 'block';
+            } else {
+                cardDetails.style.display = 'none';
+            }
+        }
+        
+        function formatearCamposTarjeta() {
+            // Formatear número de tarjeta
+            document.getElementById('cardNumber').addEventListener('input', function(e) {
+                let value = e.target.value.replace(/\D/g, '');
+                value = value.replace(/(.{4})/g, '$1 ').trim();
+                e.target.value = value;
+            });
+            
+            // Formatear fecha de vencimiento
+            document.getElementById('cardExpiry').addEventListener('input', function(e) {
+                let value = e.target.value.replace(/\D/g, '');
+                if (value.length >= 2) {
+                    value = value.substring(0, 2) + '/' + value.substring(2, 4);
+                }
+                e.target.value = value;
+            });
+            
+            // Formatear CVV
+            document.getElementById('cardCvv').addEventListener('input', function(e) {
+                e.target.value = e.target.value.replace(/\D/g, '').substring(0, 3);
+            });
+        }
+        
+        function procesarPago() {
+            const paymentMethod = document.querySelector('input[name="paymentMethod"]:checked').value;
+            
+            // Validar campos según método de pago
+            if (paymentMethod === 'tarjeta') {
+                const cardNumber = document.getElementById('cardNumber').value;
+                const cardExpiry = document.getElementById('cardExpiry').value;
+                const cardCvv = document.getElementById('cardCvv').value;
+                const cardName = document.getElementById('cardName').value;
+                
+                if (!cardNumber || !cardExpiry || !cardCvv || !cardName) {
+                    mostrarToast('Por favor completa todos los campos de la tarjeta', 'error');
+                    return;
+                }
+            }
+            
+            // Simular procesamiento de pago
+            const btn = document.getElementById('confirmPaymentBtn');
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '<i class="bi bi-hourglass-split me-2"></i>Procesando...';
+            btn.disabled = true;
+            
+            setTimeout(() => {
+                // Cerrar modal
+                bootstrap.Modal.getInstance(document.getElementById('paymentModal')).hide();
+                
+                // Mostrar éxito
+                mostrarToast('🎉 ¡Suscripción activada exitosamente!', 'success');
+                
+                // Simular redirección
+                setTimeout(() => {
+                    mostrarToast('Redirigiendo al panel de suscripciones...', 'info');
+                    // window.location.href = '/client/mis-suscripciones';
+                }, 2000);
+                
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+            }, 3000);
+        }
+        
+        // ========== UTILIDADES ==========
+        
+        function formatearFecha(fecha) {
+            return new Date(fecha).toLocaleDateString('es-PE', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            });
+        }
+        
+        function mostrarToast(mensaje, tipo = 'success') {
+            const toast = document.getElementById('subscriptionToast');
+            const toastBody = document.getElementById('toastMessage');
+            const toastHeader = toast.querySelector('.toast-header');
+            
+            // Configurar colores según tipo
+            toastHeader.className = `toast-header text-white ${
+                tipo === 'success' ? 'bg-success' :
+                tipo === 'error' ? 'bg-danger' :
+                tipo === 'warning' ? 'bg-warning' :
+                tipo === 'info' ? 'bg-info' : 'bg-success'
+            }`;
+            
+            toastBody.textContent = mensaje;
+            
+            const bsToast = new bootstrap.Toast(toast);
+            bsToast.show();
+        }
+        
+        // ========== EFECTOS VISUALES ADICIONALES ==========
+        
+        // Parallax suave en el hero
+        window.addEventListener('scroll', function() {
+            const scrolled = window.pageYOffset;
+            const hero = document.querySelector('.subscription-hero');
+            if (hero) {
+                hero.style.transform = `translateY(${scrolled * 0.5}px)`;
+            }
+        });
+        
+        // Animación de entrada para elementos
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, { threshold: 0.1 });
+        
+        document.querySelectorAll('.products-card, .subscription-plan-card, .config-card').forEach(el => {
+            el.style.opacity = '0';
+            el.style.transform = 'translateY(30px)';
+            el.style.transition = 'all 0.6s ease';
+            observer.observe(el);
+        });
+    </script>
+</body>
+</html>

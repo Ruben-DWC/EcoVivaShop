@@ -1,0 +1,695 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestión de Administradores | EcoVivaShop</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="/css/client-styles.css" rel="stylesheet">
+    <link href="/css/admin-modern-styles.css" rel="stylesheet">
+</head>
+<body class="admin-bg">
+        
+        .admin-card {
+            transition: all 0.3s ease;
+            cursor: pointer;
+            border-radius: 1rem;
+            border: none;
+            background: linear-gradient(135deg, #fff 0%, #f8f9fa 100%);
+        }
+        
+        .admin-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+        }
+        
+        .admin-avatar {
+            width: 60px;
+            height: 60px;
+            object-fit: cover;
+            border: 3px solid #28a745;
+            border-radius: 50%;
+        }
+        
+        .role-badge {
+            font-size: 0.75rem;
+            padding: 0.25rem 0.5rem;
+            border-radius: 20px;
+            font-weight: 600;
+        }
+        
+        .table-actions .btn {
+            padding: 0.25rem 0.5rem;
+            font-size: 0.875rem;
+            border-radius: 8px;
+            margin: 0 2px;
+        }
+        
+        .search-bar {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            border-radius: 1rem;
+            box-shadow: 0 8px 25px rgba(40, 167, 69, 0.3);
+        }
+        
+        .stats-card {
+            background: linear-gradient(135deg, #fff 0%, #f8f9fa 100%);
+            border-left: 5px solid #28a745;
+            border-radius: 1rem;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.08);
+            transition: all 0.3s ease;
+        }
+        
+        .stats-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.15);
+        }
+        
+        .page-header {
+            background: linear-gradient(135deg, #fff 0%, #f8f9fa 100%);
+            border-radius: 1rem;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.08);
+        }
+        
+        .table {
+            border-radius: 1rem;
+            overflow: hidden;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.08);
+        }
+        
+        .table thead th {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            color: white;
+            font-weight: 600;
+            border: none;
+            padding: 1rem;
+        }
+        
+        .table tbody tr {
+            background: white;
+            transition: all 0.3s ease;
+        }
+        
+        .table tbody tr:hover {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            transform: scale(1.01);
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+            border: none;
+            border-radius: 25px;
+            padding: 0.75rem 1.5rem;
+            font-weight: 600;
+            box-shadow: 0 4px 15px rgba(0, 123, 255, 0.3);
+            transition: all 0.3s ease;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 123, 255, 0.4);
+        }
+        
+        .navbar {
+            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%) !important;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+    </style>
+</head>
+<body class="admin-bg">
+    <!-- Navbar usando fragment -->
+    <div th:replace="~{fragments/admin-navbar :: admin-navbar}"></div>
+
+    <main class="container-fluid py-4">
+        <!-- Header -->
+        <div class="search-bar text-white p-4 rounded-4 mb-4 shadow-sm">
+            <div class="row align-items-center">
+                <div class="col-md-6">
+                    <h2 class="fw-bold mb-2">
+                        <i class="bi bi-shield-check"></i> Gestión de Administradores
+                    </h2>
+                    <p class="mb-0 opacity-90">Administra el equipo de administradores del sistema</p>
+                </div>
+                <div class="col-md-6 text-md-end">
+                    <button class="btn btn-light btn-lg shadow-sm" data-bs-toggle="modal" data-bs-target="#modalNuevoAdmin">
+                        <i class="bi bi-person-plus"></i> Nuevo Administrador
+                    </button>
+                </div>
+            </div>
+        </div>        <!-- Estadísticas -->
+        <div class="row mb-4">
+            <div class="col-lg-3 col-md-6 mb-3">
+                <div class="card border-0 shadow-sm" style="background-color: #198754;">
+                    <div class="card-body text-white">
+                        <div class="d-flex align-items-center">
+                            <div class="flex-shrink-0">
+                                <div class="bg-white bg-opacity-20 text-white rounded-circle p-3">
+                                    <i class="bi bi-people-fill fs-4"></i>
+                                </div>
+                            </div>
+                            <div class="flex-grow-1 ms-3">
+                                <h5 class="card-title mb-1 text-white fw-bold" id="total-admins">12</h5>
+                                <p class="card-text text-white mb-0 fw-medium">Total Administradores</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6 mb-3">
+                <div class="card border-0 shadow-sm" style="background-color: #0d6efd;">
+                    <div class="card-body text-white">
+                        <div class="d-flex align-items-center">
+                            <div class="flex-shrink-0">
+                                <div class="bg-white bg-opacity-20 text-white rounded-circle p-3">
+                                    <i class="bi bi-person-check-fill fs-4"></i>
+                                </div>
+                            </div>
+                            <div class="flex-grow-1 ms-3">
+                                <h5 class="card-title mb-1 text-white fw-bold" id="admins-activos">10</h5>
+                                <p class="card-text text-white mb-0 fw-medium">Activos</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6 mb-3">
+                <div class="card border-0 shadow-sm" style="background-color: #ffc107;">
+                    <div class="card-body text-dark">
+                        <div class="d-flex align-items-center">
+                            <div class="flex-shrink-0">
+                                <div class="bg-white bg-opacity-30 text-dark rounded-circle p-3">
+                                    <i class="bi bi-shield-fill-check fs-4"></i>
+                                </div>
+                            </div>
+                            <div class="flex-grow-1 ms-3">
+                                <h5 class="card-title mb-1 text-dark fw-bold" id="super-admins">2</h5>
+                                <p class="card-text text-dark mb-0 fw-medium">Super Admins</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6 mb-3">
+                <div class="card border-0 shadow-sm" style="background-color: #0dcaf0;">
+                    <div class="card-body text-white">
+                        <div class="d-flex align-items-center">
+                            <div class="flex-shrink-0">
+                                <div class="bg-white bg-opacity-20 text-white rounded-circle p-3">
+                                    <i class="bi bi-calendar-plus fs-4"></i>
+                                </div>
+                            </div>
+                            <div class="flex-grow-1 ms-3">
+                                <h5 class="card-title mb-1 text-white fw-bold" id="nuevos-mes">3</h5>
+                                <p class="card-text text-white mb-0 fw-medium">Nuevos este mes</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Filtros y búsqueda -->
+        <div class="card border-0 shadow-sm mb-4">
+            <div class="card-body">
+                <div class="row align-items-center">
+                    <div class="col-md-4 mb-3 mb-md-0">
+                        <div class="input-group">
+                            <span class="input-group-text">
+                                <i class="bi bi-search"></i>
+                            </span>                            <input type="text" class="form-control" id="buscar-admin" placeholder="Buscar administrador..." aria-label="Buscar administrador">
+                        </div>
+                    </div>
+                    <div class="col-md-3 mb-3 mb-md-0">
+                        <select class="form-select" id="filtro-rol" aria-label="Filtrar por rol">
+                            <option value="">Todos los roles</option>
+                            <option value="SUPER_ADMIN">Super Administrador</option>
+                            <option value="ADMIN">Administrador</option>
+                            <option value="VENDEDOR">Vendedor</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3 mb-3 mb-md-0">
+                        <select class="form-select" id="filtro-estado" aria-label="Filtrar por estado">
+                            <option value="">Todos los estados</option>
+                            <option value="true">Activo</option>
+                            <option value="false">Inactivo</option>
+                        </select>
+                    </div>
+                    <div class="col-md-2">                        <button class="btn btn-outline-secondary w-100" onclick="limpiarFiltros()" aria-label="Limpiar filtros de búsqueda">
+                            <i class="bi bi-x-circle"></i> Limpiar
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tabla de administradores -->
+        <div class="card border-0 shadow-sm">            <div class="card-header bg-white border-bottom">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0 text-dark fw-bold">
+                        <i class="bi bi-table text-primary"></i> Lista de Administradores
+                    </h5>
+                    <div class="d-flex gap-2">
+                        <button class="btn btn-outline-success btn-sm" onclick="exportarExcel()">
+                            <i class="bi bi-file-earmark-excel"></i> Exportar
+                        </button>
+                        <div class="dropdown">
+                            <button class="btn btn-outline-secondary btn-sm dropdown-toggle" data-bs-toggle="dropdown">
+                                <i class="bi bi-gear"></i> Acciones
+                            </button>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" href="#" onclick="enviarNotificacionMasiva()">
+                                    <i class="bi bi-bell"></i> Notificación masiva
+                                </a></li>
+                                <li><a class="dropdown-item" href="#" onclick="generarReporte()">
+                                    <i class="bi bi-file-text"></i> Generar reporte
+                                </a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0" id="tabla-administradores">                        <thead class="table-light">
+                            <tr>
+                                <th>
+                                    <input type="checkbox" class="form-check-input" id="select-all" aria-label="Seleccionar todos los administradores">
+                                </th>
+                                <th>Administrador</th>
+                                <th>Rol</th>
+                                <th>Email</th>
+                                <th>Teléfono</th>
+                                <th>Estado</th>
+                                <th>Último acceso</th>
+                                <th width="120">Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tbody-administradores">
+                            <!-- Se llenará dinámicamente -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="card-footer bg-white border-top">
+                <div class="d-flex justify-content-between align-items-center">
+                    <small class="text-muted" id="info-paginacion">
+                        Mostrando 1-10 de 12 administradores
+                    </small>
+                    <nav>
+                        <ul class="pagination pagination-sm mb-0" id="paginacion">
+                            <!-- Se llenará dinámicamente -->
+                        </ul>
+                    </nav>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Modal Nuevo Administrador -->
+    <div class="modal fade" id="modalNuevoAdmin" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        <i class="bi bi-person-plus"></i> Nuevo Administrador
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" title="Cerrar"></button>
+                </div>
+                <form id="form-nuevo-admin">
+                    <div class="modal-body">                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label" for="nuevo-nombre">Nombre *</label>
+                                <input type="text" class="form-control" name="nombre" id="nuevo-nombre" required placeholder="Ingrese el nombre">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label" for="nuevo-apellido">Apellido *</label>
+                                <input type="text" class="form-control" name="apellido" id="nuevo-apellido" required placeholder="Ingrese el apellido">
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label" for="nuevo-email">Email *</label>
+                                <input type="email" class="form-control" name="email" id="nuevo-email" required placeholder="ejemplo@EcoVivaShop.com">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label" for="nuevo-telefono">Teléfono</label>
+                                <input type="tel" class="form-control" name="telefono" id="nuevo-telefono" placeholder="+51 987 654 321">
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label" for="nuevo-rol">Rol *</label>
+                                <select class="form-select" name="rol" id="nuevo-rol" required>
+                                    <option value="">Seleccionar rol</option>
+                                    <option value="SUPER_ADMIN">Super Administrador</option>
+                                    <option value="ADMIN">Administrador</option>
+                                    <option value="VENDEDOR">Vendedor</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label" for="nuevo-password">Contraseña temporal *</label>
+                                <input type="password" class="form-control" name="password" id="nuevo-password" required placeholder="Mínimo 8 caracteres">
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label" for="nueva-direccion">Dirección</label>
+                            <textarea class="form-control" name="direccion" id="nueva-direccion" rows="2" placeholder="Dirección completa"></textarea>
+                        </div>
+                        <div class="form-check">
+                            <input type="checkbox" class="form-check-input" name="enviarEmail" checked title="Enviar email de bienvenida con credenciales">
+                            <label class="form-check-label">
+                                Enviar email de bienvenida con credenciales
+                            </label>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="submit" class="btn btn-success">
+                            <i class="bi bi-check-lg"></i> Crear Administrador
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Editar Administrador -->
+    <div class="modal fade" id="modalEditarAdmin" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        <i class="bi bi-pencil"></i> Editar Administrador
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" title="Cerrar"></button>
+                </div>
+                <form id="form-editar-admin">
+                    <div class="modal-body">
+                        <input type="hidden" name="id" id="edit-id">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Nombre *</label>
+                                <input type="text" class="form-control" name="nombre" id="edit-nombre" required placeholder="Ingrese el nombre" title="Ingrese el nombre del administrador">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Apellido *</label>
+                                <input type="text" class="form-control" name="apellido" id="edit-apellido" required placeholder="Ingrese el apellido" title="Ingrese el apellido del administrador">
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Email *</label>
+                                <input type="email" class="form-control" name="email" id="edit-email" required placeholder="ejemplo@EcoVivaShop.com" title="Ingrese el correo electrónico del administrador">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Teléfono</label>
+                                <input type="tel" class="form-control" name="telefono" id="edit-telefono" placeholder="+51 987 654 321" title="Ingrese el número de teléfono del administrador">
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Rol *</label>
+                                <select class="form-select" name="rol" id="edit-rol" required title="Seleccione el rol del administrador">
+                                    <option value="SUPER_ADMIN">Super Administrador</option>
+                                    <option value="ADMIN">Administrador</option>
+                                    <option value="VENDEDOR">Vendedor</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Estado</label>
+                                <select class="form-select" name="estado" id="edit-estado" title="Seleccione el estado del administrador">
+                                    <option value="true">Activo</option>
+                                    <option value="false">Inactivo</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Dirección</label>
+                            <textarea class="form-control" name="direccion" id="edit-direccion" rows="2" placeholder="Dirección completa" title="Ingrese la dirección del administrador"></textarea>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-check-lg"></i> Actualizar
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Datos de ejemplo (en producción vendrán del backend)
+        let administradores = [
+            {                id: 1,
+                nombre: 'Juan Carlos',
+                apellido: 'Pérez García',
+                email: 'admin@EcoVivaShop.com',
+                telefono: '+51 987 654 321',
+                rol: 'SUPER_ADMIN',
+                estado: true,
+                fechaRegistro: '2024-01-15',
+                ultimoAcceso: '2024-06-10 14:30'
+            },
+            {
+                id: 2,
+                nombre: 'María Elena',                apellido: 'Rodríguez López',
+                email: 'maria.admin@EcoVivaShop.com',
+                telefono: '+51 999 888 777',
+                rol: 'ADMIN',
+                estado: true,
+                fechaRegistro: '2024-02-20',
+                ultimoAcceso: '2024-06-10 12:15'
+            },
+            {
+                id: 3,
+                nombre: 'Carlos Andrés',                apellido: 'Gómez Silva',
+                email: 'carlos.vendedor@EcoVivaShop.com',
+                telefono: '+51 955 444 333',
+                rol: 'VENDEDOR',
+                estado: true,
+                fechaRegistro: '2024-03-10',
+                ultimoAcceso: '2024-06-09 16:45'
+            }
+        ];
+
+        // Funciones principales
+        function cargarAdministradores() {
+            const tbody = document.getElementById('tbody-administradores');
+            tbody.innerHTML = '';
+
+            administradores.forEach(admin => {
+                const row = `
+                    <tr>
+                        <td>
+                            <input type="checkbox" class="form-check-input" value="${admin.id}">
+                        </td>
+                        <td>
+                            <div class="d-flex align-items-center">
+                                <img src="/img/admin-avatar.jpg" alt="Avatar" class="rounded-circle admin-avatar me-3">
+                                <div>
+                                    <div class="fw-medium">${admin.nombre} ${admin.apellido}</div>
+                                    <small class="text-muted">ID: ${admin.id}</small>
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <span class="badge role-badge ${getRoleBadgeClass(admin.rol)}">
+                                ${getRoleLabel(admin.rol)}
+                            </span>
+                        </td>
+                        <td>${admin.email}</td>
+                        <td>${admin.telefono || 'No especificado'}</td>
+                        <td>
+                            <span class="badge ${admin.estado ? 'bg-success' : 'bg-danger'}">
+                                ${admin.estado ? 'Activo' : 'Inactivo'}
+                            </span>
+                        </td>
+                        <td>
+                            <small class="text-muted">${admin.ultimoAcceso}</small>
+                        </td>
+                        <td class="table-actions">
+                            <div class="btn-group">
+                                <button class="btn btn-outline-primary btn-sm" onclick="editarAdmin(${admin.id})" title="Editar">
+                                    <i class="bi bi-pencil"></i>
+                                </button>
+                                <button class="btn btn-outline-danger btn-sm" onclick="eliminarAdmin(${admin.id})" title="Eliminar">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                                <button class="btn btn-outline-info btn-sm" onclick="verDetalles(${admin.id})" title="Ver detalles">
+                                    <i class="bi bi-eye"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+                tbody.innerHTML += row;
+            });
+        }
+
+        function getRoleBadgeClass(rol) {
+            switch(rol) {
+                case 'SUPER_ADMIN': return 'bg-danger';
+                case 'ADMIN': return 'bg-primary';
+                case 'VENDEDOR': return 'bg-info';
+                default: return 'bg-secondary';
+            }
+        }
+
+        function getRoleLabel(rol) {
+            switch(rol) {
+                case 'SUPER_ADMIN': return 'Super Admin';
+                case 'ADMIN': return 'Administrador';
+                case 'VENDEDOR': return 'Vendedor';
+                default: return rol;
+            }
+        }
+
+        function editarAdmin(id) {
+            const admin = administradores.find(a => a.id === id);
+            if (admin) {
+                document.getElementById('edit-id').value = admin.id;
+                document.getElementById('edit-nombre').value = admin.nombre;
+                document.getElementById('edit-apellido').value = admin.apellido;
+                document.getElementById('edit-email').value = admin.email;
+                document.getElementById('edit-telefono').value = admin.telefono || '';
+                document.getElementById('edit-rol').value = admin.rol;
+                document.getElementById('edit-estado').value = admin.estado.toString();
+                
+                new bootstrap.Modal(document.getElementById('modalEditarAdmin')).show();
+            }
+        }
+
+        function eliminarAdmin(id) {
+            const admin = administradores.find(a => a.id === id);
+            if (admin && confirm(`¿Estás seguro de que deseas eliminar al administrador ${admin.nombre} ${admin.apellido}?`)) {
+                // Aquí se haría la petición al backend
+                administradores = administradores.filter(a => a.id !== id);
+                cargarAdministradores();
+                actualizarEstadisticas();
+                
+                // Mostrar mensaje de éxito
+                mostrarMensaje('Administrador eliminado exitosamente', 'success');
+            }
+        }
+
+        function actualizarEstadisticas() {
+            const total = administradores.length;
+            const activos = administradores.filter(a => a.estado).length;
+            const superAdmins = administradores.filter(a => a.rol === 'SUPER_ADMIN').length;
+            
+            document.getElementById('total-admins').textContent = total;
+            document.getElementById('admins-activos').textContent = activos;
+            document.getElementById('super-admins').textContent = superAdmins;
+        }
+
+        function mostrarMensaje(mensaje, tipo) {
+            // Implementar sistema de notificaciones toast
+            console.log(`${tipo}: ${mensaje}`);
+        }
+
+        function limpiarFiltros() {
+            document.getElementById('buscar-admin').value = '';
+            document.getElementById('filtro-rol').value = '';
+            document.getElementById('filtro-estado').value = '';
+            cargarAdministradores();
+        }
+
+        function exportarExcel() {
+            console.log('Exportando a Excel...');
+            // Implementar exportación
+        }
+
+        function enviarNotificacionMasiva() {
+            console.log('Enviando notificación masiva...');
+            // Implementar notificación masiva
+        }
+
+        function generarReporte() {
+            console.log('Generando reporte...');
+            // Implementar generación de reporte
+        }
+
+        function verDetalles(id) {
+            console.log('Ver detalles del administrador:', id);
+            // Implementar vista de detalles
+        }
+
+        // Event listeners
+        document.getElementById('form-nuevo-admin').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(this);
+            const nuevoAdmin = {
+                id: administradores.length + 1,
+                nombre: formData.get('nombre'),
+                apellido: formData.get('apellido'),
+                email: formData.get('email'),
+                telefono: formData.get('telefono'),
+                rol: formData.get('rol'),
+                estado: true,
+                fechaRegistro: new Date().toISOString().split('T')[0],
+                ultimoAcceso: 'Nunca'
+            };
+            
+            administradores.push(nuevoAdmin);
+            cargarAdministradores();
+            actualizarEstadisticas();
+            
+            bootstrap.Modal.getInstance(document.getElementById('modalNuevoAdmin')).hide();
+            this.reset();
+            
+            mostrarMensaje('Administrador creado exitosamente', 'success');
+        });
+
+        document.getElementById('form-editar-admin').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(this);
+            const id = parseInt(formData.get('id'));
+            const adminIndex = administradores.findIndex(a => a.id === id);
+            
+            if (adminIndex !== -1) {
+                administradores[adminIndex] = {
+                    ...administradores[adminIndex],
+                    nombre: formData.get('nombre'),
+                    apellido: formData.get('apellido'),
+                    email: formData.get('email'),
+                    telefono: formData.get('telefono'),
+                    rol: formData.get('rol'),
+                    estado: formData.get('estado') === 'true'
+                };
+                
+                cargarAdministradores();
+                actualizarEstadisticas();
+                
+                bootstrap.Modal.getInstance(document.getElementById('modalEditarAdmin')).hide();
+                
+                mostrarMensaje('Administrador actualizado exitosamente', 'success');
+            }
+        });
+
+        // Búsqueda en tiempo real
+        document.getElementById('buscar-admin').addEventListener('input', function(e) {
+            const busqueda = e.target.value.toLowerCase();
+            const filas = document.querySelectorAll('#tbody-administradores tr');
+            
+            filas.forEach(fila => {
+                const texto = fila.textContent.toLowerCase();
+                fila.style.display = texto.includes(busqueda) ? '' : 'none';
+            });
+        });
+
+        // Inicializar
+        document.addEventListener('DOMContentLoaded', function() {
+            cargarAdministradores();
+            actualizarEstadisticas();
+        });
+    </script>
+</body>
+</html>

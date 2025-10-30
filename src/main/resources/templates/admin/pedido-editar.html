@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Editar Pedido - EcoVivaShop Admin</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <!-- Incluir navbar -->
+    <nav th:replace="~{fragments/admin-navbar :: admin-navbar}"></nav>
+
+    <div class="container mt-4">
+        <div class="row">
+            <div class="col-12">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h2 class="text-primary">
+                        <i class="fas fa-edit me-2"></i>
+                        Editar Pedido #<span th:text="${pedido.numeroPedido}"></span>
+                    </h2>
+                    <a href="/admin/pedidos" class="btn btn-secondary">
+                        <i class="fas fa-arrow-left me-2"></i>Volver
+                    </a>
+                </div>
+
+                <!-- Información del Pedido -->
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="card mb-4">
+                            <div class="card-header bg-primary text-white">
+                                <h5 class="mb-0"><i class="fas fa-info-circle me-2"></i>Información del Pedido</h5>
+                            </div>
+                            <div class="card-body">
+                                <p><strong>ID Pedido:</strong> <span th:text="${pedido.idPedido}"></span></p>
+                                <p><strong>Número:</strong> <span th:text="${pedido.numeroPedido}"></span></p>
+                                <p><strong>Cliente:</strong> <span th:text="${pedido.usuario.nombre + ' ' + pedido.usuario.apellido}"></span></p>
+                                <p><strong>Email:</strong> <span th:text="${pedido.usuario.email}"></span></p>
+                                <p><strong>Fecha:</strong> <span th:text="${#temporals.format(pedido.fechaPedido, 'dd/MM/yyyy HH:mm')}"></span></p>
+                                <p><strong>Total:</strong> S/ <span th:text="${#numbers.formatDecimal(pedido.total, 1, 2)}"></span></p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <!-- Formulario para cambiar estado -->
+                        <div class="card">
+                            <div class="card-header bg-success text-white">
+                                <h5 class="mb-0"><i class="fas fa-cog me-2"></i>Cambiar Estado</h5>
+                            </div>
+                            <div class="card-body">
+                                <form th:action="@{/admin/pedidos/editar/{id}(id=${pedido.idPedido})}" method="post">
+                                    <div class="mb-3">
+                                        <label for="estado" class="form-label">Estado Actual:</label>
+                                        <select id="estado" name="estado" class="form-select" required>
+                                            <option th:each="estadoOption : ${estados}" 
+                                                    th:value="${estadoOption}"
+                                                    th:text="${estadoOption}"
+                                                    th:selected="${estadoOption == pedido.estado}">
+                                            </option>
+                                        </select>
+                                    </div>
+                                    <div class="d-grid">
+                                        <button type="submit" class="btn btn-success">
+                                            <i class="fas fa-save me-2"></i>Actualizar Estado
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Detalles del Pedido -->
+                <div class="card mt-4">
+                    <div class="card-header bg-info text-white">
+                        <h5 class="mb-0"><i class="fas fa-list me-2"></i>Productos del Pedido</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>Producto</th>
+                                        <th>Cantidad</th>
+                                        <th>Precio Unit.</th>
+                                        <th>Subtotal</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr th:each="detalle : ${pedido.detalles}">
+                                        <td th:text="${detalle.producto.nombre}"></td>
+                                        <td th:text="${detalle.cantidad}"></td>
+                                        <td>S/ <span th:text="${#numbers.formatDecimal(detalle.precioUnitario, 1, 2)}"></span></td>
+                                        <td>S/ <span th:text="${#numbers.formatDecimal(detalle.subtotal, 1, 2)}"></span></td>
+                                    </tr>
+                                </tbody>
+                                <tfoot>
+                                    <tr class="table-success">
+                                        <th colspan="3" class="text-end">Total:</th>
+                                        <th>S/ <span th:text="${#numbers.formatDecimal(pedido.total, 1, 2)}"></span></th>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Incluir footer -->
+    <footer th:replace="~{fragments/footer :: footer}"></footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Mostrar mensajes de éxito/error -->
+    <script th:if="${success}">
+        document.addEventListener('DOMContentLoaded', function() {
+            alert('[[${success}]]');
+        });
+    </script>
+    
+    <script th:if="${error}">
+        document.addEventListener('DOMContentLoaded', function() {
+            alert('[[${error}]]');
+        });
+    </script>
+</body>
+</html>

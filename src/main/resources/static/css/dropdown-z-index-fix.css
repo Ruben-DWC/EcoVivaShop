@@ -1,0 +1,166 @@
+/* 
+ * SOLUCIÓN DEFINITIVA PARA DROPDOWN Z-INDEX
+ * Este archivo asegura que el dropdown del usuario siempre esté visible
+ */
+
+/* REGLA 1: Contenedor padre con position relative */
+.navbar .nav-item.dropdown {
+    position: relative !important;
+}
+
+/* REGLA 2: Dropdown con position absolute y z-index máximo */
+.navbar .dropdown-menu {
+    position: absolute !important;
+    top: 100% !important;
+    right: 0 !important;
+    left: auto !important;
+    z-index: 999999 !important;
+    transform-style: preserve-3d !important;
+    backface-visibility: hidden !important;
+    will-change: transform, opacity !important;
+}
+
+/* REGLA 3: Estado mostrado con z-index reforzado */
+.navbar .dropdown-menu.show {
+    z-index: 999999 !important;
+    position: absolute !important;
+    display: block !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+}
+
+/* REGLA 4: Elementos clickeables correctamente SOLO EN EL NAVBAR */
+.navbar .dropdown-item {
+    pointer-events: all !important;
+    position: relative !important;
+    z-index: inherit !important;
+    cursor: pointer !important;
+    display: block !important;
+}
+
+.navbar .dropdown-item * {
+    pointer-events: none !important;
+}
+
+/* REGLA 5: Corregir interferencias de otros elementos */
+.container,
+.container-fluid,
+.row,
+.col,
+.col-1, .col-2, .col-3, .col-4, .col-5, .col-6,
+.col-7, .col-8, .col-9, .col-10, .col-11, .col-12,
+.col-sm, .col-md, .col-lg, .col-xl, .col-xxl {
+    z-index: auto !important;
+}
+
+/* REGLA 6: Elementos de contenido principal con z-index bajo */
+.welcome-block,
+.alert,
+.card,
+.bg-warning,
+.bg-info,
+.bg-light,
+.bg-primary,
+.bg-secondary,
+.bg-success,
+.bg-danger,
+.jumbotron,
+.hero-section,
+.banner {
+    z-index: 1 !important;
+    position: relative !important;
+}
+
+/* REGLA 7: Navbar con z-index intermedio pero estable */
+.navbar {
+    z-index: 1030 !important;
+    position: relative !important;
+}
+
+/* REGLA 8: Asegurar que el dropdown no se vea afectado por overflow */
+.navbar-collapse {
+    overflow: visible !important;
+    position: static !important;
+}
+
+.navbar-nav {
+    overflow: visible !important;
+    position: static !important;
+}
+
+.nav-item {
+    overflow: visible !important;
+    position: static !important;
+}
+
+.nav-item.dropdown {
+    overflow: visible !important;
+    position: relative !important;
+}
+
+/* REGLA 9: Corrección específica para Bootstrap */
+.dropdown-menu[data-bs-popper] {
+    z-index: 999999 !important;
+    position: absolute !important;
+}
+
+/* REGLA 10: Respaldo para navegadores específicos */
+@supports (backdrop-filter: blur(10px)) {
+    .navbar .dropdown-menu {
+        backdrop-filter: blur(10px) !important;
+        z-index: 999999 !important;
+    }
+}
+
+/* REGLA 11: Media queries para diferentes pantallas */
+@media (min-width: 768px) {
+    .navbar .dropdown-menu {
+        position: absolute !important;
+        z-index: 999999 !important;
+        top: calc(100% + 0.125rem) !important;
+    }
+}
+
+@media (max-width: 767px) {
+    .navbar .dropdown-menu {
+        position: static !important;
+        z-index: 999999 !important;
+        transform: none !important;
+        opacity: 1 !important;
+        visibility: visible !important;
+        margin-top: 0.5rem !important;
+    }
+}
+
+/* REGLA 12: Animaciones sin interferir con z-index */
+.navbar .dropdown-menu {
+    transition: all 0.3s ease !important;
+}
+
+.navbar .dropdown-menu.show {
+    animation: dropdownFadeIn 0.3s ease-out forwards !important;
+}
+
+@keyframes dropdownFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px) scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+/* REGLA 13: Fuerza bruta para casos extremos */
+body .navbar .dropdown-menu {
+    z-index: 999999 !important;
+}
+
+html .navbar .dropdown-menu {
+    z-index: 999999 !important;
+}
+
+* .navbar .dropdown-menu {
+    z-index: 999999 !important;
+}

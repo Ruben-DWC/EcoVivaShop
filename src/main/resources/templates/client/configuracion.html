@@ -1,0 +1,925 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/head :: head('Configuración | EcoVivaShop')}">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Configuración | EcoVivaShop</title>
+</head>
+<body class="eco-bg">
+    <div th:replace="~{fragments/client-navbar :: client-navbar}"></div>
+    
+    <main class="container-fluid py-5">
+        <div class="row justify-content-center">
+            <div class="col-12 col-xl-10 col-xxl-8" style="padding-bottom: 3rem;">
+                <!-- ENCABEZADO PRINCIPAL -->
+                <div class="profile-header text-center mb-5">
+                    <div class="avatar-section">
+                        <div class="profile-avatar mx-auto" onclick="document.getElementById('profileImageInput').click();">
+                            <img id="profileImage" 
+                                 th:src="@{/api/imagenes/perfil/{id}(id=${usuario != null ? usuario.idUsuario : 0})}" 
+                                 alt="Foto de perfil" 
+                                 onerror="this.src='/img/default-profile.svg'">
+                            <div class="avatar-overlay">
+                                <i class="bi bi-camera-fill"></i>
+                            </div>
+                        </div>
+                        <input type="file" id="profileImageInput" accept="image/*" style="display: none;" onchange="previewImage(this)">
+                    </div>
+                    <h1 class="display-4 fw-bold text-primary mb-2">⚙️ Configuración de Cuenta</h1>
+                    <p class="lead text-muted">Gestiona tu información personal y preferencias</p>
+                </div>
+
+                <!-- CONTENEDOR DE TARJETAS PRINCIPALES -->
+                <div class="row g-4 mb-5">
+                    
+                    <!-- INFORMACIÓN PERSONAL -->
+                    <div class="col-lg-8">
+                        <div class="config-card h-100">
+                            <div class="card-header">
+                                <div class="icon-circle bg-primary">
+                                    <i class="bi bi-person-circle"></i>
+                                </div>
+                                <div>
+                                    <h3 class="card-title">Información Personal</h3>
+                                    <p class="card-subtitle">Actualiza tus datos personales</p>
+                                </div>
+                            </div>
+                            
+                            <form id="profileForm" th:action="@{/client/configuracion}" method="post" th:object="${usuario}">
+                                <div class="row g-4">
+                                    <div class="col-md-6">
+                                        <div class="form-floating">
+                                            <input type="text" class="form-control" id="nombre" name="nombre"
+                                                   th:field="*{nombre}" placeholder="Nombre" required>
+                                            <label for="nombre"><i class="bi bi-person me-2"></i>Nombre</label>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-floating">
+                                            <input type="text" class="form-control" id="apellido" name="apellido"
+                                                   th:field="*{apellido}" placeholder="Apellido" required>
+                                            <label for="apellido"><i class="bi bi-person-badge me-2"></i>Apellido</label>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-floating">
+                                            <input type="email" class="form-control" id="email" name="email"
+                                                   th:field="*{email}" placeholder="Email" required readonly>
+                                            <label for="email"><i class="bi bi-envelope me-2"></i>Email</label>
+                                        </div>
+                                        <small class="text-muted">El email no se puede modificar</small>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-floating">
+                                            <input type="tel" class="form-control" id="telefono" name="telefono"
+                                                   th:field="*{telefono}" placeholder="Teléfono" required>
+                                            <label for="telefono"><i class="bi bi-telephone me-2"></i>Teléfono</label>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-floating">
+                                            <input type="text" class="form-control" id="dni" name="dni"
+                                                   th:field="*{dni}" placeholder="DNI" required>
+                                            <label for="dni"><i class="bi bi-card-text me-2"></i>DNI</label>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-floating">
+                                            <input type="text" class="form-control" id="direccion" name="direccion"
+                                                   th:field="*{direccion}" placeholder="Dirección" required>
+                                            <label for="direccion"><i class="bi bi-geo-alt me-2"></i>Dirección</label>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="text-end mt-4">
+                                    <button type="submit" class="btn btn-primary btn-lg px-5">
+                                        <i class="bi bi-check-circle me-2"></i>Guardar Cambios
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+
+                    <!-- INFORMACIÓN LATERAL -->
+                    <div class="col-lg-4 d-flex flex-column">
+                        <!-- CAMBIAR CONTRASEÑA -->
+                        <div class="config-card mb-4 flex-fill">
+                            <div class="card-header">
+                                <div class="icon-circle bg-warning">
+                                    <i class="bi bi-shield-lock"></i>
+                                </div>
+                                <div>
+                                    <h4 class="card-title">Seguridad</h4>
+                                    <p class="card-subtitle">Cambiar contraseña</p>
+                                </div>
+                            </div>
+                            
+                            <form id="passwordForm">
+                                <div class="mb-3">
+                                    <div class="form-floating">
+                                        <input type="password" class="form-control" id="currentPassword" placeholder="Contraseña actual" required>
+                                        <label for="currentPassword"><i class="bi bi-lock me-2"></i>Actual</label>
+                                    </div>
+                                </div>
+                                <div class="mb-3">
+                                    <div class="form-floating">
+                                        <input type="password" class="form-control" id="newPassword" placeholder="Nueva contraseña" required minlength="8">
+                                        <label for="newPassword"><i class="bi bi-key me-2"></i>Nueva</label>
+                                    </div>
+                                </div>
+                                <div class="mb-4">
+                                    <div class="form-floating">
+                                        <input type="password" class="form-control" id="confirmPassword" placeholder="Confirmar contraseña" required>
+                                        <label for="confirmPassword"><i class="bi bi-check2-circle me-2"></i>Confirmar</label>
+                                    </div>
+                                </div>
+                                <button type="submit" class="btn btn-warning w-100">
+                                    <i class="bi bi-arrow-repeat me-2"></i>Cambiar Contraseña
+                                </button>
+                            </form>
+                        </div>
+
+                        <!-- ESTADÍSTICAS RÁPIDAS -->
+                        <div class="config-card flex-fill">
+                            <div class="card-header">
+                                <div class="icon-circle bg-info">
+                                    <i class="bi bi-graph-up"></i>
+                                </div>
+                                <div>
+                                    <h4 class="card-title">Tu Actividad</h4>
+                                    <p class="card-subtitle">Resumen de cuenta</p>
+                                </div>
+                            </div>
+                            
+                            <div class="stats-grid">
+                                <div class="stat-item">
+                                    <div class="stat-icon bg-success">
+                                        <i class="bi bi-bag-check"></i>
+                                    </div>
+                                    <div class="stat-content">
+                                        <div class="stat-number">12</div>
+                                        <div class="stat-label">Pedidos</div>
+                                    </div>
+                                </div>
+                                <div class="stat-item">
+                                    <div class="stat-icon bg-primary">
+                                        <i class="bi bi-heart"></i>
+                                    </div>
+                                    <div class="stat-content">
+                                        <div class="stat-number">8</div>
+                                        <div class="stat-label">Favoritos</div>
+                                    </div>
+                                </div>
+                                <div class="stat-item">
+                                    <div class="stat-icon bg-warning">
+                                        <i class="bi bi-star"></i>
+                                    </div>
+                                    <div class="stat-content">
+                                        <div class="stat-number">4.8</div>
+                                        <div class="stat-label">Rating</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- PREFERENCIAS DE NOTIFICACIONES -->
+                <div class="row g-4 mt-5 mb-5">
+                    <div class="col-12">
+                        <div class="config-card">
+                            <div class="card-header">
+                                <div class="icon-circle bg-success">
+                                    <i class="bi bi-bell"></i>
+                                </div>
+                                <div>
+                                    <h3 class="card-title">Preferencias de Notificaciones</h3>
+                                    <p class="card-subtitle">Configura cómo quieres recibir las notificaciones</p>
+                                </div>
+                            </div>
+                            
+                            <form id="notificationForm">
+                                <div class="row g-4">
+                                    <div class="col-md-3 col-sm-6">
+                                        <div class="notification-card">
+                                            <div class="notification-icon">
+                                                <i class="bi bi-envelope-fill text-primary"></i>
+                                            </div>
+                                            <h5>Email</h5>
+                                            <p>Recibe notificaciones por correo</p>
+                                            <div class="form-check form-switch">
+                                                <input class="form-check-input" type="checkbox" id="emailNotifications" checked>
+                                                <label class="form-check-label" for="emailNotifications">Activado</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3 col-sm-6">
+                                        <div class="notification-card">
+                                            <div class="notification-icon">
+                                                <i class="bi bi-box-seam-fill text-info"></i>
+                                            </div>
+                                            <h5>Pedidos</h5>
+                                            <p>Actualizaciones de tus pedidos</p>
+                                            <div class="form-check form-switch">
+                                                <input class="form-check-input" type="checkbox" id="orderUpdates" checked>
+                                                <label class="form-check-label" for="orderUpdates">Activado</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3 col-sm-6">
+                                        <div class="notification-card">
+                                            <div class="notification-icon">
+                                                <i class="bi bi-gift-fill text-success"></i>
+                                            </div>
+                                            <h5>Promociones</h5>
+                                            <p>Ofertas y descuentos especiales</p>
+                                            <div class="form-check form-switch">
+                                                <input class="form-check-input" type="checkbox" id="promotions">
+                                                <label class="form-check-label" for="promotions">Desactivado</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3 col-sm-6">
+                                        <div class="notification-card">
+                                            <div class="notification-icon">
+                                                <i class="bi bi-newspaper text-warning"></i>
+                                            </div>
+                                            <h5>Newsletter</h5>
+                                            <p>Boletín semanal de novedades</p>
+                                            <div class="form-check form-switch">
+                                                <input class="form-check-input" type="checkbox" id="newsletter">
+                                                <label class="form-check-label" for="newsletter">Desactivado</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="text-center mt-4">
+                                    <button type="submit" class="btn btn-success btn-lg px-5">
+                                        <i class="bi bi-check-circle me-2"></i>Guardar Preferencias
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+    
+    <div th:replace="~{fragments/footer :: footer}"></div>
+    
+    <!-- Toast para notificaciones -->
+    <div class="toast-container position-fixed bottom-0 end-0 p-3">
+        <div id="successToast" class="toast align-items-center text-white bg-success border-0" role="alert">
+            <div class="d-flex">
+                <div class="toast-body">
+                    <i class="bi bi-check-circle me-2"></i>
+                    <span id="toastMessage">Cambios guardados exitosamente</span>
+                </div>
+                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" title="Cerrar notificación" aria-label="Cerrar"></button>
+            </div>
+        </div>
+    </div>
+
+    <style>
+        /* Prevenir desbordamiento y mejorar contención */
+        body {
+            overflow-x: hidden;
+            padding-bottom: 0; /* Eliminar padding inferior del body */
+        }
+        
+        /* Ajustar el contenedor principal para evitar solapamiento con footer */
+        main.container-fluid {
+            max-width: 100vw;
+            padding-left: 15px;
+            padding-right: 15px;
+            padding-bottom: 6rem; /* Aumentar espacio inferior para separar del footer */
+            margin-bottom: 3rem; /* Margen adicional más grande de seguridad */
+            min-height: calc(100vh - 200px); /* Altura mínima considerando navbar y footer */
+        }
+        
+        .col-12.col-xl-10.col-xxl-8 {
+            max-width: 100%;
+            padding-left: 15px;
+            padding-right: 15px;
+        }
+        
+        .row {
+            margin-left: 0;
+            margin-right: 0;
+        }
+        
+        .eco-bg {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        
+        /* Asegurar que el footer no se superponga */
+        footer {
+            position: relative;
+            z-index: 10;
+            margin-top: auto;
+        }
+        
+        /* Ajustar el contenedor principal para mejor espaciado */
+        .profile-header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 25px;
+            padding: 3rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        }
+        
+        .profile-avatar {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            overflow: hidden;
+            border: 5px solid #fff;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+            position: relative;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .profile-avatar:hover {
+            transform: scale(1.05);
+            box-shadow: 0 20px 45px rgba(0, 0, 0, 0.15);
+        }
+        
+        .profile-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .avatar-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.7);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        
+        .profile-avatar:hover .avatar-overlay {
+            opacity: 1;
+        }
+        
+        .avatar-overlay i {
+            color: white;
+            font-size: 2rem;
+        }
+        
+        .config-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: all 0.3s ease;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .config-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.12);
+        }
+        
+        /* Mejorar distribución del contenido en las tarjetas */
+        .config-card form {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .config-card .row.g-4 {
+            flex-grow: 1;
+        }
+        
+        .config-card .text-end {
+            margin-top: auto;
+            padding-top: 1.5rem;
+        }
+        
+        /* Asegurar que las tarjetas laterales mantengan altura uniforme */
+        .col-lg-4.d-flex.flex-column {
+            gap: 1.5rem;
+        }
+        
+        .col-lg-4.d-flex.flex-column .config-card {
+            min-height: 300px;
+        }
+        
+        /* Espaciado específico para las secciones principales */
+        .row.g-4.mb-5 {
+            padding-bottom: 2rem;
+            border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+            margin-bottom: 3rem !important;
+        }
+        
+        .card-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid rgba(0, 0, 0, 0.05);
+        }
+        
+        .icon-circle {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 1rem;
+            font-size: 1.5rem;
+            color: white;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+        }
+        
+        .card-title {
+            margin: 0;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #2d3436;
+        }
+        
+        .card-subtitle {
+            margin: 0;
+            color: #74b9ff;
+            font-weight: 500;
+        }
+        
+        .form-floating > .form-control {
+            border-radius: 15px;
+            border: 2px solid rgba(0, 0, 0, 0.1);
+            padding: 1rem 0.75rem;
+            background: rgba(255, 255, 255, 0.8);
+            transition: all 0.3s ease;
+        }
+        
+        .form-floating > .form-control:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.15);
+            background: white;
+        }
+        
+        .form-floating > label {
+            color: #74b9ff;
+            font-weight: 600;
+        }
+        
+        .btn {
+            border-radius: 50px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 35px rgba(102, 126, 234, 0.4);
+        }
+        
+        .btn-warning {
+            background: linear-gradient(135deg, #fdcb6e 0%, #e17055 100%);
+            border: none;
+            color: white;
+            box-shadow: 0 8px 20px rgba(253, 203, 110, 0.3);
+        }
+        
+        .btn-warning:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 35px rgba(253, 203, 110, 0.4);
+            color: white;
+        }
+        
+        .btn-success {
+            background: linear-gradient(135deg, #00b894 0%, #00cec9 100%);
+            border: none;
+            box-shadow: 0 8px 20px rgba(0, 184, 148, 0.3);
+        }
+        
+        .btn-success:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 35px rgba(0, 184, 148, 0.4);
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1rem;
+        }
+        
+        .stat-item {
+            display: flex;
+            align-items: center;
+            padding: 1rem;
+            background: rgba(255, 255, 255, 0.5);
+            border-radius: 15px;
+            transition: all 0.3s ease;
+        }
+        
+        .stat-item:hover {
+            background: rgba(255, 255, 255, 0.8);
+            transform: translateX(5px);
+        }
+        
+        .stat-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 1rem;
+            color: white;
+            font-size: 1.2rem;
+        }
+        
+        .stat-number {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #2d3436;
+        }
+        
+        .stat-label {
+            color: #636e72;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+        
+        .notification-card {
+            background: rgba(255, 255, 255, 0.6);
+            border-radius: 15px;
+            padding: 1.5rem;
+            text-align: center;
+            transition: all 0.3s ease;
+            height: 100%;
+            border: 2px solid transparent;
+        }
+        
+        .notification-card:hover {
+            background: rgba(255, 255, 255, 0.9);
+            border-color: rgba(102, 126, 234, 0.2);
+            transform: translateY(-3px);
+        }
+        
+        .notification-icon {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+        
+        .notification-card h5 {
+            font-weight: 700;
+            color: #2d3436;
+            margin-bottom: 0.5rem;
+        }
+        
+        .notification-card p {
+            color: #636e72;
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+        }
+        
+        .form-check-input:checked {
+            background-color: #667eea;
+            border-color: #667eea;
+        }
+        
+        .form-check-input:focus {
+            box-shadow: 0 0 0 0.25rem rgba(102, 126, 234, 0.25);
+        }
+        
+        .toast {
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+        
+        @media (max-width: 768px) {
+            .profile-header {
+                padding: 2rem 1rem;
+            }
+            
+            .config-card {
+                padding: 1.5rem;
+            }
+            
+            .card-header {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .icon-circle {
+                margin-right: 0;
+                margin-bottom: 1rem;
+            }
+        }
+        
+        /* Animaciones */
+        .config-card {
+            animation: fadeInUp 0.6s ease-out forwards;
+            opacity: 0;
+        }
+        
+        .config-card:nth-child(1) { animation-delay: 0.1s; }
+        .config-card:nth-child(2) { animation-delay: 0.2s; }
+        .config-card:nth-child(3) { animation-delay: 0.3s; }
+        
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        /* Media queries para responsive design y mejor espaciado */
+        @media (max-width: 768px) {
+            main.container-fluid {
+                padding-bottom: 4rem;
+                margin-bottom: 2rem;
+                min-height: calc(100vh - 150px);
+            }
+            
+            .profile-header {
+                padding: 2rem 1.5rem;
+                margin-bottom: 1.5rem;
+            }
+            
+            .col-lg-8, .col-lg-4 {
+                margin-bottom: 1rem;
+            }
+            
+            /* Espaciado móvil para las tarjetas principales */
+            .row.g-4.mb-5 {
+                margin-bottom: 2rem !important;
+                padding-bottom: 1.5rem;
+                border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            }
+            
+            /* Ajustar altura mínima en móviles */
+            .col-lg-4.d-flex.flex-column .config-card {
+                min-height: unset;
+            }
+            
+            /* Stack vertical en móviles */
+            .col-lg-4.d-flex.flex-column {
+                gap: 1rem;
+            }
+            
+            /* Asegurar que la sección de notificaciones tenga espacio suficiente */
+            .row.g-4.mt-5.mb-5 {
+                margin-bottom: 4rem !important;
+                padding-bottom: 2rem;
+            }
+        }
+        
+        @media (max-width: 576px) {
+            main.container-fluid {
+                padding-left: 10px;
+                padding-right: 10px;
+                padding-bottom: 3rem;
+                margin-bottom: 1rem;
+            }
+            
+            .profile-header {
+                padding: 1.5rem 1rem;
+                border-radius: 15px;
+            }
+            
+            .config-card {
+                margin-bottom: 1rem;
+                padding: 1.5rem;
+            }
+            
+            /* Espaciado compacto para móviles pequeños */
+            .row.g-4.mb-5 {
+                margin-bottom: 1.5rem !important;
+                padding-bottom: 1rem;
+            }
+            
+            /* Espacio extra para la sección de notificaciones en móviles */
+            .row.g-4.mt-5.mb-5 {
+                margin-bottom: 3rem !important;
+                padding-bottom: 1.5rem;
+            }
+        }
+        
+        /* Asegurar separación adecuada del footer en todas las resoluciones */
+        @media (min-width: 1200px) {
+            main.container-fluid {
+                padding-bottom: 7rem;
+                margin-bottom: 4rem;
+            }
+            
+            /* Espaciado generoso para pantallas grandes */
+            .row.g-4.mb-5 {
+                margin-bottom: 4rem !important;
+                padding-bottom: 3rem;
+                border-bottom: 3px solid rgba(255, 255, 255, 0.1);
+            }
+            
+            /* Espacio adicional para la sección de notificaciones en pantallas grandes */
+            .row.g-4.mt-5.mb-5 {
+                margin-bottom: 6rem !important;
+                padding-bottom: 3rem;
+            }
+            
+            /* Altura óptima para tarjetas laterales en pantallas grandes */
+            .col-lg-4.d-flex.flex-column .config-card {
+                min-height: 350px;
+            }
+        }
+    </style>
+
+    <script>
+        // Función para previsualizar imagen de perfil
+        function previewImage(input) {
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    document.getElementById('profileImage').src = e.target.result;
+                }
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            // Guardar información del perfil
+            document.getElementById('profileForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                const submitBtn = this.querySelector('button[type="submit"]');
+                const originalText = submitBtn.innerHTML;
+                submitBtn.innerHTML = '<i class="bi bi-hourglass-split me-2"></i>Guardando...';
+                submitBtn.disabled = true;
+                
+                const formData = new FormData(this);
+                
+                // Si hay archivo de imagen, subir primero
+                const imageFile = document.getElementById('profileImageInput').files[0];
+                if (imageFile) {
+                    const imageFormData = new FormData();
+                    imageFormData.append('image', imageFile);
+                    
+                    fetch('/client/upload-profile-image', {
+                        method: 'POST',
+                        body: imageFormData
+                    }).then(response => response.text())
+                    .then(data => {
+                        console.log('Imagen subida:', data);
+                    });
+                }
+                
+                // Enviar datos del perfil
+                fetch('/client/configuracion', {
+                    method: 'POST',
+                    body: formData
+                }).then(response => {
+                    if (response.ok) {
+                        showSuccessToast('Información del perfil actualizada exitosamente');
+                        // Recargar la página para mostrar los cambios
+                        setTimeout(() => {
+                            location.reload();
+                        }, 1000);
+                    } else {
+                        alert('Error al actualizar el perfil');
+                    }
+                }).finally(() => {
+                    submitBtn.innerHTML = originalText;
+                    submitBtn.disabled = false;
+                });
+            });
+
+            // Cambiar contraseña
+            document.getElementById('passwordForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                const currentPassword = document.getElementById('currentPassword').value;
+                const newPassword = document.getElementById('newPassword').value;
+                const confirmPassword = document.getElementById('confirmPassword').value;
+                
+                if (!currentPassword) {
+                    alert('Por favor ingresa tu contraseña actual');
+                    return;
+                }
+                
+                if (newPassword !== confirmPassword) {
+                    alert('Las contraseñas no coinciden');
+                    return;
+                }
+                
+                if (newPassword.length < 8) {
+                    alert('La contraseña debe tener al menos 8 caracteres');
+                    return;
+                }
+                
+                const submitBtn = this.querySelector('button[type="submit"]');
+                const originalText = submitBtn.innerHTML;
+                submitBtn.innerHTML = '<i class="bi bi-hourglass-split me-2"></i>Cambiando...';
+                submitBtn.disabled = true;
+                
+                const formData = new FormData();
+                formData.append('currentPassword', currentPassword);
+                formData.append('newPassword', newPassword);
+                
+                fetch('/client/cambiar-contraseña', {
+                    method: 'POST',
+                    body: formData
+                }).then(response => response.text())
+                .then(data => {
+                    if (data === 'Contraseña cambiada exitosamente') {
+                        showSuccessToast(data);
+                        this.reset();
+                    } else {
+                        alert(data);
+                    }
+                }).catch(error => {
+                    alert('Error al cambiar la contraseña');
+                }).finally(() => {
+                    submitBtn.innerHTML = originalText;
+                    submitBtn.disabled = false;
+                });
+            });
+
+            // Guardar preferencias de notificaciones
+            document.getElementById('notificationForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                const submitBtn = this.querySelector('button[type="submit"]');
+                const originalText = submitBtn.innerHTML;
+                submitBtn.innerHTML = '<i class="bi bi-hourglass-split me-2"></i>Guardando...';
+                submitBtn.disabled = true;
+                
+                const formData = new FormData(this);
+                
+                fetch('/client/guardar-preferencias', {
+                    method: 'POST',
+                    body: formData
+                }).then(response => response.text())
+                .then(data => {
+                    showSuccessToast(data);
+                }).catch(error => {
+                    alert('Error al guardar las preferencias');
+                }).finally(() => {
+                    submitBtn.innerHTML = originalText;
+                    submitBtn.disabled = false;
+                });
+            });
+
+            // Validación en tiempo real para contraseñas
+            document.getElementById('confirmPassword').addEventListener('input', function() {
+                const newPassword = document.getElementById('newPassword').value;
+                const confirmPassword = this.value;
+                
+                if (confirmPassword && newPassword !== confirmPassword) {
+                    this.setCustomValidity('Las contraseñas no coinciden');
+                    this.classList.add('is-invalid');
+                } else {
+                    this.setCustomValidity('');
+                    this.classList.remove('is-invalid');
+                }
+            });
+
+            // Toggle switches para notificaciones
+            document.querySelectorAll('.form-check-input').forEach(checkbox => {
+                checkbox.addEventListener('change', function() {
+                    const label = this.parentNode.querySelector('.form-check-label');
+                    label.textContent = this.checked ? 'Activado' : 'Desactivado';
+                });
+            });
+        });
+
+        // Función para mostrar toast de éxito
+        function showSuccessToast(message) {
+            document.getElementById('toastMessage').textContent = message;
+            const toast = new bootstrap.Toast(document.getElementById('successToast'));
+            toast.show();
+        }
+    </script>
+</body>
+</html>

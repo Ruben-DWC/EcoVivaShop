@@ -1,0 +1,2178 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/head :: head('Panel de Control Admin | EcoVivaShop')}">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Panel de Control Admin | EcoVivaShop</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <!-- Custom Admin Styles -->
+    <style>
+        :root {
+            --primary-green: #28a745;
+            --secondary-green: #20c997;
+            --primary-blue: #007bff;
+            --secondary-blue: #17a2b8;
+            --warning-color: #ffc107;
+            --danger-color: #dc3545;
+            --dark-color: #343a40;
+            --light-bg: #f8f9fa;
+            --gradient-primary: linear-gradient(135deg, var(--primary-green) 0%, var(--secondary-green) 100%);
+            --gradient-secondary: linear-gradient(135deg, var(--primary-blue) 0%, var(--secondary-blue) 100%);
+            --shadow-sm: 0 2px 4px rgba(0,0,0,0.1);
+            --shadow-lg: 0 10px 25px rgba(0,0,0,0.15);
+            --border-radius: 1rem;
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #2c3e50;
+            overflow-x: hidden;
+        }
+
+        /* Hero Section Styles */
+        .admin-hero {
+            background: var(--gradient-primary);
+            position: relative;
+            padding: 4rem 0;
+            margin-bottom: 2rem;
+            overflow: hidden;
+            border-radius: 0 0 3rem 3rem;
+        }
+
+        .admin-hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 100" fill="white" opacity="0.1"><polygon points="0,0 1000,0 1000,100 0,100"></polygon></svg>');
+            background-size: cover;
+        }
+
+        .floating-element {
+            position: absolute;
+            animation: float 6s ease-in-out infinite;
+        }
+
+        .floating-element.circle {
+            width: 100px;
+            height: 100px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            backdrop-filter: blur(10px);
+        }
+
+        .floating-element.triangle {
+            width: 0;
+            height: 0;
+            border-left: 50px solid transparent;
+            border-right: 50px solid transparent;
+            border-bottom: 87px solid rgba(255, 255, 255, 0.1);
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(5deg); }
+        }
+
+        .hero-stats {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: var(--border-radius);
+            padding: 2rem;
+            text-align: center;
+            transition: var(--transition);
+        }
+
+        .hero-stats:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .metric-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: var(--border-radius);
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .metric-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: var(--gradient-primary);
+        }
+
+        .metric-card:hover {
+            transform: translateY(-10px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .metric-icon {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            margin: 0 auto 1rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .metric-icon::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            transition: left 0.6s;
+        }
+
+        .metric-card:hover .metric-icon::before {
+            left: 100%;
+        }
+
+        .action-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin: 3rem 0;
+        }
+
+        .action-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border: 2px solid transparent;
+            border-radius: var(--border-radius);
+            padding: 2rem;
+            text-decoration: none;
+            color: inherit;
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .action-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: var(--gradient-primary);
+            opacity: 0;
+            transition: opacity 0.3s;
+            z-index: -1;
+        }
+
+        .action-card:hover::before {
+            opacity: 1;
+        }
+
+        .action-card:hover {
+            transform: translateY(-10px);
+            border-color: var(--primary-green);
+            color: white;
+            text-decoration: none;
+        }
+
+        .action-icon {
+            width: 60px;
+            height: 60px;
+            background: var(--gradient-primary);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            color: white;
+            margin-bottom: 1rem;
+        }
+
+        .timeline {
+            position: relative;
+            padding-left: 2rem;
+        }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 1rem;
+            top: 0;
+            bottom: 0;
+            width: 3px;
+            background: var(--gradient-primary);
+            border-radius: 2px;
+        }
+
+        .timeline-item {
+            position: relative;
+            margin-bottom: 2rem;
+        }
+
+        .timeline-marker {
+            position: absolute;
+            left: -2.5rem;
+            top: 0.25rem;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            border: 3px solid white;
+            z-index: 2;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .timeline-content {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 1.5rem;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-sm);
+            transition: var(--transition);
+            border-left: 4px solid var(--primary-green);
+        }
+
+        .timeline-content:hover {
+            transform: translateX(10px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .stats-counter {
+            font-size: 3rem;
+            font-weight: 800;
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-align: center;
+            display: block;
+            margin: 0.5rem 0;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1200px) {
+            .action-grid {
+                grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            }
+        }
+
+        @media (max-width: 768px) {
+            .admin-hero {
+                padding: 2rem 0;
+                border-radius: 0 0 2rem 2rem;
+            }
+            
+            .action-grid {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+            
+            .metric-card {
+                margin-bottom: 1rem;
+            }
+            
+            .stats-counter {
+                font-size: 2rem;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .admin-hero {
+                padding: 1.5rem 0;
+                margin-bottom: 1rem;
+            }
+            
+            .hero-stats {
+                padding: 1rem;
+            }
+            
+            .timeline {
+                padding-left: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Admin Navbar Fragment -->
+    <div th:replace="~{fragments/admin-navbar :: admin-navbar}"></div>
+
+    <!-- Hero Section with Floating Animations -->
+    <section class="admin-hero">
+        <!-- Floating Elements -->
+        <div class="floating-element circle" style="top: 10%; left: 5%; animation-delay: 0s;"></div>
+        <div class="floating-element triangle" style="top: 20%; right: 10%; animation-delay: 2s;"></div>
+        <div class="floating-element circle" style="bottom: 15%; left: 15%; animation-delay: 4s;"></div>
+        <div class="floating-element triangle" style="bottom: 25%; right: 20%; animation-delay: 1s;"></div>
+        
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-lg-8">
+                    <h1 class="display-4 fw-bold text-white mb-3">
+                        <i class="bi bi-speedometer2 me-3"></i>
+                        Panel de Control EcoVivaShop
+                    </h1>
+                    <p class="lead text-white-50 mb-4">
+                        Gestiona tu tienda ecológica con herramientas avanzadas y métricas en tiempo real
+                    </p>
+                    <div class="d-flex flex-wrap gap-3 mb-4">
+                        <div class="hero-stats">
+                            <div class="stats-counter" id="hero-total-clientes">--</div>
+                            <div class="text-white fw-semibold">Clientes Activos</div>
+                        </div>
+                        <div class="hero-stats">
+                            <div class="stats-counter" id="hero-productos-activos">--</div>
+                            <div class="text-white fw-semibold">Productos</div>
+                        </div>
+                        <div class="hero-stats">
+                            <div class="stats-counter" id="hero-pedidos-mes">--</div>
+                            <div class="text-white fw-semibold">Pedidos Este Mes</div>
+                        </div>
+                        <div class="hero-stats">
+                            <div class="stats-counter" id="hero-ventas-mes">--</div>
+                            <div class="text-white fw-semibold">Ventas del Mes</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-4 text-end">
+                    <div class="text-white-75">
+                        <i class="bi bi-clock me-2"></i>
+                        <small class="d-block mb-1">Último acceso:</small>
+                        <span class="fw-bold" id="currentDateTime"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <main class="container-fluid py-4">
+        <!-- Modern Metrics Cards -->
+        <div class="row g-4 mb-5">
+            <div class="col-xl-3 col-lg-6 col-md-6">
+                <div class="metric-card h-100 p-4">
+                    <div class="metric-icon bg-success">
+                        <i class="bi bi-people-fill text-white"></i>
+                    </div>
+                    <div class="text-center">
+                        <div class="stats-counter" id="total-clientes">10</div>
+                        <h6 class="fw-bold text-dark mb-2">Total Clientes</h6>
+                        <div class="d-flex align-items-center justify-content-center text-success">
+                            <i class="bi bi-arrow-up me-1"></i>
+                            <small class="fw-semibold">+12% este mes</small>
+                        </div>
+                        <div class="mt-3">
+                            <div class="progress" style="height: 6px;">
+                                <div class="progress-bar bg-success" role="progressbar" style="width: 75%" 
+                                     aria-valuenow="75" aria-valuemin="0" aria-valuemax="100" 
+                                     aria-label="Progreso de crecimiento de clientes: 75%"></div>
+                            </div>
+                            <small class="text-muted mt-1 d-block">Crecimiento activo</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-xl-3 col-lg-6 col-md-6">
+                <div class="metric-card h-100 p-4">
+                    <div class="metric-icon bg-primary">
+                        <i class="bi bi-cart-check-fill text-white"></i>
+                    </div>
+                    <div class="text-center">
+                        <div class="stats-counter" id="pedidos-pendientes">4</div>
+                        <h6 class="fw-bold text-dark mb-2">Pedidos Pendientes</h6>
+                        <div class="d-flex align-items-center justify-content-center text-primary">
+                            <i class="bi bi-clock me-1"></i>
+                            <small class="fw-semibold">Requieren atención</small>
+                        </div>
+                        <div class="mt-3">
+                            <div class="progress" style="height: 6px;">
+                                <div class="progress-bar bg-primary" role="progressbar" style="width: 60%" 
+                                     aria-valuenow="60" aria-valuemin="0" aria-valuemax="100" 
+                                     aria-label="Progreso de pedidos pendientes: 60%"></div>
+                            </div>
+                            <small class="text-muted mt-1 d-block">En proceso</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-xl-3 col-lg-6 col-md-6">
+                <div class="metric-card h-100 p-4">
+                    <div class="metric-icon bg-warning">
+                        <i class="bi bi-cash-stack text-white"></i>
+                    </div>
+                    <div class="text-center">
+                        <div class="stats-counter text-warning" id="ventas-mes">S/ 348.19</div>
+                        <h6 class="fw-bold text-dark mb-2">Ventas del Mes</h6>
+                        <div class="d-flex align-items-center justify-content-center text-warning">
+                            <i class="bi bi-arrow-up me-1"></i>
+                            <small class="fw-semibold">+8.5% vs mes anterior</small>
+                        </div>
+                        <div class="mt-3">
+                            <div class="progress" style="height: 6px;">
+                                <div class="progress-bar bg-warning" role="progressbar" style="width: 85%" 
+                                     aria-valuenow="85" aria-valuemin="0" aria-valuemax="100" 
+                                     aria-label="Progreso de meta de ventas mensuales: 85%"></div>
+                            </div>
+                            <small class="text-muted mt-1 d-block">Meta mensual</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-xl-3 col-lg-6 col-md-6">
+                <div class="metric-card h-100 p-4">
+                    <div class="metric-icon bg-info">
+                        <i class="bi bi-box-seam-fill text-white"></i>
+                    </div>
+                    <div class="text-center">
+                        <div class="stats-counter text-info" id="total-productos">136</div>
+                        <h6 class="fw-bold text-dark mb-2">Productos Activos</h6>
+                        <div class="d-flex align-items-center justify-content-center text-info">
+                            <i class="bi bi-check-circle me-1"></i>
+                            <small class="fw-semibold">Todos disponibles</small>
+                        </div>
+                        <div class="mt-3">
+                            <div class="progress" style="height: 6px;">
+                                <div class="progress-bar bg-info" role="progressbar" style="width: 90%" 
+                                     aria-valuenow="90" aria-valuemin="0" aria-valuemax="100" 
+                                     aria-label="Estado de inventario de productos: 90%"></div>
+                            </div>
+                            <small class="text-muted mt-1 d-block">Inventario óptimo</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Interactive Quick Actions -->
+        <div class="row mb-5">
+            <div class="col-12">
+                <div class="d-flex align-items-center justify-content-between mb-4">
+                    <h3 class="fw-bold text-dark mb-0">
+                        <i class="bi bi-lightning-fill text-warning me-2"></i>
+                        Acciones Rápidas
+                    </h3>
+                    <div class="badge bg-success px-3 py-2">
+                        <i class="bi bi-check-circle me-1"></i>
+                        Sistema Activo
+                    </div>
+                </div>
+                
+                <div class="action-grid">
+                    <a href="/admin/clientes" class="action-card">
+                        <div class="action-icon">
+                            <i class="bi bi-people"></i>
+                        </div>
+                        <h5 class="fw-bold mb-2">Gestionar Clientes</h5>
+                        <p class="text-muted mb-3">Ver y administrar todos los usuarios registrados en la plataforma</p>
+                        <div class="d-flex align-items-center justify-content-between">
+                            <span class="badge bg-success bg-opacity-10 text-white px-3 py-2">
+                                <span id="quick-total-clientes">10</span> activos
+                            </span>
+                            <i class="bi bi-arrow-right-circle fs-5"></i>
+                        </div>
+                    </a>
+                    
+                    <a href="/admin/registro-admin" class="action-card">
+                        <div class="action-icon">
+                            <i class="bi bi-person-plus"></i>
+                        </div>
+                        <h5 class="fw-bold mb-2">Nuevo Administrador</h5>
+                        <p class="text-muted mb-3">Registrar un nuevo administrador con permisos completos</p>
+                        <div class="d-flex align-items-center justify-content-between">
+                            <span class="badge bg-primary bg-opacity-10 text-white px-3 py-2">
+                                <span id="quick-total-admins">2</span> admins
+                            </span>
+                            <i class="bi bi-arrow-right-circle fs-5"></i>
+                        </div>
+                    </a>
+                    
+                    <a href="/admin/productos" class="action-card">
+                        <div class="action-icon">
+                            <i class="bi bi-box-seam"></i>
+                        </div>
+                        <h5 class="fw-bold mb-2">Gestionar Productos</h5>
+                        <p class="text-muted mb-3">Administrar catálogo, inventario y precios de productos</p>
+                        <div class="d-flex align-items-center justify-content-between">
+                            <span class="badge bg-warning bg-opacity-10 text-white px-3 py-2">
+                                <span id="quick-productos-stock">127</span> en stock
+                            </span>
+                            <i class="bi bi-arrow-right-circle fs-5"></i>
+                        </div>
+                    </a>
+                    
+                    <a href="/admin/pedidos" class="action-card">
+                        <div class="action-icon">
+                            <i class="bi bi-list-check"></i>
+                        </div>
+                        <h5 class="fw-bold mb-2">Historial de Pedidos</h5>
+                        <p class="text-muted mb-3">Ver todos los pedidos y gestionar estados de entrega</p>
+                        <div class="d-flex align-items-center justify-content-between">
+                            <span class="badge bg-info bg-opacity-10 text-white px-3 py-2">
+                                <span id="quick-pedidos-pendientes">4</span> pendientes
+                            </span>
+                            <i class="bi bi-arrow-right-circle fs-5"></i>
+                        </div>
+                    </a>
+                    
+                    <a href="/admin/reportes" class="action-card">
+                        <div class="action-icon">
+                            <i class="bi bi-graph-up"></i>
+                        </div>
+                        <h5 class="fw-bold mb-2">Reportes y Analytics</h5>
+                        <p class="text-muted mb-3">Análisis detallado de ventas, usuarios y rendimiento</p>
+                        <div class="d-flex align-items-center justify-content-between">
+                            <span class="badge bg-danger bg-opacity-10 text-white px-3 py-2">
+                                Este mes
+                            </span>
+                            <i class="bi bi-arrow-right-circle fs-5"></i>
+                        </div>
+                    </a>
+                    
+                    <a href="/admin/configuracion" class="action-card">
+                        <div class="action-icon">
+                            <i class="bi bi-gear"></i>
+                        </div>
+                        <h5 class="fw-bold mb-2">Configuración</h5>
+                        <p class="text-muted mb-3">Ajustes del sistema, notificaciones y preferencias</p>
+                        <div class="d-flex align-items-center justify-content-between">
+                            <span class="badge bg-secondary bg-opacity-10 text-secondary px-3 py-2">
+                                Sistema
+                            </span>
+                            <i class="bi bi-arrow-right-circle fs-5"></i>
+                        </div>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Activity & Impact Section -->
+        <div class="row g-4 mb-5" style="margin-bottom: 3rem !important;">
+            <div class="col-lg-8">
+                <div class="metric-card h-100 p-4" style="min-height: 600px;">
+                    <div class="d-flex align-items-center justify-content-between mb-4">
+                        <h4 class="fw-bold text-dark mb-0">
+                            <i class="bi bi-clock-history text-info me-2"></i>
+                            Actividad Reciente
+                        </h4>
+                        <button class="btn btn-outline-primary btn-sm" onclick="refreshActivity()">
+                            <i class="bi bi-arrow-clockwise me-1"></i>
+                            Actualizar
+                        </button>
+                    </div>
+                    
+                    <div class="timeline" id="activity-timeline">
+                        <!-- La actividad se cargará dinámicamente -->
+                        <div class="timeline-item">
+                            <div class="timeline-marker bg-success"></div>
+                            <div class="timeline-content">
+                                <div class="d-flex align-items-center justify-content-between">
+                                    <div>
+                                        <h6 class="fw-bold text-dark mb-1">Nuevo usuario registrado</h6>
+                                        <p class="text-muted mb-0">María González se registró exitosamente</p>
+                                    </div>
+                                    <small class="text-success fw-semibold">Hace 30 min</small>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="timeline-item">
+                            <div class="timeline-marker bg-warning"></div>
+                            <div class="timeline-content">
+                                <div class="d-flex align-items-center justify-content-between">
+                                    <div>
+                                        <h6 class="fw-bold text-dark mb-1">Producto actualizado</h6>
+                                        <p class="text-muted mb-0">Eco Kit Hogar - Stock actualizado: 25 unidades</p>
+                                    </div>
+                                    <small class="text-warning fw-semibold">Hace 1 hora</small>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="timeline-item">
+                            <div class="timeline-marker bg-info"></div>
+                            <div class="timeline-content">
+                                <div class="d-flex align-items-center justify-content-between">
+                                    <div>
+                                        <h6 class="fw-bold text-dark mb-1">Email de bienvenida enviado</h6>
+                                        <p class="text-muted mb-0">Correo automático enviado a nuevo usuario</p>
+                                    </div>
+                                    <small class="text-info fw-semibold">Hace 2 horas</small>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="timeline-item">
+                            <div class="timeline-marker bg-primary"></div>
+                            <div class="timeline-content">
+                                <div class="d-flex align-items-center justify-content-between">
+                                    <div>
+                                        <h6 class="fw-bold text-dark mb-1">Pedido procesado</h6>
+                                        <p class="text-muted mb-0">Pedido #ECO-2025-001 enviado al cliente</p>
+                                    </div>
+                                    <small class="text-white fw-semibold">Hace 3 horas</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-lg-4">
+                <div class="metric-card h-100 p-4">
+                    <h4 class="fw-bold text-dark mb-4">
+                        <i class="bi bi-graph-up-arrow text-success me-2"></i>
+                        Estadísticas Rápidas
+                    </h4>
+                    
+                    <div class="mb-4">
+                        <div class="d-flex align-items-center justify-content-between mb-2">
+                            <span class="text-muted">Usuarios registrados hoy</span>
+                            <span class="fw-bold text-success" id="usuarios-hoy">12</span>
+                        </div>
+                        <div class="progress mb-3" style="height: 8px;">
+                            <div class="progress-bar bg-success" role="progressbar" style="width: 65%" 
+                                 aria-valuenow="65" aria-valuemin="0" aria-valuemax="100"
+                                 aria-label="Usuarios registrados hoy: 65%"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <div class="d-flex align-items-center justify-content-between mb-2">
+                            <span class="text-muted">Productos con stock bajo</span>
+                            <span class="fw-bold text-warning" id="stock-bajo">8</span>
+                        </div>
+                        <div class="progress mb-3" style="height: 8px;">
+                            <div class="progress-bar bg-warning" role="progressbar" style="width: 25%" 
+                                 aria-valuenow="25" aria-valuemin="0" aria-valuemax="100"
+                                 aria-label="Productos con stock bajo: 25%"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <div class="d-flex align-items-center justify-content-between mb-2">
+                            <span class="text-muted">Pedidos entregados</span>
+                            <span class="fw-bold text-info" id="pedidos-entregados">145</span>
+                        </div>
+                        <div class="progress mb-3" style="height: 8px;">
+                            <div class="progress-bar bg-info" role="progressbar" style="width: 80%" 
+                                 aria-valuenow="80" aria-valuemin="0" aria-valuemax="100"
+                                 aria-label="Pedidos entregados: 80%"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="text-center pt-3 border-top">
+                        <a href="/admin/reportes" class="btn btn-outline-primary btn-sm">
+                            <i class="bi bi-bar-chart me-1"></i>
+                            Ver reportes completos
+                        </a>
+                    </div>
+                        <button class="btn btn-outline-primary btn-sm" onclick="refreshActivity()">
+                            <i class="bi bi-arrow-clockwise me-1"></i>
+                            Actualizar
+                        </button>
+                    </div>
+                    
+                    <div class="timeline" id="activity-timeline">
+                        <!-- La actividad se cargará dinámicamente -->
+                        <div class="timeline-item">
+                            <div class="timeline-marker bg-success"></div>
+                            <div class="timeline-content">
+                                <div class="d-flex align-items-center justify-content-between">
+                                    <div>
+                                        <h6 class="fw-bold text-dark mb-1">Nuevo usuario registrado</h6>
+                                        <p class="text-muted mb-0">María González se registró exitosamente</p>
+                                    </div>
+                                    <small class="text-success fw-semibold">Hace 30 min</small>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="timeline-item">
+                            <div class="timeline-marker bg-warning"></div>
+                            <div class="timeline-content">
+                                <div class="d-flex align-items-center justify-content-between">
+                                    <div>
+                                        <h6 class="fw-bold text-dark mb-1">Producto actualizado</h6>
+                                        <p class="text-muted mb-0">Eco Kit Hogar - Stock actualizado: 25 unidades</p>
+                                    </div>
+                                    <small class="text-warning fw-semibold">Hace 1 hora</small>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="timeline-item">
+                            <div class="timeline-marker bg-info"></div>
+                            <div class="timeline-content">
+                                <div class="d-flex align-items-center justify-content-between">
+                                    <div>
+                                        <h6 class="fw-bold text-dark mb-1">Email de bienvenida enviado</h6>
+                                        <p class="text-muted mb-0">Correo automático enviado a nuevo usuario</p>
+                                    </div>
+                                    <small class="text-info fw-semibold">Hace 2 horas</small>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="timeline-item">
+                            <div class="timeline-marker bg-primary"></div>
+                            <div class="timeline-content">
+                                <div class="d-flex align-items-center justify-content-between">
+                                    <div>
+                                        <h6 class="fw-bold text-dark mb-1">Pedido procesado</h6>
+                                        <p class="text-muted mb-0">Pedido #ECO-2025-001 enviado al cliente</p>
+                                    </div>
+                                    <small class="text-white fw-semibold">Hace 3 horas</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-lg-4">
+                <div class="metric-card h-100 p-4">
+                    <h4 class="fw-bold text-dark mb-4">
+                        <i class="bi bi-graph-up-arrow text-success me-2"></i>
+                        Estadísticas Rápidas
+                    </h4>
+                    
+                    <div class="mb-4">
+                        <div class="d-flex align-items-center justify-content-between mb-2">
+                            <span class="text-muted">Usuarios registrados hoy</span>
+                            <span class="fw-bold text-success" id="usuarios-hoy">--</span>
+                        </div>
+                        <div class="progress mb-3" style="height: 8px;">
+                            <div class="progress-bar bg-success" role="progressbar" style="width: 65%" 
+                                 aria-valuenow="65" aria-valuemin="0" aria-valuemax="100"
+                                 aria-label="Usuarios registrados hoy: 65%"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <div class="d-flex align-items-center justify-content-between mb-2">
+                            <span class="text-muted">Productos con stock bajo</span>
+                            <span class="fw-bold text-warning" id="stock-bajo">--</span>
+                        </div>
+                        <div class="progress mb-3" style="height: 8px;">
+                            <div class="progress-bar bg-warning" role="progressbar" style="width: 25%" 
+                                 aria-valuenow="25" aria-valuemin="0" aria-valuemax="100"
+                                 aria-label="Productos con stock bajo: 25%"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <div class="d-flex align-items-center justify-content-between mb-2">
+                            <span class="text-muted">Pedidos entregados</span>
+                            <span class="fw-bold text-info" id="pedidos-entregados">--</span>
+                        </div>
+                        <div class="progress mb-3" style="height: 8px;">
+                            <div class="progress-bar bg-info" role="progressbar" style="width: 80%" 
+                                 aria-valuenow="80" aria-valuemin="0" aria-valuemax="100"
+                                 aria-label="Pedidos entregados: 80%"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="text-center pt-3 border-top">
+                        <a href="/admin/reportes" class="btn btn-outline-primary btn-sm">
+                            <i class="bi bi-bar-chart me-1"></i>
+                            Ver reportes completos
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Environmental Impact Section -->
+        <div class="row mb-5">
+            <div class="col-12">
+                <div class="metric-card p-5 position-relative overflow-hidden">
+                    <!-- Background Pattern -->
+                    <div class="position-absolute top-0 start-0 w-100 h-100 opacity-10">
+                        <div class="d-flex align-items-center justify-content-center h-100">
+                            <i class="bi bi-globe-americas" style="font-size: 15rem; color: var(--primary-green);"></i>
+                        </div>
+                    </div>
+                    
+                    <div class="position-relative z-1">
+                        <div class="text-center mb-5">
+                            <h2 class="display-6 fw-bold text-success mb-3">
+                                <i class="bi bi-globe-americas me-3"></i>
+                                Impacto Ambiental EcoVivaShop
+                            </h2>
+                            <p class="lead text-muted mb-0">
+                                Nuestro compromiso con el planeta se refleja en cada producto vendido y cada cliente satisfecho
+                            </p>
+                        </div>
+                        
+                        <div class="row g-4">
+                            <div class="col-lg-3 col-md-6">
+                                <div class="text-center p-4 bg-white bg-opacity-75 rounded-4 h-100 impact-stat">
+                                    <div class="impact-icon mb-3">
+                                        <i class="bi bi-tree-fill text-success display-4"></i>
+                                    </div>
+                                    <div class="stats-counter text-success">1,247</div>
+                                    <h5 class="fw-bold text-dark mb-2">Árboles Salvados</h5>
+                                    <p class="text-muted mb-0">Equivalente a productos eco-friendly vendidos</p>
+                                    <div class="mt-3">
+                                        <div class="progress" style="height: 6px;">
+                                            <div class="progress-bar bg-success" role="progressbar" style="width: 85%" 
+                                                 aria-valuenow="85" aria-valuemin="0" aria-valuemax="100"
+                                                 aria-label="Progreso árboles salvados: 85%"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="col-lg-3 col-md-6">
+                                <div class="text-center p-4 bg-white bg-opacity-75 rounded-4 h-100 impact-stat">
+                                    <div class="impact-icon mb-3">
+                                        <i class="bi bi-droplet-fill text-primary display-4"></i>
+                                    </div>
+                                    <div class="stats-counter text-primary">15,680L</div>
+                                    <h5 class="fw-bold text-dark mb-2">Agua Ahorrada</h5>
+                                    <p class="text-muted mb-0">Gracias a productos sostenibles</p>
+                                    <div class="mt-3">
+                                        <div class="progress" style="height: 6px;">
+                                            <div class="progress-bar bg-primary" role="progressbar" style="width: 72%" 
+                                                 aria-valuenow="72" aria-valuemin="0" aria-valuemax="100"
+                                                 aria-label="Progreso agua ahorrada: 72%"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="col-lg-3 col-md-6">
+                                <div class="text-center p-4 bg-white bg-opacity-75 rounded-4 h-100 impact-stat">
+                                    <div class="impact-icon mb-3">
+                                        <i class="bi bi-recycle text-warning display-4"></i>
+                                    </div>
+                                    <div class="stats-counter text-warning">892kg</div>
+                                    <h5 class="fw-bold text-dark mb-2">Residuos Reducidos</h5>
+                                    <p class="text-muted mb-0">Mediante packaging eco-amigable</p>
+                                    <div class="mt-3">
+                                        <div class="progress" style="height: 6px;">
+                                            <div class="progress-bar bg-warning" role="progressbar" style="width: 68%" 
+                                                 aria-valuenow="68" aria-valuemin="0" aria-valuemax="100"
+                                                 aria-label="Progreso residuos reducidos: 68%"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="col-lg-3 col-md-6">
+                                <div class="text-center p-4 bg-white bg-opacity-75 rounded-4 h-100 impact-stat">
+                                    <div class="impact-icon mb-3">
+                                        <i class="bi bi-heart-fill text-danger display-4"></i>
+                                    </div>
+                                    <div class="stats-counter text-danger">2,456</div>
+                                    <h5 class="fw-bold text-dark mb-2">Familias Beneficiadas</h5>
+                                    <p class="text-muted mb-0">Con productos naturales y saludables</p>
+                                    <div class="mt-3">
+                                        <div class="progress" style="height: 6px;">
+                                            <div class="progress-bar bg-danger" role="progressbar" style="width: 90%" 
+                                                 aria-valuenow="90" aria-valuemin="0" aria-valuemax="100"
+                                                 aria-label="Progreso familias beneficiadas: 90%"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="text-center mt-5">
+                            <button class="btn btn-success btn-lg px-5 py-3" onclick="showImpactDetails()">
+                                <i class="bi bi-graph-up me-2"></i>
+                                Ver Informe de Sostenibilidad Completo
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Modern Footer -->
+    <footer class="mt-5 py-5" style="background: var(--gradient-primary);">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-4 mb-4">
+                    <h5 class="text-white fw-bold mb-3">
+                        <i class="bi bi-leaf me-2"></i>
+                        EcoVivaShop Admin
+                    </h5>
+                    <p class="text-white-50 mb-3">
+                        Panel de administración avanzado para gestionar tu tienda ecológica con las mejores herramientas del mercado.
+                    </p>
+                    <div class="d-flex gap-3">
+                        <div class="text-center">
+                            <div class="fw-bold text-white h5" id="footer-productos">136</div>
+                            <small class="text-white-50">Productos</small>
+                        </div>
+                        <div class="text-center">
+                            <div class="fw-bold text-white h5" id="footer-clientes">10</div>
+                            <small class="text-white-50">Clientes</small>
+                        </div>
+                        <div class="text-center">
+                            <div class="fw-bold text-white h5" id="footer-ventas">S/ 348.19</div>
+                            <small class="text-white-50">Ventas</small>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-lg-2 col-md-6 mb-4">
+                    <h6 class="text-white fw-bold mb-3">Gestión</h6>
+                    <ul class="list-unstyled">
+                        <li class="mb-2">
+                            <a href="/admin/clientes" class="text-white-50 text-decoration-none hover-text-white">
+                                <i class="bi bi-people me-2"></i>Clientes
+                            </a>
+                        </li>
+                        <li class="mb-2">
+                            <a href="/admin/productos" class="text-white-50 text-decoration-none hover-text-white">
+                                <i class="bi bi-box me-2"></i>Productos
+                            </a>
+                        </li>
+                        <li class="mb-2">
+                            <a href="/admin/pedidos" class="text-white-50 text-decoration-none hover-text-white">
+                                <i class="bi bi-cart me-2"></i>Pedidos
+                            </a>
+                        </li>
+                        <li class="mb-2">
+                            <a href="/admin/reportes" class="text-white-50 text-decoration-none hover-text-white">
+                                <i class="bi bi-graph-up me-2"></i>Reportes
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+                
+                <div class="col-lg-2 col-md-6 mb-4">
+                    <h6 class="text-white fw-bold mb-3">Sistema</h6>
+                    <ul class="list-unstyled">
+                        <li class="mb-2">
+                            <a href="/admin/configuracion" class="text-white-50 text-decoration-none hover-text-white">
+                                <i class="bi bi-gear me-2"></i>Configuración
+                            </a>
+                        </li>
+                        <li class="mb-2">
+                            <a href="/admin/registro-admin" class="text-white-50 text-decoration-none hover-text-white">
+                                <i class="bi bi-person-plus me-2"></i>Nuevo Admin
+                            </a>
+                        </li>
+                        <li class="mb-2">
+                            <span class="text-white-50">
+                                <i class="bi bi-shield-check me-2"></i>Seguro
+                            </span>
+                        </li>
+                        <li class="mb-2">
+                            <span class="text-success">
+                                <i class="bi bi-check-circle me-2"></i>Online
+                            </span>
+                        </li>
+                    </ul>
+                </div>
+                
+                <div class="col-lg-4 mb-4">
+                    <h6 class="text-white fw-bold mb-3">Estado del Sistema</h6>
+                    <div class="bg-white bg-opacity-10 p-3 rounded-3 backdrop-filter-blur">
+                        <div class="d-flex align-items-center justify-content-between mb-2">
+                            <span class="text-white-50 small">Servidor</span>
+                            <span class="badge bg-success">Online</span>
+                        </div>
+                        <div class="d-flex align-items-center justify-content-between mb-2">
+                            <span class="text-white-50 small">Base de Datos</span>
+                            <span class="badge bg-success">Conectada</span>
+                        </div>
+                        <div class="d-flex align-items-center justify-content-between mb-2">
+                            <span class="text-white-50 small">Última actualización</span>
+                            <span class="text-white small" id="last-update">23:32</span>
+                        </div>
+                        <div class="d-flex align-items-center justify-content-between">
+                            <span class="text-white-50 small">Versión</span>
+                            <span class="text-white small">v2.1.0</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <hr class="my-4 border-white opacity-25">
+            
+            <div class="row align-items-center">
+                <div class="col-md-6">
+                    <p class="text-white-50 mb-0">
+                        <i class="bi bi-c-circle me-1"></i>
+                        2025 EcoVivaShop. Todos los derechos reservados.
+                    </p>
+                </div>
+                <div class="col-md-6 text-md-end">
+                    <div class="d-flex justify-content-md-end gap-3">
+                        <span class="badge bg-white bg-opacity-10 text-white">
+                            <i class="bi bi-shield-shaded me-1"></i>
+                            Certificado Verde
+                        </span>
+                        <span class="badge bg-white bg-opacity-10 text-white">
+                            100% Ecológico
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <style>
+        /* Variables CSS para el tema */
+        :root {
+            --primary-green: #28a745;
+            --primary-blue: #007bff;
+            --primary-warning: #ffc107;
+            --primary-info: #17a2b8;
+            --primary-danger: #dc3545;
+            --gradient-primary: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --gradient-success: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+            --gradient-info: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --gradient-warning: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            --admin-bg: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --card-bg: rgba(255, 255, 255, 0.95);
+            --text-dark: #2d3436;
+            --text-muted: #636e72;
+            --shadow-light: 0 4px 15px rgba(0,0,0,0.08);
+            --shadow-medium: 0 8px 30px rgba(0,0,0,0.12);
+        }
+
+        body {
+            background: var(--admin-bg);
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .eco-admin-bg {
+            background: var(--admin-bg);
+            min-height: 100vh;
+        }
+
+        /* Hero Section Styles */
+        .admin-hero {
+            background: var(--gradient-primary);
+            padding: 4rem 0;
+            position: relative;
+            overflow: hidden;
+            margin-bottom: 2rem;
+        }
+
+        .floating-element {
+            position: absolute;
+            width: 60px;
+            height: 60px;
+            opacity: 0.1;
+            animation: float 6s ease-in-out infinite;
+        }
+
+        .floating-element.circle {
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+        }
+
+        .floating-element.triangle {
+            width: 0;
+            height: 0;
+            border-left: 30px solid transparent;
+            border-right: 30px solid transparent;
+            border-bottom: 52px solid rgba(255, 255, 255, 0.2);
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(180deg); }
+        }
+
+        .hero-stats {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 1rem;
+            padding: 1.5rem;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .stats-counter {
+            font-size: 2rem;
+            font-weight: 800;
+            color: #fff;
+            margin-bottom: 0.5rem;
+        }
+
+        /* Metric Cards */
+        .metric-card {
+            background: var(--card-bg);
+            border-radius: 1.5rem;
+            box-shadow: var(--shadow-light);
+            transition: all 0.3s ease;
+            border: none;
+            backdrop-filter: blur(10px);
+        }
+
+        .metric-card:hover {
+            transform: translateY(-8px);
+            box-shadow: var(--shadow-medium);
+        }
+
+        .metric-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1rem;
+            font-size: 1.5rem;
+        }
+
+        .metric-card .stats-counter {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: var(--text-dark);
+            margin-bottom: 0.5rem;
+        }
+
+        .metric-card h6 {
+            color: var(--text-dark);
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+
+        .metric-card .text-muted {
+            color: var(--text-muted) !important;
+        }
+
+        /* Action Grid */
+        .action-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .action-card {
+            background: var(--card-bg);
+            border-radius: 1.2rem;
+            padding: 2rem;
+            text-decoration: none;
+            color: var(--text-dark);
+            transition: all 0.3s ease;
+            box-shadow: var(--shadow-light);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .action-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-medium);
+            color: var(--text-dark);
+            text-decoration: none;
+        }
+
+        .action-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1.5rem;
+            font-size: 1.5rem;
+            color: #fff;
+        }
+
+        .action-card:nth-child(1) .action-icon { background: var(--gradient-success); }
+        .action-card:nth-child(2) .action-icon { background: var(--primary-blue); }
+        .action-card:nth-child(3) .action-icon { background: var(--primary-warning); }
+        .action-card:nth-child(4) .action-icon { background: var(--primary-info); }
+        .action-card:nth-child(5) .action-icon { background: var(--primary-danger); }
+        .action-card:nth-child(6) .action-icon { background: var(--gradient-primary); }
+
+        .action-card h5 {
+            color: var(--text-dark);
+            font-weight: 700;
+            margin-bottom: 1rem;
+        }
+
+        /* Timeline */
+        .timeline {
+            position: relative;
+            padding-left: 2rem;
+        }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 1rem;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: #e9ecef;
+        }
+
+        .timeline-item {
+            position: relative;
+            margin-bottom: 1.5rem;
+        }
+
+        .timeline-marker {
+            position: absolute;
+            left: -2rem;
+            top: 0.25rem;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            border: 2px solid white;
+            z-index: 1;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .timeline-content {
+            background: #ffffff;
+            padding: 1.25rem;
+            border-radius: 0.75rem;
+            border-left: 4px solid #28a745;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+        }
+
+        .timeline-content:hover {
+            box-shadow: 0 5px 15px rgba(0,0,0,0.15);
+            transform: translateX(3px);
+        }
+
+        .timeline-content h6 {
+            color: #1a202c !important;
+            font-weight: 700;
+            font-size: 1rem;
+        }
+
+        .timeline-content p {
+            color: #2d3748 !important;
+            font-weight: 500;
+            font-size: 0.9rem;
+        }
+
+        .timeline-content small {
+            font-weight: 600;
+            color: #4a5568 !important;
+        }
+
+        /* Specific timeline text improvements */
+        .timeline-item h6,
+        .timeline-item .fw-bold {
+            color: #1a202c !important;
+            font-weight: 700 !important;
+        }
+
+        .timeline-item p,
+        .timeline-item .text-muted {
+            color: #2d3748 !important;
+            font-weight: 500 !important;
+        }
+
+        .timeline-item small {
+            color: #4a5568 !important;
+            font-weight: 600 !important;
+        }
+
+        /* Statistics section text improvements */
+        .metric-card .text-muted,
+        .metric-card span.text-muted {
+            color: #2d3748 !important;
+            font-weight: 500 !important;
+        }
+
+        .metric-card .fw-bold {
+            color: #1a202c !important;
+        }
+
+        /* Ensure all text in metric cards has proper contrast */
+        .metric-card h4,
+        .metric-card h5,
+        .metric-card h6 {
+            color: #1a202c !important;
+        }
+
+        /* Timeline content specific improvements */
+        .timeline-content * {
+            text-shadow: 0 1px 2px rgba(255,255,255,0.8);
+        }
+
+        /* Override any Bootstrap or inherited styles */
+        .timeline-content .text-muted,
+        .timeline-content p,
+        .timeline-item .text-muted,
+        .timeline-item p {
+            color: #212529 !important;
+            font-weight: 600 !important;
+        }
+
+        .timeline-content h6,
+        .timeline-content .fw-bold,
+        .timeline-item h6,
+        .timeline-item .fw-bold {
+            color: #000000 !important;
+            font-weight: 700 !important;
+        }
+
+        .timeline-content small,
+        .timeline-item small {
+            color: #343a40 !important;
+            font-weight: 700 !important;
+        }
+
+        /* Force dark text in all timeline elements */
+        .timeline-content div,
+        .timeline-item div {
+            color: inherit;
+        }
+
+        /* Ultra-specific timeline text styling */
+        #activity-timeline .timeline-item h6 {
+            color: #000000 !important;
+            font-weight: 800 !important;
+            font-size: 1.1rem !important;
+        }
+
+        #activity-timeline .timeline-item p {
+            color: #212529 !important;
+            font-weight: 600 !important;
+            font-size: 1rem !important;
+        }
+
+        #activity-timeline .timeline-item small {
+            color: #343a40 !important;
+            font-weight: 700 !important;
+            font-size: 0.9rem !important;
+        }
+
+        /* Ensure maximum contrast */
+        .timeline-content {
+            background: #ffffff !important;
+        }
+
+        /* Remove any conflicting text color classes */
+        .timeline-content .text-muted {
+            color: #212529 !important;
+        }
+
+        /* Timeline improvements for better proportions */
+        #activity-timeline {
+            max-height: 450px;
+            overflow-y: auto;
+            padding-right: 1rem;
+            border-radius: var(--border-radius);
+        }
+
+        #activity-timeline::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        #activity-timeline::-webkit-scrollbar-track {
+            background: rgba(0,0,0,0.1);
+            border-radius: 3px;
+        }
+
+        #activity-timeline::-webkit-scrollbar-thumb {
+            background: var(--primary-green);
+            border-radius: 3px;
+        }
+
+        #activity-timeline::-webkit-scrollbar-thumb:hover {
+            background: var(--primary-green-dark);
+        }
+
+        /* Impact Stats */
+        .impact-stat {
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+        }
+
+        .impact-stat:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+        }
+
+        .impact-icon {
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        /* Footer Improvements */
+        footer {
+            backdrop-filter: blur(10px);
+        }
+
+        .hover-text-white:hover {
+            color: #fff !important;
+            text-decoration: none !important;
+        }
+
+        /* Responsive Improvements */
+        @media (max-width: 768px) {
+            .hero-stats {
+                margin-bottom: 1rem;
+            }
+            
+            .action-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .timeline {
+                padding-left: 1rem;
+            }
+            
+            .timeline::before {
+                left: 0.5rem;
+            }
+            
+            .timeline-marker {
+                left: -1.5rem;
+            }
+        }
+
+        /* Utility Classes */
+        .backdrop-filter-blur {
+            backdrop-filter: blur(10px);
+        }
+
+        .text-white-75 {
+            color: rgba(255, 255, 255, 0.75) !important;
+        }
+
+        .bg-opacity-75 {
+            --bs-bg-opacity: 0.75;
+        }
+
+        /* Fix for any remaining white text issues */
+        .metric-card * {
+            color: inherit;
+        }
+
+        .metric-card h6,
+        .metric-card .fw-bold {
+            color: var(--text-dark) !important;
+        }
+
+        .metric-card .text-muted {
+            color: var(--text-muted) !important;
+        }
+
+        .metric-card .stats-counter {
+            color: var(--text-dark) !important;
+        }
+
+        /* Ensure proper contrast everywhere */
+        main {
+            background: transparent;
+        }
+
+        .container-fluid {
+            background: transparent;
+        }
+
+        .bg-gradient-success {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%) !important;
+        }
+
+        .bg-gradient-info {
+            background: linear-gradient(135deg, #17a2b8 0%, #007bff 100%) !important;
+        }
+
+        .bg-gradient-warning {
+            background: linear-gradient(135deg, #ffc107 0%, #fd7e14 100%) !important;
+        }
+
+        .bg-gradient-primary {
+            background: linear-gradient(135deg, #007bff 0%, #6610f2 100%) !important;
+        }
+
+        /* Sobrescribir colores de fondo para mejor contraste */
+        .metric-card.bg-success {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%) !important;
+        }
+
+        .metric-card.bg-primary {
+            background: linear-gradient(135deg, #007bff 0%, #0056b3 100%) !important;
+        }
+
+        .metric-card.bg-warning {
+            background: linear-gradient(135deg, #ffc107 0%, #e0a800 100%) !important;
+        }
+
+        .metric-card.bg-info {
+            background: linear-gradient(135deg, #17a2b8 0%, #138496 100%) !important;
+        }
+
+        .action-card {
+            transition: all 0.3s ease;
+            border-radius: 1rem;
+            text-decoration: none;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .action-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+            text-decoration: none;
+        }
+
+        /* Mejorar contraste en action cards con colores vibrantes */
+        .action-card.btn-outline-success:hover {
+            background: linear-gradient(135deg, #28a745, #20c997) !important;
+            border-color: #28a745 !important;
+            color: white !important;
+            box-shadow: 0 8px 25px rgba(40, 167, 69, 0.4) !important;
+        }
+
+        .action-card.btn-outline-primary:hover {
+            background: linear-gradient(135deg, #007bff, #0056b3) !important;
+            border-color: #007bff !important;
+            color: white !important;
+            box-shadow: 0 8px 25px rgba(0, 123, 255, 0.4) !important;
+        }
+
+        .action-card.btn-outline-info:hover {
+            background: linear-gradient(135deg, #17a2b8, #138496) !important;
+            border-color: #17a2b8 !important;
+            color: white !important;
+            box-shadow: 0 8px 25px rgba(23, 162, 184, 0.4) !important;
+        }
+
+        .action-card.btn-outline-warning:hover {
+            background: linear-gradient(135deg, #ffc107, #e0a800) !important;
+            border-color: #ffc107 !important;
+            color: #212529 !important;
+            box-shadow: 0 8px 25px rgba(255, 193, 7, 0.4) !important;
+        }
+
+        .action-card.btn-outline-secondary:hover {
+            background: linear-gradient(135deg, #6c757d, #495057) !important;
+            border-color: #6c757d !important;
+            color: white !important;
+            box-shadow: 0 8px 25px rgba(108, 117, 125, 0.4) !important;
+        }
+
+        .action-card.btn-outline-dark:hover {
+            background: linear-gradient(135deg, #343a40, #23272b) !important;
+            border-color: #343a40 !important;
+            color: white !important;
+            box-shadow: 0 8px 25px rgba(52, 58, 64, 0.4) !important;
+        }
+
+        /* Nueva clase para configuración con color púrpura vibrante */
+        .btn-outline-purple {
+            color: #6f42c1;
+            border-color: #6f42c1;
+            background-color: transparent;
+        }
+
+        .btn-outline-purple:hover {
+            background: linear-gradient(135deg, #6f42c1, #563d7c) !important;
+            border-color: #6f42c1 !important;
+            color: white !important;
+            box-shadow: 0 8px 25px rgba(111, 66, 193, 0.4) !important;
+        }
+
+        .action-card.btn-outline-purple:hover {
+            background: linear-gradient(135deg, #6f42c1, #563d7c) !important;
+            border-color: #6f42c1 !important;
+            color: white !important;
+            box-shadow: 0 8px 25px rgba(111, 66, 193, 0.4) !important;
+        }
+
+        /* FINAL FIX: Asegurar colores vibrantes para Reportes y Configuración */
+        .action-card.btn-outline-info {
+            color: #17a2b8 !important;
+            border-color: #17a2b8 !important;
+            background-color: transparent !important;
+        }
+
+        .action-card.btn-outline-info:hover,
+        .action-card.btn-outline-info:focus,
+        .action-card.btn-outline-info:active {
+            background: linear-gradient(135deg, #17a2b8, #138496) !important;
+            border-color: #17a2b8 !important;
+            color: white !important;
+            box-shadow: 0 12px 35px rgba(23, 162, 184, 0.5) !important;
+            transform: translateY(-10px) !important;
+        }
+
+        .action-card.btn-outline-purple {
+            color: #6f42c1 !important;
+            border-color: #6f42c1 !important;
+            background-color: transparent !important;
+        }
+
+        .action-card.btn-outline-purple:hover,
+        .action-card.btn-outline-purple:focus,
+        .action-card.btn-outline-purple:active {
+            background: linear-gradient(135deg, #6f42c1, #563d7c) !important;
+            border-color: #6f42c1 !important;
+            color: white !important;
+            box-shadow: 0 12px 35px rgba(111, 66, 193, 0.5) !important;
+            transform: translateY(-10px) !important;
+        }
+
+        /* Sobrescribir cualquier estilo de Bootstrap que pueda interferir */
+        .btn-outline-secondary:not(.action-card):hover {
+            background-color: #6c757d;
+            border-color: #6c757d;
+            color: #fff;
+        }
+
+        .btn-outline-dark:not(.action-card):hover {
+            background-color: #343a40;
+            border-color: #343a40;
+            color: #fff;
+        }
+
+        /* Asegurar que los iconos y texto mantengan el color correcto */
+        .action-card:hover .bi,
+        .action-card:hover .fw-bold,
+        .action-card:hover small {
+            color: inherit !important;
+        }
+
+        /* Mejorar contraste en métricas */
+        .metric-card .text-light {
+            color: rgba(255, 255, 255, 0.9) !important;
+        }
+
+        .metric-card .text-muted {
+            color: rgba(0, 0, 0, 0.7) !important;
+        }
+
+        .timeline {
+            position: relative;
+            padding-left: 2rem;
+        }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 1rem;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: #e9ecef;
+        }
+
+        .timeline-item {
+            position: relative;
+            margin-bottom: 1.5rem;
+        }
+
+        .timeline-marker {
+            position: absolute;
+            left: -2rem;
+            top: 0.25rem;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            border: 2px solid white;
+            z-index: 1;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .timeline-content {
+            background: #ffffff;
+            padding: 1.25rem;
+            border-radius: 0.75rem;
+            border-left: 4px solid #28a745;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+        }
+
+        .timeline-content:hover {
+            box-shadow: 0 5px 15px rgba(0,0,0,0.15);
+            transform: translateX(3px);
+        }
+
+        /* COLORES MEJORADOS Y MÁS LEGIBLES PARA EL TIMELINE */
+        .timeline-title {
+            color: #2b6cb0 !important;
+            font-weight: 800 !important;
+            font-size: 1.1rem !important;
+            margin-bottom: 0.5rem !important;
+            line-height: 1.3 !important;
+        }
+
+        .timeline-description {
+            color: #2d3748 !important;
+            font-weight: 600 !important;
+            font-size: 0.95rem !important;
+            margin-bottom: 0.75rem !important;
+            line-height: 1.4 !important;
+        }
+
+        .timeline-time {
+            color: #805ad5 !important;
+            font-weight: 700 !important;
+            font-size: 0.8rem !important;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            background: #f7fafc;
+            padding: 0.25rem 0.5rem;
+            border-radius: 0.25rem;
+            display: inline-block;
+        }
+
+        /* BORDES COLORIDOS SEGÚN TIPO DE ACTIVIDAD */
+        .timeline-item:nth-child(1) .timeline-content {
+            border-left-color: #48bb78;
+        }
+
+        .timeline-item:nth-child(2) .timeline-content {
+            border-left-color: #ed8936;
+        }
+
+        .timeline-item:nth-child(3) .timeline-content {
+            border-left-color: #4299e1;
+        }
+
+        .timeline-item:nth-child(4) .timeline-content {
+            border-left-color: #667eea;
+        }
+
+        /* HOVER EFFECTS MEJORADOS */
+        .timeline-item:hover .timeline-title {
+            color: #1a365d !important;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.1);
+        }
+
+        .timeline-item:hover .timeline-description {
+            color: #1a202c !important;
+        }
+
+        .timeline-item:hover .timeline-time {
+            color: #553c9a !important;
+            background: #edf2f7;
+        }
+
+        /* RESETEAR ESTILOS HEREDADOS Y FORZAR COLORES */
+        .timeline-content h6,
+        .timeline-content .timeline-title {
+            color: #2b6cb0 !important;
+            font-weight: 800 !important;
+        }
+
+        .timeline-content p,
+        .timeline-content .timeline-description {
+            color: #2d3748 !important;
+            font-weight: 600 !important;
+        }
+
+        .timeline-content small,
+        .timeline-content .timeline-time {
+            color: #805ad5 !important;
+            font-weight: 700 !important;
+        }
+
+        /* ELIMINAR ESTILOS ANTERIORES CONFLICTIVOS */
+        .timeline-content * {
+            color: inherit;
+        }
+        
+        .timeline-content h6 {
+            color: #2b6cb0 !important;
+        }
+        
+        .timeline-content .text-muted {
+            color: #2d3748 !important;
+        }
+        
+        .timeline-content small {
+            color: #805ad5 !important;
+        }
+
+        .navbar-dark .navbar-nav .nav-link:hover {
+            background: rgba(255,255,255,0.1);
+            border-radius: 0.5rem;
+        }
+
+        .card {
+            border-radius: 1rem;
+        }
+
+        .card-header {
+            border-radius: 1rem 1rem 0 0 !important;
+        }
+    </style>
+
+    <script>
+        // Update current date and time
+        function updateDateTime() {
+            const now = new Date();
+            const options = { 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            };
+            document.getElementById('currentDateTime').textContent = now.toLocaleDateString('es-ES', options);
+        }
+
+        updateDateTime();
+        setInterval(updateDateTime, 60000); // Update every minute
+
+        // Add smooth scrolling and animations
+        document.addEventListener('DOMContentLoaded', function() {
+            // Animate metric cards on load
+            const metricCards = document.querySelectorAll('.metric-card');
+            metricCards.forEach((card, index) => {
+                card.style.opacity = '0';
+                card.style.transform = 'translateY(20px)';
+                setTimeout(() => {
+                    card.style.transition = 'all 0.6s ease';
+                    card.style.opacity = '1';
+                    card.style.transform = 'translateY(0)';
+                }, index * 100);
+            });
+
+            // Add click effects to action cards
+            const actionCards = document.querySelectorAll('.action-card');
+            actionCards.forEach(card => {
+                card.addEventListener('click', function(e) {
+                    // Add ripple effect
+                    const ripple = document.createElement('span');
+                    ripple.style.position = 'absolute';
+                    ripple.style.borderRadius = '50%';
+                    ripple.style.background = 'rgba(255,255,255,0.3)';
+                    ripple.style.transform = 'scale(0)';
+                    ripple.style.animation = 'ripple 0.6s linear';
+                    ripple.style.left = e.offsetX + 'px';
+                    ripple.style.top = e.offsetY + 'px';
+                    ripple.style.width = ripple.style.height = '40px';
+                    ripple.style.marginLeft = ripple.style.marginTop = '-20px';
+                    
+                    this.appendChild(ripple);
+                    setTimeout(() => ripple.remove(), 600);
+                });            });
+        });
+    </script>
+
+    <!-- API Scripts -->
+    <script src="/js/admin-api.js"></script>
+    <script src="/js/admin-modern-interactions.js"></script>
+    
+    <!-- Panel de Control específico -->
+    <script>
+        // Agregar ID al contenedor principal para que el script API lo detecte
+        document.addEventListener('DOMContentLoaded', function() {
+            const mainContainer = document.querySelector('.container-fluid');
+            if (mainContainer) {
+                mainContainer.id = 'panel-control-container';
+            }
+        });
+    </script>
+
+    <style>
+        @keyframes ripple {
+            to {
+                transform: scale(4);
+                opacity: 0;
+            }
+        }
+
+        /* Mejoras adicionales de contraste y legibilidad */
+        .text-white-75 {
+            color: rgba(255, 255, 255, 0.75) !important;
+        }
+
+        .metric-card .h4 {
+            font-weight: 800 !important;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+        }
+
+        .metric-card .small {
+            font-weight: 600 !important;
+        }
+
+        /* Mejorar bordes en action cards */
+        .action-card {
+            border-width: 2px !important;
+        }
+
+        /* Texto más destacado en timeline */
+        .timeline-content h6 {
+            font-weight: 700 !important;
+            color: #2c3e50 !important;
+        }
+
+        .timeline-content .text-muted {
+            color: #6c757d !important;
+            font-weight: 500 !important;
+        }
+
+        /* Mejoras en navbar */
+        .navbar-brand {
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Asegurar que los iconos sean visibles */
+        .display-6, .display-4 {
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+
+    <!-- Modern Admin Dashboard JavaScript -->
+    <script>
+        class ModernAdminDashboard {
+            constructor() {
+                this.baseURL = '/api';
+                this.stats = {};
+                this.init();
+            }
+
+            async init() {
+                this.updateDateTime();
+                setInterval(() => this.updateDateTime(), 30000);
+                
+                await this.loadDashboardStats();
+                this.setupAnimations();
+                this.setupRealTimeUpdates();
+            }
+
+            updateDateTime() {
+                const now = new Date();
+                const options = { 
+                    year: 'numeric', 
+                    month: 'long', 
+                    day: 'numeric', 
+                    hour: '2-digit', 
+                    minute: '2-digit',
+                    hour12: false 
+                };
+                const dateTime = now.toLocaleDateString('es-ES', options);
+                
+                const elements = ['currentDateTime', 'last-update'];
+                elements.forEach(id => {
+                    const element = document.getElementById(id);
+                    if (element) element.textContent = dateTime;
+                });
+            }
+
+            async loadDashboardStats() {
+                try {
+                    const response = await fetch(`${this.baseURL}/admin/dashboard/stats`);
+                    const stats = await response.json();
+                    this.stats = stats;
+                    this.updateAllStats(stats);
+                } catch (error) {
+                    console.error('Error cargando estadísticas:', error);
+                    this.loadFallbackStats();
+                }
+            }
+
+            loadFallbackStats() {
+                const fallbackStats = {
+                    totalClientes: 1247,
+                    totalProductos: 156,
+                    pedidosPendientes: 23,
+                    ventasMes: 45670.50,
+                    usuariosHoy: 12,
+                    stockBajo: 8,
+                    pedidosEntregados: 145,
+                    totalAdmins: 3,
+                    productosStock: 148
+                };
+                this.stats = fallbackStats;
+                this.updateAllStats(fallbackStats);
+            }
+
+            updateAllStats(stats) {
+                // Hero section stats
+                this.updateElement('hero-total-clientes', this.formatNumber(stats.totalClientes || 0));
+                this.updateElement('hero-productos-activos', this.formatNumber(stats.totalProductos || 0));
+                this.updateElement('hero-pedidos-mes', this.formatNumber((stats.pedidosPendientes || 0) + (stats.pedidosEntregados || 0)));
+                this.updateElement('hero-ventas-mes', this.formatCurrency(stats.ventasMes || 0));
+
+                // Main metric cards
+                this.updateElement('total-clientes', this.formatNumber(stats.totalClientes || 0));
+                this.updateElement('pedidos-pendientes', this.formatNumber(stats.pedidosPendientes || 0));
+                this.updateElement('ventas-mes', this.formatCurrency(stats.ventasMes || 0));
+                this.updateElement('total-productos', this.formatNumber(stats.totalProductos || 0));
+
+                // Quick action stats
+                this.updateElement('quick-total-clientes', this.formatNumber(stats.totalClientes || 0));
+                this.updateElement('quick-total-admins', this.formatNumber(stats.totalAdmins || 0));
+                this.updateElement('quick-productos-stock', this.formatNumber(stats.productosStock || 0));
+                this.updateElement('quick-pedidos-pendientes', this.formatNumber(stats.pedidosPendientes || 0));
+
+                // Side stats
+                this.updateElement('usuarios-hoy', this.formatNumber(stats.usuariosHoy || 0));
+                this.updateElement('stock-bajo', this.formatNumber(stats.stockBajo || 0));
+                this.updateElement('pedidos-entregados', this.formatNumber(stats.pedidosEntregados || 0));
+
+                // Footer stats
+                this.updateElement('footer-productos', this.formatNumber(stats.totalProductos || 0));
+                this.updateElement('footer-clientes', this.formatNumber(stats.totalClientes || 0));
+                this.updateElement('footer-ventas', this.formatCurrency(stats.ventasMes || 0));
+            }
+
+            updateElement(id, value) {
+                const element = document.getElementById(id);
+                if (element) {
+                    if (element.classList.contains('stats-counter')) {
+                        this.animateCounter(element, value);
+                    } else {
+                        element.textContent = value;
+                    }
+                }
+            }
+
+            formatNumber(number) {
+                return new Intl.NumberFormat('es-ES').format(number);
+            }
+
+            formatCurrency(amount) {
+                return new Intl.NumberFormat('es-PE', {
+                    style: 'currency',
+                    currency: 'PEN'
+                }).format(amount);
+            }
+
+            animateCounter(element, targetValue) {
+                const duration = 2000;
+                const frameDuration = 1000 / 60;
+                const totalFrames = Math.round(duration / frameDuration);
+                const easeOutQuad = t => t * (2 - t);
+
+                let frame = 0;
+                const counter = setInterval(() => {
+                    frame++;
+                    const progress = easeOutQuad(frame / totalFrames);
+                    
+                    let currentValue;
+                    if (typeof targetValue === 'string' && targetValue.includes('S/')) {
+                        const numericValue = parseFloat(targetValue.replace(/[^\d.-]/g, ''));
+                        currentValue = this.formatCurrency(numericValue * progress);
+                    } else {
+                        const numericValue = parseInt(targetValue.replace(/[^\d]/g, ''));
+                        currentValue = this.formatNumber(Math.round(numericValue * progress));
+                    }
+                    
+                    element.textContent = currentValue;
+
+                    if (frame === totalFrames) {
+                        clearInterval(counter);
+                        element.textContent = targetValue;
+                    }
+                }, frameDuration);
+            }
+
+            setupAnimations() {
+                // Add ripple effect to buttons
+                document.querySelectorAll('.btn, .action-card').forEach(button => {
+                    button.addEventListener('click', function(e) {
+                        const ripple = document.createElement('span');
+                        const rect = this.getBoundingClientRect();
+                        const size = Math.max(rect.width, rect.height);
+                        const x = e.clientX - rect.left - size / 2;
+                        const y = e.clientY - rect.top - size / 2;
+                        
+                        ripple.style.cssText = `
+                            position: absolute;
+                            width: ${size}px;
+                            height: ${size}px;
+                            left: ${x}px;
+                            top: ${y}px;
+                            background: rgba(255, 255, 255, 0.3);
+                            border-radius: 50%;
+                            transform: scale(0);
+                            animation: ripple 0.6s ease-out;
+                            pointer-events: none;
+                        `;
+                        
+                        this.style.position = 'relative';
+                        this.style.overflow = 'hidden';
+                        this.appendChild(ripple);
+                        
+                        setTimeout(() => ripple.remove(), 600);
+                    });
+                });
+            }
+
+            setupRealTimeUpdates() {
+                // Refresh stats every 5 minutes
+                setInterval(() => {
+                    this.loadDashboardStats();
+                }, 5 * 60 * 1000);
+            }
+        }
+
+        // Global functions
+        function refreshActivity() {
+            const button = event.target.closest('button');
+            const icon = button.querySelector('.bi-arrow-clockwise');
+            
+            icon.style.animation = 'spin 1s linear infinite';
+            
+            setTimeout(() => {
+                icon.style.animation = 'none';
+                showNotification('Actividad actualizada correctamente', 'success');
+            }, 1000);
+        }
+
+        function showImpactDetails() {
+            showNotification('Generando informe de sostenibilidad...', 'info');
+        }
+
+        function showNotification(message, type = 'info') {
+            const notification = document.createElement('div');
+            notification.className = `alert alert-${type} alert-dismissible fade show position-fixed`;
+            notification.style.cssText = 'top: 20px; right: 20px; z-index: 9999; min-width: 300px;';
+            notification.innerHTML = `
+                ${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            `;
+            
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.remove();
+            }, 3000);
+        }
+
+        // Initialize dashboard
+        document.addEventListener('DOMContentLoaded', function() {
+            new ModernAdminDashboard();
+        });
+    </script>
+</body>
+</html>

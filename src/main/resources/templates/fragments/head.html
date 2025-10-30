@@ -1,0 +1,155 @@
+<!-- head.html: Fragmento para la cabecera del HTML -->
+<head th:fragment="head(title)">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="_csrf" th:content="${_csrf.token}"/>
+    <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
+    <title th:text="${title}">EcoVivaShop</title>
+    
+    <!-- Favicons -->
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="shortcut icon" href="/favicon.ico">
+    <link rel="apple-touch-icon" sizes="180x180" href="/img/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/img/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/img/favicon-16x16.png">
+    
+    <!-- CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+    <!-- EcoVivaShop Modern Theme - Sistema de Diseño Principal -->
+    <link rel="stylesheet" href="/css/ecovivashop-theme.css">
+    <!-- Client Styles -->
+    <link rel="stylesheet" href="/css/client-styles.css">
+    <!-- Navbar Dropdown Fix -->
+    <link rel="stylesheet" href="/css/navbar-dropdown-fix.css">
+    <!-- Dropdown Z-Index Fix - Solución definitiva para dropdown detrás de elementos -->
+    <link rel="stylesheet" href="/css/dropdown-z-index-fix.css">
+    <!-- General Dropdown Fix - Solución para dropdowns fuera del navbar -->
+    <link rel="stylesheet" href="/css/general-dropdown-fix.css">
+    <!-- User Dropdown Fix - Solución para dropdown de usuario -->
+    <link rel="stylesheet" href="/css/user-dropdown-fix.css">
+    <!-- Simple Dropdown - Solución simple y funcional -->
+    <link rel="stylesheet" href="/css/simple-dropdown.css">
+    <!-- Cart Badge Fix - Posicionamiento correcto del contador del carrito -->
+    <link rel="stylesheet" href="/css/cart-badge-fix.css">
+    
+    <!-- JavaScript -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Cart Test Script - Simulación temporal del contador -->
+    <script src="/js/cart-test.js"></script>
+    
+    <!-- OVERLAY CLEANUP SCRIPT - Previene capas semitransparentes que bloquean contenido -->
+    <script>
+        // Función global para limpiar overlays residuales
+        window.limpiarOverlaysResiduales = function() {
+            console.log('🧹 [GLOBAL] Limpiando overlays residuales...');
+            
+            try {
+                // Eliminar loadingOverlay dinámico si existe
+                const loadingOverlay = document.getElementById('loadingOverlay');
+                if (loadingOverlay && loadingOverlay.parentNode) {
+                    console.log('❌ [GLOBAL] Eliminando loadingOverlay residual');
+                    loadingOverlay.parentNode.removeChild(loadingOverlay);
+                }
+                
+                // Ocultar loadingIndicator estático si está visible
+                const loadingIndicator = document.getElementById('loadingIndicator');
+                if (loadingIndicator) {
+                    loadingIndicator.style.display = 'none';
+                    console.log('❌ [GLOBAL] Ocultando loadingIndicator residual');
+                }
+                
+                // Eliminar cualquier modal-backdrop residual de Bootstrap
+                const modalBackdrops = document.querySelectorAll('.modal-backdrop');
+                modalBackdrops.forEach(backdrop => {
+                    if (backdrop && backdrop.parentNode) {
+                        console.log('❌ [GLOBAL] Eliminando modal-backdrop residual');
+                        backdrop.parentNode.removeChild(backdrop);
+                    }
+                });
+                
+                // Eliminar cualquier elemento con position fixed y alto z-index que pueda estar bloqueando
+                const elementosFixed = document.querySelectorAll('[style*="position: fixed"], [style*="position:fixed"]');
+                elementosFixed.forEach(elemento => {
+                    const zIndex = window.getComputedStyle(elemento).zIndex;
+                    if (zIndex && parseInt(zIndex) > 1000) {
+                        // Solo eliminar si tiene z-index muy alto y parece ser un overlay
+                        const background = window.getComputedStyle(elemento).background;
+                        if (background && (background.includes('rgba') || background.includes('opacity') || background.includes('0.') || background.includes('0.5') || background.includes('0.6'))) {
+                            console.log('❌ [GLOBAL] Eliminando elemento fixed con alto z-index y fondo semitransparente');
+                            if (elemento.parentNode) {
+                                elemento.parentNode.removeChild(elemento);
+                            }
+                        }
+                    }
+                });
+                
+                // Remover clase 'show' de cualquier modal que pueda estar abierto
+                const modalsAbiertos = document.querySelectorAll('.modal.show');
+                modalsAbiertos.forEach(modal => {
+                    console.log('❌ [GLOBAL] Cerrando modal abierto residual');
+                    try {
+                        const bsModal = bootstrap.Modal.getInstance(modal);
+                        if (bsModal) {
+                            bsModal.hide();
+                        } else {
+                            modal.classList.remove('show');
+                            modal.style.display = 'none';
+                        }
+                    } catch (e) {
+                        // Fallback si Bootstrap no está disponible aún
+                        modal.classList.remove('show');
+                        modal.style.display = 'none';
+                    }
+                });
+                
+                // RESTAURAR SCROLL DE LA PÁGINA - Bootstrap añade overflow: hidden al body cuando abre modals
+                if (document.body.classList.contains('modal-open')) {
+                    document.body.classList.remove('modal-open');
+                    console.log('❌ [GLOBAL] Removiendo clase modal-open del body');
+                }
+                
+                // Restaurar overflow del body si está bloqueado
+                const bodyOverflow = document.body.style.overflow;
+                const htmlOverflow = document.documentElement.style.overflow;
+                const bodyOverflowY = document.body.style.overflowY;
+                const htmlOverflowY = document.documentElement.style.overflowY;
+                
+                if (bodyOverflow === 'hidden' || bodyOverflowY === 'hidden') {
+                    document.body.style.overflow = '';
+                    document.body.style.overflowY = '';
+                    console.log('❌ [GLOBAL] Restaurando overflow del body');
+                }
+                
+                if (htmlOverflow === 'hidden' || htmlOverflowY === 'hidden') {
+                    document.documentElement.style.overflow = '';
+                    document.documentElement.style.overflowY = '';
+                    console.log('❌ [GLOBAL] Restaurando overflow del html');
+                }
+                
+                console.log('✅ [GLOBAL] Limpieza de overlays completada');
+            } catch (error) {
+                console.warn('⚠️ [GLOBAL] Error durante limpieza de overlays:', error);
+            }
+        };
+        
+        // Ejecutar limpieza cuando el DOM esté listo
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', function() {
+                window.limpiarOverlaysResiduales();
+                setTimeout(window.limpiarOverlaysResiduales, 100);
+                setTimeout(window.limpiarOverlaysResiduales, 500);
+            });
+        } else {
+            // DOM ya está listo
+            window.limpiarOverlaysResiduales();
+            setTimeout(window.limpiarOverlaysResiduales, 100);
+            setTimeout(window.limpiarOverlaysResiduales, 500);
+        }
+        
+        // También ejecutar en window load por si acaso
+        window.addEventListener('load', function() {
+            setTimeout(window.limpiarOverlaysResiduales, 1000);
+        });
+    </script>
+</head>

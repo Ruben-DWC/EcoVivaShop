@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bienvenido al equipo EcoVivaShop</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(135deg, #263238 0%, #37474f 100%);
+            color: #333;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.2);
+        }
+        .header {
+            background: linear-gradient(135deg, #263238 0%, #37474f 100%);
+            color: white;
+            padding: 40px 30px;
+            text-align: center;
+            position: relative;
+        }
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="20" cy="20" r="2" fill="rgba(255,255,255,0.1)"/><circle cx="80" cy="40" r="3" fill="rgba(255,255,255,0.1)"/><circle cx="40" cy="80" r="2" fill="rgba(255,255,255,0.1)"/></svg>');
+        }
+        .admin-title {
+            margin: 0;
+            font-size: 24px;
+            position: relative;
+            z-index: 1;
+        }
+        .logo {
+            width: 100px;
+            height: 100px;
+            background: linear-gradient(135deg, #43a047 0%, #388e3c 100%);
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 20px;
+            font-size: 50px;
+            position: relative;
+            z-index: 1;
+        }
+        .admin-badge {
+            background: #ffd700;
+            color: #333;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-top: 10px;
+            display: inline-block;
+        }
+        .content {
+            padding: 40px 30px;
+        }
+        .welcome-message {
+            font-size: 28px;
+            font-weight: bold;
+            color: #263238;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .subtitle {
+            font-size: 18px;
+            color: #666;
+            text-align: center;
+            margin-bottom: 30px;
+            line-height: 1.6;
+        }
+        .credentials-box {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            border: 3px solid #43a047;
+            border-radius: 15px;
+            padding: 30px;
+            margin: 30px 0;
+            text-align: center;
+        }
+        .credentials-title {
+            color: #263238;
+            font-weight: bold;
+            font-size: 20px;
+            margin-bottom: 20px;
+        }
+        .credential-item {
+            background: white;
+            border-radius: 10px;
+            padding: 15px 20px;
+            margin: 10px 0;
+            border-left: 5px solid #43a047;
+            text-align: left;
+        }
+        .credential-label {
+            font-size: 12px;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 5px;
+        }
+        .credential-value {
+            font-size: 16px;
+            font-weight: bold;
+            color: #263238;
+            font-family: 'Courier New', monospace;
+        }
+        .role-info {
+            background: linear-gradient(135deg, #43a047 0%, #388e3c 100%);
+            color: white;
+            border-radius: 15px;
+            padding: 30px;
+            margin: 30px 0;
+            text-align: center;
+        }
+        .permissions {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 25px;
+            margin: 20px 0;
+        }
+        .permission-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+            padding: 10px;
+            background: white;
+            border-radius: 8px;
+            border-left: 4px solid #43a047;
+        }
+        .permission-item:last-child {
+            margin-bottom: 0;
+        }
+        .permission-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #43a047 0%, #388e3c 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 16px;
+            margin-right: 15px;
+            flex-shrink: 0;
+        }
+        .permission-text {
+            font-weight: 500;
+            color: #263238;
+        }
+        .cta-button {
+            display: inline-block;
+            background: linear-gradient(135deg, #263238 0%, #37474f 100%);
+            color: white;
+            padding: 18px 35px;
+            text-decoration: none;
+            border-radius: 50px;
+            font-weight: bold;
+            font-size: 16px;
+            text-align: center;
+            margin: 30px auto;
+            display: block;
+            width: fit-content;
+            transition: transform 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .cta-button:hover {
+            transform: translateY(-2px);
+            color: white;
+        }
+        .security-notice {
+            background: #fff3cd;
+            border: 2px solid #ffc107;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 25px 0;
+            text-align: center;
+        }
+        .security-notice h4 {
+            color: #856404;
+            margin-bottom: 10px;
+        }
+        .security-notice p {
+            color: #856404;
+            margin: 0;
+            font-size: 14px;
+        }
+        .footer {
+            background: #263238;
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        .contact-info {
+            margin-top: 20px;
+            font-size: 14px;
+            color: rgba(255,255,255,0.8);
+        }
+        .divider {
+            height: 3px;
+            background: linear-gradient(90deg, #43a047 0%, #388e3c 50%, #43a047 100%);
+            margin: 20px 0;
+        }
+        .footer-note-style {
+            margin: 20px 0 0;
+            font-size: 12px;
+            opacity: 0.7;
+        }
+        .header-title {
+            margin: 0;
+            font-size: 24px;
+            position: relative;
+            z-index: 1;
+        }
+        .panel-admin-title {
+            margin: 10px 0 0;
+            opacity: 0.9;
+            position: relative;
+            z-index: 1;
+        }
+        .panel-admin-title-alt {
+            margin: 10px 0 0;
+            opacity: 0.9;
+            position: relative;
+            z-index: 1;
+        }
+            @media (max-width: 600px) {
+                .container {
+                    margin: 10px;
+                    border-radius: 10px;
+                }
+                .header, .content, .footer {
+                    padding: 20px;
+                }
+                .credentials-box, .role-info {
+                    padding: 20px;
+                }
+            }
+        .role-title {
+            margin: 0 0 15px;
+            font-size: 22px;
+        }
+        </style>
+        <div class="header">
+            <div class="logo">🛡️</div>
+            <h1 class="header-title">EcoVivaShop Admin</h1>
+            <p class="panel-admin-title">Panel de Administración</p>
+            <div class="admin-badge">Administrador Autorizado</div>
+        </div>
+            <div class="logo">🛡️</div>
+            <h1 class="header-title">EcoVivaShop Admin</h1>
+            <p class="panel-admin-title-alt">Panel de Administración</p>
+            <div class="admin-badge">Administrador Autorizado</div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="content">
+            <div class="welcome-message">
+                ¡Bienvenido al equipo!
+            </div>
+            
+            <div class="subtitle">
+                Hola <strong th:text="${nombreAdmin}">Administrador</strong>, 
+                tu cuenta de administrador ha sido creada exitosamente.
+                <br><br>
+                Ahora tienes acceso completo al panel de administración de EcoVivaShop.
+                <h3 class="role-title">🎯 Tu Rol en el Equipo</h3>
+
+            <!-- Role Information -->
+            <div class="role-info">
+                <h3 style="margin: 0 0 15px; font-size: 22px;">🎯 Tu Rol en el Equipo</h3>
+                <p style="margin: 0; font-size: 18px; font-weight: bold;" th:text="${rolAdmin}">Super Administrador</p>
+                <p style="margin: 10px 0 0; opacity: 0.9; font-size: 14px;">
+                    Con este rol, tienes permisos específicos para gestionar la plataforma EcoVivaShop
+                </p>
+            </div>
+
+            <!-- Login Credentials -->
+            <div class="credentials-box">
+                <div class="credentials-title">🔐 Tus Credenciales de Acceso</div>
+                <p style="color: #666; margin-bottom: 20px;">
+                    Utiliza estas credenciales para acceder al panel de administración:
+                </p>
+                
+                <div class="credential-item">
+                    <div class="credential-label">Email de Acceso</div>
+                    <div class="credential-value" th:text="${emailAdmin}">admin@EcoVivaShop.com</div>
+                </div>
+                
+                <div class="credential-item">
+                    <div class="credential-label">Contraseña Temporal</div>
+                    <div class="credential-value" th:text="${credenciales}">TempPass123!</div>
+                </div>
+                
+                <div class="credential-item">
+                    <div class="credential-label">URL de Acceso</div>
+                    <div class="credential-value">https://localhost:8080/admin/portal</div>
+                </div>
+            </div>
+
+            <!-- Security Notice -->
+            <div class="security-notice">
+                <h4>⚠️ Importante - Seguridad</h4>
+                <p>
+                    Por favor, cambia tu contraseña temporal en tu primer inicio de sesión.
+                    Nunca compartas tus credenciales y utiliza siempre una contraseña segura.
+                </p>
+            </div>
+
+            <!-- Permissions -->
+            <div class="permissions">
+                <h4 style="color: #263238; margin-bottom: 20px; text-align: center;">
+                    ✅ Permisos y Responsabilidades
+                </h4>
+                
+                <div class="permission-item">
+                    <div class="permission-icon">👥</div>
+                    <div class="permission-text">Gestión de usuarios y clientes registrados</div>
+                </div>
+                
+                <div class="permission-item">
+                    <div class="permission-icon">📦</div>
+                    <div class="permission-text">Administración del catálogo de productos ecológicos</div>
+                </div>
+                
+                <div class="permission-item">
+                    <div class="permission-icon">🛒</div>
+                    <div class="permission-text">Monitoreo y gestión de pedidos</div>
+                </div>
+                
+                <div class="permission-item">
+                    <div class="permission-icon">📊</div>
+                    <div class="permission-text">Acceso a reportes y estadísticas</div>
+                </div>
+                
+                <div class="permission-item">
+                    <div class="permission-icon">⚙️</div>
+                    <div class="permission-text">Configuración del sistema y parámetros</div>
+                </div>
+            </div>
+
+            <!-- Call to Action -->
+            <a href="https://localhost:8080/admin/portal" class="cta-button">
+                🚀 Acceder al Panel de Administración
+            </a>
+
+            <div style="text-align: center; margin-top: 30px;">
+                <p style="color: #666; font-style: italic; font-size: 14px;">
+                    "Con grandes poderes, vienen grandes responsabilidades. Gracias por ser parte del cambio hacia un mundo más sostenible."
+                </p>
+            </div>
+
+            <div class="divider"></div>
+
+            <div style="background: #e8f5e8; border-radius: 10px; padding: 20px; text-align: center;">
+                <h4 style="color: #2e7d32; margin-bottom: 10px;">🌱 Misión EcoVivaShop</h4>
+                <p style="color: #666; margin: 0; font-size: 14px;">
+                    Trabajamos juntos para crear un marketplace que promueva productos sostenibles, 
+                    educación ambiental y un futuro más verde para todos.
+                </p>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="footer">
+            <h4 style="margin: 0 0 10px; font-size: 18px;">🤝 Soporte Técnico Administrativo</h4>
+            <p style="margin: 0 0 20px; opacity: 0.9;">
+                Si tienes problemas técnicos o preguntas sobre el sistema, contáctanos inmediatamente.
+            </p>
+
+            <!-- Contact Info -->
+            <div class="contact-info">
+                <p style="margin: 5px 0;">📧 admin-support@EcoVivaShop.com</p>
+                <p style="margin: 5px 0;">📱 +1 (555) 123-4567 (Ext. 101)</p>
+                <p style="margin: 5px 0;">💬 Chat interno del sistema</p>
+            <p class="footer-note-style">
+                © 2025 EcoVivaShop - Panel de Administración<br>
+                Este correo fue enviado a <span th:text="${emailAdmin}">admin@ejemplo.com</span><br>
+                <strong>CONFIDENCIAL:</strong> Este mensaje contiene información sensible del sistema.
+            </p>
+            <p style="margin: 20px 0 0; font-size: 12px; opacity: 0.7;">
+                © 2025 EcoVivaShop - Panel de Administración<br>
+                Este correo fue enviado a <span th:text="${emailAdmin}">admin@ejemplo.com</span><br>
+                <strong>CONFIDENCIAL:</strong> Este mensaje contiene información sensible del sistema.
+            </p>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Confirmación de tu pedido - EcoVivaShop</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(135deg, #e3f2fd 0%, #f3e5f5 100%);
+            color: #333;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+        .header {
+            background: linear-gradient(135deg, #2196f3 0%, #1976d2 100%);
+            color: white;
+            padding: 40px 30px;
+            text-align: center;
+        }
+        .logo {
+            width: 80px;
+            height: 80px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 20px;
+            font-size: 40px;
+        }
+        .content {
+            padding: 40px 30px;
+        }
+        .order-message {
+            font-size: 28px;
+            font-weight: bold;
+            color: #1976d2;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .order-number {
+            font-size: 24px;
+            font-weight: bold;
+            color: #ff6f00;
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 15px;
+            background: linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%);
+            border-radius: 10px;
+        }
+        .order-details {
+            background: #f5f5f5;
+            padding: 25px;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+        .order-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        .order-item:last-child {
+            border-bottom: none;
+        }
+        .total-section {
+            background: linear-gradient(135deg, #e8f5e8 0%, #c8e6c9 100%);
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            text-align: center;
+        }
+        .total-amount {
+            font-size: 32px;
+            font-weight: bold;
+            color: #2e7d32;
+        }
+        .status-badge {
+            display: inline-block;
+            background: linear-gradient(135deg, #4caf50 0%, #388e3c 100%);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 25px;
+            font-weight: bold;
+            font-size: 14px;
+        }
+        .tracking-info {
+            background: linear-gradient(135deg, #fff3e0 0%, #ffcc02 100%);
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            text-align: center;
+        }
+        .eco-impact {
+            background: linear-gradient(135deg, #e8f5e8 0%, #c8e6c9 100%);
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            text-align: center;
+        }
+        .eco-stats {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 15px;
+        }
+        .eco-stat {
+            text-align: center;
+        }
+        .eco-icon {
+            font-size: 30px;
+            margin-bottom: 5px;
+        }
+        .button {
+            display: inline-block;
+            background: linear-gradient(135deg, #2196f3 0%, #1976d2 100%);
+            color: white;
+            padding: 15px 30px;
+            text-decoration: none;
+            border-radius: 25px;
+            font-weight: bold;
+            text-align: center;
+            margin: 10px 5px;
+        }
+        .button:hover {
+            background: linear-gradient(135deg, #1976d2 0%, #1565c0 100%);
+            color: white;
+            text-decoration: none;
+        }
+        .social-links {
+            text-align: center;
+            margin: 30px 0;
+        }
+        .social-links a {
+            display: inline-block;
+            margin: 0 10px;
+            color: #2196f3;
+            font-size: 24px;
+            text-decoration: none;
+        }
+        .footer {
+            background: #f5f5f5;
+            padding: 30px;
+            text-align: center;
+            color: #666;
+        }
+        @media (max-width: 600px) {
+            .container {
+                margin: 10px;
+                border-radius: 10px;
+            }
+            .content {
+                padding: 20px;
+            }
+            .order-message {
+                font-size: 24px;
+            }
+            .total-amount {
+                font-size: 28px;
+            }
+            .eco-stats {
+                flex-direction: column;
+                gap: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <div class="logo">🛒</div>
+            <h1 style="margin: 0; font-size: 32px;">¡Pedido Confirmado!</h1>
+            <p style="margin: 10px 0 0 0; opacity: 0.9;">Gracias por tu compra en EcoVivaShop</p>
+        </div>
+
+        <!-- Content -->
+        <div class="content">
+            <div class="order-message">
+                ¡Hola <span th:text="${nombreCliente}">Cliente</span>! 👋
+            </div>
+
+            <p style="text-align: center; font-size: 18px; color: #666; margin-bottom: 30px;">
+                Tu pedido ha sido confirmado y está siendo procesado. Te notificaremos cuando esté listo para envío.
+            </p>
+
+            <!-- Order Number -->
+            <div class="order-number">
+                📦 Pedido #<span th:text="${numeroPedido}">ECO-2024-001</span>
+            </div>
+
+            <!-- Order Status -->
+            <div style="text-align: center; margin: 20px 0;">
+                <span class="status-badge">✅ Confirmado - En Procesamiento</span>
+            </div>
+
+            <!-- Order Details -->
+            <div class="order-details">
+                <h3 style="margin-top: 0; color: #1976d2; text-align: center;">
+                    📋 Detalles de tu Pedido
+                </h3>
+                
+                <div class="order-item">
+                    <div>
+                        <strong>Cliente:</strong><br>
+                        <span th:text="${nombreCliente}">Juan Pérez</span>
+                    </div>
+                    <div>
+                        <strong>Email:</strong><br>
+                        <span th:text="${emailCliente}">cliente@ejemplo.com</span>
+                    </div>
+                </div>
+                
+                <div class="order-item">
+                    <div>
+                        <strong>Fecha del Pedido:</strong><br>
+                        <span id="fechaPedido">10 de Junio, 2025</span>
+                    </div>
+                    <div>
+                        <strong>Estado:</strong><br>
+                        <span style="color: #4caf50; font-weight: bold;">Confirmado</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Total Section -->
+            <div class="total-section">
+                <h3 style="margin-top: 0; color: #2e7d32;">💰 Total de tu Pedido</h3>
+                <div class="total-amount" th:text="${totalPedido}">S/ 359.96</div>
+                <p style="margin: 10px 0 0 0; color: #666;">
+                    Incluye impuestos y gastos de envío
+                </p>
+            </div>
+
+            <!-- Tracking Info -->
+            <div class="tracking-info">
+                <h3 style="margin-top: 0; color: #ff6f00;">🚚 Información de Envío</h3>
+                <p style="margin: 10px 0;">
+                    <strong>Tiempo estimado de entrega:</strong> 3-5 días hábiles<br>
+                    <strong>Método de envío:</strong> Envío Express EcoVivaShop<br>
+                    <strong>Código de seguimiento:</strong> Se enviará por email
+                </p>
+            </div>
+
+            <!-- Environmental Impact -->
+            <div class="eco-impact">
+                <h3 style="margin-top: 0; color: #2e7d32; text-align: center;">🌱 Tu Impacto Ambiental</h3>
+                <p style="margin: 10px 0; text-align: center;">Con esta compra has contribuido a:</p>
+                <div class="eco-stats">
+                    <div class="eco-stat">
+                        <div class="eco-icon">🌳</div>
+                        <div><strong>0.5</strong></div>
+                        <div style="font-size: 12px;">Árboles salvados</div>
+                    </div>
+                    <div class="eco-stat">
+                        <div class="eco-icon">💧</div>
+                        <div><strong>25L</strong></div>
+                        <div style="font-size: 12px;">Agua ahorrada</div>
+                    </div>
+                    <div class="eco-stat">
+                        <div class="eco-icon">♻️</div>
+                        <div><strong>2kg</strong></div>
+                        <div style="font-size: 12px;">Residuos reducidos</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div style="text-align: center; margin: 30px 0;">
+                <a href="https://EcoVivaShop.com/pedidos" class="button">
+                    📦 Ver Mis Pedidos
+                </a>
+                <a href="https://EcoVivaShop.com/productos" class="button">
+                    🛍️ Seguir Comprando
+                </a>
+            </div>
+
+            <!-- Support Information -->
+            <div style="background: #f8f9fa; padding: 20px; border-radius: 10px; margin: 20px 0; text-align: center;">
+                <h4 style="color: #1976d2; margin-top: 0;">¿Necesitas Ayuda?</h4>
+                <p style="margin: 10px 0;">
+                    Si tienes alguna pregunta sobre tu pedido, no dudes en contactarnos:
+                </p>
+                <p style="margin: 10px 0;">
+                    📧 <a href="mailto:soporte@EcoVivaShop.com" style="color: #2196f3;">soporte@EcoVivaShop.com</a><br>
+                    📱 WhatsApp: <a href="https://wa.me/51999999999" style="color: #25d366;">+51 999 999 999</a><br>
+                    🕒 Horario de atención: Lunes a Viernes 9:00 AM - 6:00 PM
+                </p>
+            </div>
+
+            <!-- Social Links -->
+            <div class="social-links">
+                <p style="color: #666; margin-bottom: 15px;">Síguenos en nuestras redes sociales:</p>
+                <a href="https://facebook.com/EcoVivaShop" title="Facebook">📘</a>
+                <a href="https://instagram.com/EcoVivaShop" title="Instagram">📸</a>
+                <a href="https://twitter.com/EcoVivaShop" title="Twitter">🐦</a>
+                <a href="https://linkedin.com/company/EcoVivaShop" title="LinkedIn">💼</a>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="footer">
+            <p style="margin: 0; font-weight: bold; color: #2e7d32;">
+                🌿 EcoVivaShop - Productos Ecológicos para un Futuro Sostenible
+            </p>
+            <p style="margin: 10px 0 0 0; font-size: 14px;">
+                📍 Av. Ecológica 123, Lima, Perú<br>
+                🌐 <a href="https://EcoVivaShop.com" style="color: #2196f3;">www.EcoVivaShop.com</a>
+            </p>
+            <p style="margin: 15px 0 0 0; font-size: 12px; color: #999;">
+                © 2025 EcoVivaShop. Todos los derechos reservados.<br>
+                Este correo fue enviado a <span th:text="${emailCliente}">cliente@ejemplo.com</span>
+            </p>
+        </div>
+    </div>
+
+    <script>
+        // Set current date
+        document.addEventListener('DOMContentLoaded', function() {
+            const fechaElement = document.getElementById('fechaPedido');
+            if (fechaElement) {
+                const now = new Date();
+                const options = { 
+                    year: 'numeric', 
+                    month: 'long', 
+                    day: 'numeric'
+                };
+                fechaElement.textContent = now.toLocaleDateString('es-ES', options);
+            }
+        });
+    </script>
+</body>
+</html>

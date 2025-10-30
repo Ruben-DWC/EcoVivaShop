@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/head :: head('Mi Perfil | EcoVivaShop')}">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mi Perfil | EcoVivaShop</title>
+</head>
+<body class="eco-bg">
+    <div th:replace="~{fragments/client-navbar :: client-navbar}"></div>
+    
+    <main class="container my-5">
+        <!-- CONTENEDOR PRINCIPAL CON DISEÑO MODERNO -->
+        <div class="client-profile-container">
+            <!-- ENCABEZADO DEL PERFIL -->
+            <div class="client-profile-header">
+                <div class="client-profile-avatar">
+                    <img th:src="@{/api/imagenes/perfil/{id}(id=${usuario != null ? usuario.idUsuario : 0})}" 
+                         alt="Foto de perfil" 
+                         class="w-100 h-100 rounded-circle" 
+                         style="object-fit: cover;"
+                         onerror="this.style.display='none'; this.nextElementSibling.style.display='flex'">
+                    <i class="bi bi-person-fill" style="display: none; font-size: 3rem;"></i>
+                </div>
+                <h2 class="client-profile-name" th:text="${usuario != null ? usuario.nombre : 'Cliente'}">Mi Perfil</h2>
+                <p class="client-profile-email" th:text="${usuario != null ? usuario.email : 'cliente@ecovivashop.com'}">Email del usuario</p>
+            </div>
+
+            <!-- INFORMACIÓN PERSONAL -->
+            <div class="client-info-section">
+                <h3 class="client-section-title">
+                    <i class="bi bi-person-badge"></i>
+                    Información Personal
+                </h3>
+                <div class="row g-4">
+                    <div class="col-md-6">
+                        <label class="client-form-label">Nombre Completo</label>
+                        <div class="client-form-control" style="background: rgba(255,255,255,0.7);">
+                            <span th:text="${usuario != null ? usuario.nombre : 'Juan Pérez Rodríguez'}">Juan Pérez Rodríguez</span>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="client-form-label">Correo Electrónico</label>
+                        <div class="client-form-control" style="background: rgba(255,255,255,0.7);">
+                            <span th:text="${usuario != null ? usuario.email : 'juan.perez@email.com'}">juan.perez@email.com</span>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="client-form-label">Teléfono</label>
+                        <div class="client-form-control" style="background: rgba(255,255,255,0.7);">
+                            <span th:text="${usuario != null ? usuario.telefono : '+51 999 123 456'}">+51 999 123 456</span>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="client-form-label">DNI</label>
+                        <div class="client-form-control" style="background: rgba(255,255,255,0.7);">
+                            <span th:text="${usuario != null ? usuario.dni : '12345678'}">12345678</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- INFORMACIÓN DE DIRECCIÓN -->
+            <div class="client-info-section">
+                <h3 class="client-section-title">
+                    <i class="bi bi-geo-alt-fill"></i>
+                    Dirección Principal
+                </h3>
+                <div class="row g-4">
+                    <div class="col-md-12">
+                        <label class="client-form-label">Dirección</label>
+                        <div class="client-form-control" style="background: rgba(255,255,255,0.7);">
+                            <span th:text="${usuario != null ? usuario.direccion : 'Av. Principal 123, San Isidro'}">Av. Principal 123, San Isidro</span>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="client-form-label">Ciudad</label>
+                        <div class="client-form-control" style="background: rgba(255,255,255,0.7);">
+                            Lima
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="client-form-label">Código Postal</label>
+                        <div class="client-form-control" style="background: rgba(255,255,255,0.7);">
+                            15001
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ESTADÍSTICAS ECO-AMIGABLES -->
+            <div class="client-info-section">
+                <h3 class="client-section-title">
+                    <i class="bi bi-graph-up"></i>
+                    Mi Actividad EcoAmigable
+                </h3>
+                <div class="row g-4">
+                    <div class="col-md-3">
+                        <div class="text-center p-4 border rounded-3 bg-gradient" style="background: linear-gradient(135deg, rgba(34, 197, 94, 0.1) 0%, rgba(22, 163, 74, 0.05) 100%); border-color: #22c55e !important;">
+                            <i class="bi bi-bag-check-fill" style="font-size: 2.5rem; color: #16a34a;"></i>
+                            <h4 class="fw-bold mt-2" style="color: #134e4a;">12</h4>
+                            <p class="small mb-0" style="color: #0891b2; font-weight: 600;">Pedidos Realizados</p>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="text-center p-4 border rounded-3 bg-gradient" style="background: linear-gradient(135deg, rgba(39, 201, 181, 0.1) 0%, rgba(20, 184, 166, 0.05) 100%); border-color: #27c9b5 !important;">
+                            <i class="bi bi-leaf" style="font-size: 2.5rem; color: #0d9488;"></i>
+                            <h4 class="fw-bold mt-2" style="color: #134e4a;">2.4kg</h4>
+                            <p class="small mb-0" style="color: #0891b2; font-weight: 600;">CO₂ Ahorrado</p>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="text-center p-4 border rounded-3 bg-gradient" style="background: linear-gradient(135deg, rgba(245, 158, 11, 0.1) 0%, rgba(217, 119, 6, 0.05) 100%); border-color: #f59e0b !important;">
+                            <i class="bi bi-star-fill" style="font-size: 2.5rem; color: #d97706;"></i>
+                            <h4 class="fw-bold mt-2" style="color: #134e4a;">150</h4>
+                            <p class="small mb-0" style="color: #0891b2; font-weight: 600;">Puntos Eco</p>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="text-center p-4 border rounded-3 bg-gradient" style="background: linear-gradient(135deg, rgba(168, 85, 247, 0.1) 0%, rgba(147, 51, 234, 0.05) 100%); border-color: #a855f7 !important;">
+                            <i class="bi bi-award" style="font-size: 2.5rem; color: #9333ea;"></i>
+                            <h4 class="fw-bold mt-2" style="color: #134e4a;">Bronce</h4>
+                            <p class="small mb-0" style="color: #0891b2; font-weight: 600;">Nivel EcoAmigo</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- PRODUCTOS FAVORITOS -->
+            <div class="client-info-section">
+                <h3 class="client-section-title">
+                    <i class="bi bi-heart-fill"></i>
+                    Productos Favoritos
+                </h3>
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <div class="d-flex align-items-center p-3 border rounded" style="background: rgba(255,255,255,0.7);">
+                            <img src="/img/default-profile.svg"
+                                 class="rounded me-3" 
+                                 style="width: 60px; height: 60px; object-fit: cover;"
+                                 alt="Imagen del producto Eco Kit Hogar">
+                            <div class="flex-grow-1">
+                                <h6 class="fw-bold mb-1" style="color: #134e4a;">Eco Kit Hogar</h6>
+                                <p class="text-muted small mb-1">Kit completo para el hogar</p>
+                                <span class="fw-bold" style="color: #16a34a;">S/ 117.00</span>
+                            </div>
+                            <a href="/client/catalogo" class="client-btn-secondary btn-sm" 
+                               title="Agregar Eco Kit al carrito" aria-label="Agregar Eco Kit al carrito">
+                                <i class="bi bi-cart-plus"></i>
+                            </a>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="d-flex align-items-center p-3 border rounded" style="background: rgba(255,255,255,0.7);">
+                            <img src="/img/default-profile.svg"
+                                 class="rounded me-3" 
+                                 style="width: 60px; height: 60px; object-fit: cover;"
+                                 alt="Imagen del producto Shampoo Natural orgánico">
+                            <div class="flex-grow-1">
+                                <h6 class="fw-bold mb-1" style="color: #134e4a;">Shampoo Natural</h6>
+                                <p class="text-muted small mb-1">Orgánico sin químicos</p>
+                                <span class="fw-bold" style="color: #16a34a;">S/ 40.00</span>
+                            </div>
+                            <a href="/client/catalogo" class="client-btn-secondary btn-sm"
+                               title="Agregar Shampoo al carrito" aria-label="Agregar Shampoo al carrito">
+                                <i class="bi bi-cart-plus"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- BOTONES DE ACCIÓN -->
+            <div class="d-flex gap-4 justify-content-center flex-wrap">
+                <a href="/client/configuracion" class="client-btn-primary">
+                    <i class="bi bi-pencil-square"></i>
+                    Editar Perfil
+                </a>
+                <a href="/client/pedidos" class="client-btn-secondary">
+                    <i class="bi bi-bag-check"></i>
+                    Ver Mis Pedidos
+                </a>
+                <a href="/client/suscripcion" class="client-btn-primary" style="background: linear-gradient(135deg, #a855f7 0%, #9333ea 100%);">
+                    <i class="bi bi-star"></i>
+                    Mi Suscripción
+                </a>
+            </div>
+        </div>
+    </main>
+
+    <div th:replace="~{fragments/footer :: footer}"></div>
+    
+    <!-- JavaScript para funcionalidades interactivas -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/js/client-global.js"></script>
+    <script>
+        // Inicializar funcionalidades cuando cargue la página
+        document.addEventListener('DOMContentLoaded', function() {
+            // Inicializar funciones globales
+            if (typeof initializeUserDropdown === 'function') {
+                initializeUserDropdown();
+            }
+            
+            // Animaciones para las estadísticas
+            const counters = document.querySelectorAll('.text-center h4');
+            counters.forEach(counter => {
+                const target = counter.textContent.trim();
+                const numericValue = parseFloat(target);
+                
+                if (!isNaN(numericValue)) {
+                    let current = 0;
+                    const increment = numericValue / 50;
+                    const timer = setInterval(() => {
+                        current += increment;
+                        if (current >= numericValue) {
+                            counter.textContent = target;
+                            clearInterval(timer);
+                        } else {
+                            if (target.includes('kg')) {
+                                counter.textContent = current.toFixed(1) + 'kg';
+                            } else if (target.includes('.')) {
+                                counter.textContent = current.toFixed(1);
+                            } else {
+                                counter.textContent = Math.floor(current);
+                            }
+                        }
+                    }, 30);
+                }
+            });
+        });
+    </script>
+</body>
+</html>
+

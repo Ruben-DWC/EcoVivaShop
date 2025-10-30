@@ -1,0 +1,712 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/head :: head('Carrito de Compras | EcoVivaShop')}">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Carrito de Compras | EcoVivaShop</title>
+</head>
+<style>
+    :root {
+        --primary-green: #20c997;
+        --secondary-green: #28a745;
+        --accent-teal: #17a2b8;
+        --warm-orange: #ff6b6b;
+        --eco-gold: #ffd700;
+    }
+
+    body {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 25%, #20c997 50%, #28a745 75%, #17a2b8 100%);
+        background-size: 400% 400%;
+        animation: gradientMove 20s ease infinite;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        min-height: 100vh;
+    }
+
+    @keyframes gradientMove {
+        0% { background-position: 0% 50%; }
+        50% { background-position: 100% 50%; }
+        100% { background-position: 0% 50%; }
+    }
+
+    .cart-container {
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(20px);
+        border-radius: 30px;
+        box-shadow: 0 25px 50px rgba(0, 0, 0, 0.2);
+        margin: 2rem auto;
+        max-width: 1200px;
+        overflow: hidden;
+        border: 1px solid rgba(255, 255, 255, 0.3);
+    }
+
+    .cart-header {
+        background: linear-gradient(135deg, var(--primary-green), var(--secondary-green));
+        color: white;
+        padding: 2.5rem;
+        text-align: center;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .cart-header::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        left: -50%;
+        width: 200%;
+        height: 200%;
+        background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+        transform: rotate(45deg);
+        animation: shimmer 3s infinite;
+    }
+
+    @keyframes shimmer {
+        0% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
+        100% { transform: translateX(100%) translateY(100%) rotate(45deg); }
+    }
+
+    .cart-title {
+        font-size: 2.5rem;
+        font-weight: 700;
+        margin-bottom: 1rem;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        position: relative;
+        z-index: 1;
+    }
+
+    .cart-subtitle {
+        font-size: 1.1rem;
+        opacity: 0.9;
+        position: relative;
+        z-index: 1;
+    }
+
+    .cart-content {
+        padding: 2rem;
+    }
+
+    .cart-item {
+        background: white;
+        border-radius: 20px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        margin-bottom: 1.5rem;
+        overflow: hidden;
+        border: 1px solid rgba(32, 201, 151, 0.2);
+        transition: all 0.3s ease;
+    }
+
+    .cart-item:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 15px 40px rgba(32, 201, 151, 0.2);
+        border-color: var(--primary-green);
+    }
+
+    .floating-particles {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+        z-index: 1;
+    }
+
+    .particle {
+        position: absolute;
+        color: rgba(32, 201, 151, 0.3);
+        animation: float 6s ease-in-out infinite;
+    }
+
+    @keyframes float {
+        0%, 100% { transform: translateY(0) rotate(0deg); }
+        33% { transform: translateY(-20px) rotate(120deg); }
+        66% { transform: translateY(-10px) rotate(240deg); }
+    }
+</style>
+<body>
+    <div class="floating-particles" id="particles"></div>
+
+    <div th:replace="~{fragments/client-navbar :: client-navbar}"></div>
+
+    <div class="cart-container">
+        <!-- Header -->
+        <div class="cart-header">
+            <h1 class="cart-title">
+                <i class="bi bi-cart3 me-3"></i>Carrito Eco-Amigable
+            </h1>
+            <p class="cart-subtitle">Tu selección consciente para un futuro sostenible</p>
+        </div>
+
+        <div class="cart-content">
+
+            <!-- Carrito con productos -->
+            <div th:if="${carrito != null and #lists.size(carrito) > 0}">
+                <!-- Lista de productos -->
+                <div class="cart-items">
+                    <div class="cart-item d-flex align-items-center p-3" 
+                         th:each="item : ${carrito}">
+                        <!-- Imagen del producto -->
+                        <div class="cart-item-image">
+                            <div th:if="${item.imagen != null and #strings.length(item.imagen) > 0}">
+                                <img th:src="${item.imagen}" th:alt="${item.nombre}" th:title="${item.nombre}" alt="Imagen del producto" />
+                            </div>
+                            <div th:unless="${item.imagen != null and #strings.length(item.imagen) > 0}">
+                                <i class="bi bi-box" style="font-size: 3rem; color: #ccc;"></i>
+                            </div>
+                        </div>
+
+                        <!-- Información del producto -->
+                        <div class="cart-item-info">
+                            <div class="cart-item-category">Producto Eco-Amigable</div>
+                            <h4 class="cart-item-name" th:text="${item.nombre}">Nombre del Producto</h4>
+                            <div class="cart-item-price">
+                                S/ <span th:text="${#numbers.formatDecimal(item.precio, 1, 2)}">0.00</span>
+                            </div>
+                            
+                            <!-- Controles de cantidad -->
+                            <div class="quantity-controls">
+                                <span class="fw-bold">Cantidad:</span>
+                                <button type="button" class="quantity-btn" 
+                                        th:data-producto-id="${item.idProducto}"
+                                        th:data-cantidad="${item.cantidad - 1}"
+                                        data-action="decrease"
+                                        aria-label="Disminuir cantidad" title="Reducir cantidad">
+                                    <i class="bi bi-dash"></i>
+                                </button>
+                                <input type="number" 
+                                       th:value="${item.cantidad}"
+                                       class="quantity-input"
+                                       min="1" max="50"
+                                       th:data-producto-id="${item.idProducto}"
+                                       aria-label="Cantidad del producto" title="Cantidad en el carrito">
+                                <button type="button" class="quantity-btn"
+                                        th:data-producto-id="${item.idProducto}"
+                                        th:data-cantidad="${item.cantidad + 1}"
+                                        data-action="increase"
+                                        aria-label="Aumentar cantidad" title="Aumentar cantidad">
+                                    <i class="bi bi-plus"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Total del item y botón eliminar -->
+                        <div class="d-flex flex-column align-items-end">
+                            <div class="item-total mb-3">
+                                S/ <span th:text="${#numbers.formatDecimal(item.precio * item.cantidad, 1, 2)}">0.00</span>
+                            </div>
+                            <button type="button" class="remove-btn"
+                                    th:data-producto-id="${item.idProducto}"
+                                    aria-label="Eliminar producto" title="Quitar del carrito">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Resumen del carrito -->
+                <div class="cart-summary mt-4">
+                    <div class="row">
+                        <div class="col-md-8">
+                            <div class="shipping-info">
+                                <h5><i class="bi bi-truck me-2"></i>Información de Envío</h5>
+                                <p>Envío gratis para compras mayores a S/ 200</p>
+                                <div class="eco-benefits">
+                                    <h6><i class="bi bi-leaf me-2"></i>Beneficios Eco-Amigables</h6>
+                                    <ul>
+                                        <li>5% de descuento por compra sostenible</li>
+                                        <li>Empaque biodegradable incluido</li>
+                                        <li>Contribuyes a la reforestación</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="summary-card">
+                                <h5>Resumen del Pedido</h5>
+                                <div class="summary-line">
+                                    <span>Subtotal:</span>
+                                    <span>S/ <span th:text="${#numbers.formatDecimal(subtotal, 1, 2)}">0.00</span></span>
+                                </div>
+                                <div class="summary-line">
+                                    <span>Descuento Eco (5%):</span>
+                                    <span class="text-success">-S/ <span th:text="${#numbers.formatDecimal(descuento, 1, 2)}">0.00</span></span>
+                                </div>
+                                <div class="summary-line">
+                                    <span>Envío:</span>
+                                    <span th:if="${envio > 0}">S/ <span th:text="${#numbers.formatDecimal(envio, 1, 2)}">0.00</span></span>
+                                    <span th:unless="${envio > 0}" class="text-success">Gratis</span>
+                                </div>
+                                <div class="summary-line">
+                                    <span>IGV (18%):</span>
+                                    <span>S/ <span th:text="${#numbers.formatDecimal(igv, 1, 2)}">0.00</span></span>
+                                </div>
+                                <hr>
+                                <div class="summary-total">
+                                    <span>Total:</span>
+                                    <span>S/ <span th:text="${#numbers.formatDecimal(total, 1, 2)}">0.00</span></span>
+                                </div>
+                                <button class="btn-eco-large mt-3 w-100" onclick="proceedToCheckout()">
+                                    <i class="bi bi-credit-card me-2"></i>Proceder al Pago
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Carrito vacío -->
+            <div th:unless="${carrito != null and #lists.size(carrito) > 0}" class="empty-cart">
+                <i class="bi bi-cart-x"></i>
+                <h3>Tu carrito está vacío</h3>
+                <p class="lead">¡Descubre nuestros productos eco-amigables y comienza tu compra consciente!</p>
+                <a href="/client/catalogo" class="btn-eco-large mt-4" style="max-width: 300px; margin: 0 auto;">
+                    <i class="bi bi-leaf-fill me-2"></i>Explorar Productos
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div th:replace="~{fragments/footer :: footer}"></div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/js/client-global.js"></script>
+    <script>
+        // Configurar event listeners al cargar la página
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('🛒 Página carrito cargada');
+            
+            // Mostrar datos del modelo Thymeleaf
+            const carritoData = /*[[${carrito}]]*/ [];
+            console.log('📦 Datos del carrito desde servidor:', carritoData);
+            console.log('📦 Cantidad de items en carrito:', carritoData ? carritoData.length : 0);
+            
+            // Mostrar también datos de localStorage si existen
+            const localCart = localStorage.getItem('cart');
+            if (localCart) {
+                console.log('💾 Datos del carrito en localStorage:', JSON.parse(localCart));
+            } else {
+                console.log('💾 No hay datos en localStorage');
+            }
+            
+            // Si hay productos en el servidor, limpiar localStorage para evitar conflictos
+            if (carritoData && carritoData.length > 0) {
+                console.log('🧹 Limpiando localStorage porque hay productos en el servidor');
+                localStorage.removeItem('cart');
+            }
+            // Si el carrito del servidor está vacío pero hay datos en localStorage, sincronizar automáticamente
+            else if (localCart) {
+                const parsedLocalCart = JSON.parse(localCart);
+                if (parsedLocalCart && parsedLocalCart.length > 0) {
+                    console.log('⚠️ El carrito del servidor está vacío pero localStorage tiene datos');
+                    console.log('⚠️ Sincronizando automáticamente...');
+                    
+                    // Sincronizar automáticamente los productos del localStorage al servidor
+                    sincronizarCarritoAutomatico(parsedLocalCart);
+                }
+            }
+            
+            // Configurar botones de cantidad
+            setupQuantityControls();
+            
+            // Configurar botones de eliminación
+            setupRemoveButtons();
+            
+            // Configurar entrada manual en campos de cantidad
+            setupQuantityInputs();
+        });
+        
+        // Configurar event listeners para botones de cantidad
+        function setupQuantityControls() {
+            const quantityButtons = document.querySelectorAll('.quantity-btn');
+            quantityButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const productoId = this.getAttribute('data-producto-id');
+                    const action = this.getAttribute('data-action');
+                    
+                    if (productoId && action) {
+                        let nuevaCantidad;
+                        const currentInput = document.querySelector(`input[data-producto-id="${productoId}"]`);
+                        const currentValue = currentInput ? parseInt(currentInput.value) : 1;
+                        
+                        if (action === 'increase') {
+                            nuevaCantidad = currentValue + 1;
+                        } else if (action === 'decrease') {
+                            nuevaCantidad = Math.max(1, currentValue - 1);
+                        }
+                        
+                        if (nuevaCantidad) {
+                            updateQuantity(parseInt(productoId), nuevaCantidad);
+                        }
+                    }
+                });
+            });
+        }
+        
+        // Configurar event listeners para botones de eliminación
+        function setupRemoveButtons() {
+            const removeButtons = document.querySelectorAll('.remove-btn');
+            removeButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const productoId = this.getAttribute('data-producto-id');
+                    if (productoId) {
+                        removeFromCart(parseInt(productoId));
+                    }
+                });
+            });
+        }
+
+        // Configurar entrada manual en campos de cantidad
+        function setupQuantityInputs() {
+            const quantityInputs = document.querySelectorAll('.quantity-input');
+            quantityInputs.forEach(input => {
+                input.addEventListener('change', function() {
+                    const productoId = this.getAttribute('data-producto-id');
+                    let value = parseInt(this.value);
+                    
+                    if (isNaN(value) || value < 1) {
+                        value = 1;
+                        this.value = value;
+                    }
+                    
+                    if (productoId) {
+                        updateQuantity(parseInt(productoId), value);
+                    }
+                });
+            });
+        }
+        
+        // Crear partículas flotantes
+        function createFloatingParticles() {
+            const container = document.getElementById('particles');
+            const icons = ['bi-cart-check', 'bi-leaf', 'bi-heart', 'bi-star'];
+            
+            setInterval(() => {
+                const particle = document.createElement('i');
+                particle.className = `bi ${icons[Math.floor(Math.random() * icons.length)]} particle`;
+                particle.style.left = Math.random() * 100 + '%';
+                particle.style.top = Math.random() * 100 + '%';
+                particle.style.fontSize = (Math.random() * 1 + 0.5) + 'rem';
+                particle.style.animationDuration = (Math.random() * 3 + 3) + 's';
+                
+                container.appendChild(particle);
+                
+                setTimeout(() => {
+                    if (particle.parentNode) {
+                        particle.parentNode.removeChild(particle);
+                    }
+                }, 6000);
+            }, 4000);
+        }
+
+        // Actualizar cantidad
+        function updateQuantity(productoId, nuevaCantidad) {
+            if (nuevaCantidad < 1) {
+                removeFromCart(productoId);
+                return;
+            }
+
+            fetchWithCSRF('/client/actualizar-carrito', {
+                method: 'POST',
+                body: `productoId=${productoId}&cantidad=${nuevaCantidad}`
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    location.reload();
+                } else {
+                    showNotification(data.message || 'Error al actualizar cantidad', 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showNotification('Error al actualizar el carrito', 'error');
+            });
+        }
+
+        // Remover del carrito
+        function removeFromCart(productoId) {
+            if (confirm('¿Estás seguro de que deseas eliminar este producto del carrito?')) {
+                fetchWithCSRF('/client/remover-del-carrito', {
+                    method: 'POST',
+                    body: `productoId=${productoId}`
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        showNotification('Producto eliminado del carrito', 'success');
+                        setTimeout(() => location.reload(), 1000);
+                    } else {
+                        showNotification(data.message || 'Error al eliminar producto', 'error');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    showNotification('Error al eliminar producto del carrito', 'error');
+                });
+            }
+        }
+
+        // Sincronizar carrito automáticamente
+        function sincronizarCarritoAutomatico(localCartItems) {
+            console.log('🔄 Iniciando sincronización automática del carrito...');
+            showNotification('Sincronizando tu carrito...', 'info');
+            
+            // Función para agregar un producto al servidor
+            const agregarProductoAlServidor = (item, index) => {
+                return new Promise((resolve) => {
+                    fetchWithCSRF('/client/agregar-al-carrito', {
+                        method: 'POST',
+                        body: `productoId=${item.id}&cantidad=${item.cantidad}`
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            console.log(`✅ Producto ${item.nombre} sincronizado correctamente`);
+                        } else {
+                            console.log(`⚠️ Error al sincronizar ${item.nombre}:`, data.message);
+                        }
+                        resolve();
+                    })
+                    .catch(error => {
+                        console.log(`❌ Error de red al sincronizar ${item.nombre}:`, error);
+                        resolve();
+                    });
+                });
+            };
+            
+            // Sincronizar todos los productos secuencialmente
+            const sincronizarTodos = async () => {
+                for (let i = 0; i < localCartItems.length; i++) {
+                    await agregarProductoAlServidor(localCartItems[i], i);
+                    // Pequeña pausa entre requests
+                    await new Promise(resolve => setTimeout(resolve, 300));
+                }
+                
+                // Limpiar localStorage después de sincronización exitosa
+                console.log('🧹 Limpiando localStorage después de sincronización');
+                localStorage.removeItem('cart');
+                
+                // Mostrar mensaje de éxito y recargar la página
+                showNotification('¡Carrito sincronizado exitosamente!', 'success');
+                setTimeout(() => {
+                    location.reload();
+                }, 1500);
+            };
+            
+            sincronizarTodos();
+        }
+
+        // Mostrar notificaciones
+        function showNotification(message, type) {
+            const notification = document.createElement('div');
+            const alertClass = type === 'success' ? 'success' : 
+                             type === 'info' ? 'info' : 
+                             type === 'warning' ? 'warning' : 'danger';
+            notification.className = `alert alert-${alertClass} position-fixed`;
+            notification.style.cssText = `
+                top: 20px;
+                right: 20px;
+                z-index: 10000;
+                min-width: 350px;
+                animation: slideInRight 0.5s ease-out;
+                box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+            `;
+            const iconClass = type === 'success' ? 'bi-check-circle-fill' : 
+                            type === 'info' ? 'bi-info-circle-fill' :
+                            type === 'warning' ? 'bi-exclamation-triangle-fill' : 'bi-exclamation-triangle-fill';
+            notification.innerHTML = `
+                <div class="d-flex align-items-center">
+                    <i class="bi ${iconClass} me-2 fs-5"></i>
+                    ${message}
+                </div>
+            `;
+            
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.style.animation = 'slideOutRight 0.5s ease-out';
+                setTimeout(() => {
+                    if (notification.parentNode) {
+                        notification.parentNode.removeChild(notification);
+                    }
+                }, 500);
+            }, 3000);
+        }
+
+        // CSS para animaciones
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes slideInRight {
+                from { transform: translateX(100%); opacity: 0; }
+                to { transform: translateX(0); opacity: 1; }
+            }
+            @keyframes slideOutRight {
+                from { transform: translateX(0); opacity: 1; }
+                to { transform: translateX(100%); opacity: 0; }
+            }
+            .cart-item-image {
+                width: 120px;
+                height: 120px;
+                background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+                border-radius: 15px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                overflow: hidden;
+                margin-right: 1.5rem;
+            }
+            .cart-item-image img {
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+                transition: transform 0.3s ease;
+            }
+            .cart-item:hover .cart-item-image img {
+                transform: scale(1.1);
+            }
+            .cart-item-info {
+                flex: 1;
+            }
+            .cart-item-name {
+                font-size: 1.3rem;
+                font-weight: 700;
+                color: #2c3e50;
+                margin-bottom: 0.5rem;
+            }
+            .cart-item-category {
+                background: linear-gradient(135deg, var(--accent-teal), #138496);
+                color: white;
+                padding: 0.2rem 0.8rem;
+                border-radius: 12px;
+                font-size: 0.8rem;
+                font-weight: 600;
+                display: inline-block;
+                margin-bottom: 0.8rem;
+            }
+            .cart-item-price {
+                font-size: 1.5rem;
+                font-weight: 700;
+                color: var(--secondary-green);
+                margin-bottom: 1rem;
+            }
+            .quantity-controls {
+                display: flex;
+                align-items: center;
+                gap: 1rem;
+                margin-bottom: 1rem;
+            }
+            .quantity-btn {
+                background: var(--primary-green);
+                color: white;
+                border: none;
+                border-radius: 50%;
+                width: 35px;
+                height: 35px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                cursor: pointer;
+                transition: all 0.3s ease;
+            }
+            .quantity-btn:hover {
+                background: var(--secondary-green);
+                transform: scale(1.1);
+            }
+            .quantity-input {
+                width: 60px;
+                text-align: center;
+                border: 2px solid var(--primary-green);
+                border-radius: 8px;
+                padding: 0.3rem;
+                font-weight: 600;
+            }
+            .item-total {
+                font-size: 1.2rem;
+                font-weight: 700;
+                color: var(--secondary-green);
+                text-align: right;
+            }
+            .remove-btn {
+                background: var(--warm-orange);
+                color: white;
+                border: none;
+                border-radius: 50%;
+                width: 40px;
+                height: 40px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                cursor: pointer;
+                transition: all 0.3s ease;
+                margin-left: 1rem;
+            }
+            .remove-btn:hover {
+                background: #e55555;
+                transform: scale(1.1);
+            }
+            .empty-cart {
+                text-align: center;
+                padding: 4rem 2rem;
+                color: #6c757d;
+            }
+            .empty-cart i {
+                font-size: 5rem;
+                margin-bottom: 2rem;
+                color: var(--primary-green);
+                opacity: 0.5;
+            }
+            .btn-eco-large {
+                background: linear-gradient(135deg, var(--primary-green), var(--secondary-green));
+                border: none;
+                color: white;
+                border-radius: 25px;
+                padding: 1rem 2rem;
+                font-weight: 700;
+                font-size: 1.2rem;
+                transition: all 0.3s ease;
+                text-decoration: none;
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                box-shadow: 0 10px 25px rgba(32, 201, 151, 0.3);
+                width: 100%;
+            }
+            .btn-eco-large:hover {
+                transform: translateY(-3px);
+                box-shadow: 0 15px 35px rgba(32, 201, 151, 0.4);
+                color: white;
+            }
+        `;
+        document.head.appendChild(style);
+
+        // Inicializar partículas
+        createFloatingParticles();
+
+        // Función para proceder al checkout
+        function proceedToCheckout() {
+            // Verificar si hay productos en el carrito
+            const cartItems = document.querySelectorAll('.cart-item');
+            if (cartItems.length === 0) {
+                showNotification('Tu carrito está vacío. Agrega productos antes de proceder al pago.', 'error');
+                return;
+            }
+            
+            // Redirigir al checkout
+            window.location.href = '/client/checkout';
+        }
+
+        // Función para limpiar localStorage manualmente (para debugging)
+        window.limpiarLocalStorage = function() {
+            if (confirm('¿Estás seguro de que quieres limpiar el carrito local? Esta acción no se puede deshacer.')) {
+                localStorage.removeItem('cart');
+                showNotification('Carrito local limpiado exitosamente', 'success');
+                console.log('🧹 Carrito local limpiado manualmente');
+                setTimeout(() => location.reload(), 1000);
+            }
+        };
+
+        console.log('🛒 EcoVivaShop - Carrito cargado exitosamente');
+    </script>
+</body>
+</html>

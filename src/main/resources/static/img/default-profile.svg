@@ -1,0 +1,7 @@
+<!-- Imagen SVG por defecto para perfil -->
+<svg width="300" height="300" viewBox="0 0 300 300" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <rect width="300" height="300" fill="#F8F9FA"/>
+    <circle cx="150" cy="120" r="45" fill="#28A745"/>
+    <path d="M75 225C75 195 105 165 150 165C195 165 225 195 225 225V275H75V225Z" fill="#28A745"/>
+    <text x="150" y="295" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="#6C757D">Sin imagen</text>
+</svg>

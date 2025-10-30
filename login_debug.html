@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EcoVivaShop - Login y Acceso Admin</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-green: #28a745;
+            --secondary-green: #20c997;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            min-height: 100vh;
+        }
+        
+        .login-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        
+        .login-card {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        .login-header {
+            background: linear-gradient(135deg, var(--primary-green) 0%, var(--secondary-green) 100%);
+            color: white;
+            padding: 2rem;
+            text-align: center;
+        }
+        
+        .debug-section {
+            margin: 1rem 0;
+            padding: 1rem;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            background: #f8f9fa;
+        }
+        
+        .status-badge {
+            display: inline-block;
+            padding: 0.25rem 0.5rem;
+            border-radius: 0.375rem;
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+        
+        .status-success { background-color: #d1e7dd; color: #0f5132; }
+        .status-warning { background-color: #fff3cd; color: #664d03; }
+        .status-danger { background-color: #f8d7da; color: #842029; }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <div class="login-card">
+            <div class="login-header">
+                <h1><i class="bi bi-leaf"></i> EcoVivaShop Admin</h1>
+                <p>Sistema de Gestión de Productos Ecológicos</p>
+            </div>
+            
+            <div class="card-body p-4">
+                <div class="debug-section">
+                    <h3><i class="bi bi-info-circle"></i> Estado del Sistema</h3>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <p><strong>Servidor:</strong> <span class="status-badge status-success">Activo en puerto 8081</span></p>
+                            <p><strong>Base de Datos:</strong> <span class="status-badge status-success">PostgreSQL Conectada</span></p>
+                            <p><strong>Templates:</strong> <span class="status-badge status-success">Thymeleaf Configurado</span></p>
+                        </div>
+                        <div class="col-md-6">
+                            <p><strong>Seguridad:</strong> <span class="status-badge status-warning">Spring Security Activo</span></p>
+                            <p><strong>Admin Page:</strong> <span class="status-badge status-warning">Requiere Login</span></p>
+                            <p><strong>CSS Issue:</strong> <span class="status-badge status-danger">En Resolución</span></p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="debug-section">
+                    <h3><i class="bi bi-person-check"></i> Acceso de Administrador</h3>
+                    <p>Para acceder a la gestión de productos, necesitas iniciar sesión como administrador.</p>
+                    
+                    <div class="alert alert-info">
+                        <h5><i class="bi bi-key"></i> Credenciales de Prueba:</h5>
+                        <ul>
+                            <li><strong>Email:</strong> admin@ecovivashop.com</li>
+                            <li><strong>Contraseña:</strong> admin123</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="d-grid gap-2">
+                        <a href="http://localhost:8081/login" class="btn btn-primary btn-lg">
+                            <i class="bi bi-box-arrow-in-right"></i> Ir a Página de Login
+                        </a>
+                        <a href="http://localhost:8081/admin/productos" class="btn btn-success btn-lg">
+                            <i class="bi bi-boxes"></i> Acceder Directo a Productos (después del login)
+                        </a>
+                    </div>
+                </div>
+
+                <div class="debug-section">
+                    <h3><i class="bi bi-bug"></i> Problemas Identificados</h3>
+                    
+                    <div class="alert alert-warning">
+                        <h5>❌ Problema Principal: CSS en línea visible en /admin/productos</h5>
+                        <p><strong>Causa:</strong> Posible error en la renderización del template Thymeleaf o conflicto de estilos.</p>
+                        <p><strong>Síntomas:</strong></p>
+                        <ul>
+                            <li>Texto CSS raw aparece en la página</li>
+                            <li>Solo se muestra 1 producto en lugar de todos</li>
+                            <li>Layout no se renderiza correctamente</li>
+                        </ul>
+                    </div>
+
+                    <div class="alert alert-success">
+                        <h5>✅ Correcciones Implementadas:</h5>
+                        <ul>
+                            <li>Template gestion.html completamente reescrito con Bootstrap 5</li>
+                            <li>Controlador ProductoController optimizado con paginación</li>
+                            <li>Servicio ProductoService con métodos de búsqueda</li>
+                            <li>Diseño responsivo y moderno aplicado</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="debug-section">
+                    <h3><i class="bi bi-list-check"></i> Pasos para Verificar</h3>
+                    <ol>
+                        <li>
+                            <strong>Hacer Login:</strong>
+                            <a href="http://localhost:8081/login" class="btn btn-sm btn-outline-primary">Abrir Login</a>
+                        </li>
+                        <li>
+                            <strong>Usar credenciales:</strong> admin@ecovivashop.com / admin123
+                        </li>
+                        <li>
+                            <strong>Navegar a productos:</strong>
+                            <a href="http://localhost:8081/admin/productos" class="btn btn-sm btn-outline-success">Ver Productos</a>
+                        </li>
+                        <li>
+                            <strong>Verificar:</strong> Layout, productos mostrados, funcionalidad
+                        </li>
+                        <li>
+                            <strong>Revisar consola:</strong> F12 para errores JavaScript/CSS
+                        </li>
+                    </ol>
+                </div>
+
+                <div class="debug-section">
+                    <h3><i class="bi bi-database"></i> Verificación de Datos</h3>
+                    <p>Si después del login los problemas persisten, verificar:</p>
+                    <ul>
+                        <li>Productos en base de datos (debería haber 5+ productos)</li>
+                        <li>Inventario asociado a cada producto</li>
+                        <li>Configuración de Thymeleaf</li>
+                        <li>Logs del servidor para errores 500</li>
+                    </ul>
+                    
+                    <div class="mt-3">
+                        <small class="text-muted">
+                            <strong>SQL de verificación:</strong><br>
+                            <code>SELECT p.nombre, p.categoria, i.stock FROM tb_producto p LEFT JOIN tb_inventario i ON p.id_producto = i.id_producto;</code>
+                        </small>
+                    </div>
+                </div>
+
+                <div class="text-center mt-4">
+                    <p class="text-muted">
+                        <i class="bi bi-clock"></i> Última actualización: Sistema optimizado y listo para pruebas
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        console.log("EcoVivaShop Debug Page loaded");
+        
+        // Verificar si el servidor está corriendo
+        fetch('http://localhost:8081/login')
+            .then(response => {
+                if (response.ok) {
+                    console.log("✅ Servidor activo en puerto 8081");
+                } else {
+                    console.log("⚠️ Servidor responde pero hay problemas");
+                }
+            })
+            .catch(error => {
+                console.log("❌ Error conectando al servidor:", error);
+            });
+    </script>
+</body>
+</html>

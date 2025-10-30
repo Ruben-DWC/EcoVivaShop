@@ -1,0 +1,139 @@
+/*
+ * SOLUCIÓN PARA EL CONTADOR DEL CARRITO
+ * Posicionamiento correcto del badge del carrito en el navbar
+ */
+
+/* REGLA 1: Contenedor del enlace carrito con position relative */
+.navbar .nav-item .nav-link.position-relative {
+    position: relative !important;
+}
+
+/* REGLA 2: Estilo específico para el contador del carrito */
+.navbar .carrito-count {
+    position: absolute !important;
+    top: -8px !important;
+    right: -8px !important;
+    transform: none !important;
+    z-index: 1000 !important;
+    min-width: 20px !important;
+    height: 20px !important;
+    font-size: 0.7rem !important;
+    font-weight: bold !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    border-radius: 50% !important;
+    background-color: #dc3545 !important;
+    color: white !important;
+    border: 2px solid white !important;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2) !important;
+    line-height: 1 !important;
+    padding: 0 !important;
+    text-align: center !important;
+}
+
+/* REGLA 3: Asegurar que el ícono del carrito tenga su posición */
+.navbar .bi-cart {
+    position: relative !important;
+    z-index: 1 !important;
+}
+
+/* REGLA 4: Animación suave cuando cambia el número */
+.carrito-count {
+    transition: all 0.3s ease !important;
+}
+
+.carrito-count:not(:empty) {
+    animation: bounceIn 0.5s ease !important;
+}
+
+/* REGLA 5: Para números de más de 2 dígitos */
+.carrito-count:has-text {
+    min-width: 24px !important;
+    border-radius: 12px !important;
+    padding: 0 4px !important;
+}
+
+/* REGLA 6: Hover effect para mejor visibilidad */
+.nav-link:hover .carrito-count {
+    transform: scale(1.1) !important;
+    box-shadow: 0 3px 6px rgba(0,0,0,0.3) !important;
+}
+
+/* REGLA 7: Responsive - ajustes para móvil */
+@media (max-width: 768px) {
+    .navbar .carrito-count {
+        top: -6px !important;
+        right: -6px !important;
+        min-width: 18px !important;
+        height: 18px !important;
+        font-size: 0.65rem !important;
+    }
+}
+
+/* REGLA 8: Ocultar cuando el contador es 0 */
+.carrito-count:empty,
+.carrito-count[data-count="0"] {
+    display: none !important;
+}
+
+/* REGLA 9: Animación de entrada */
+@keyframes bounceIn {
+    0% {
+        transform: scale(0.3);
+        opacity: 0;
+    }
+    50% {
+        transform: scale(1.05);
+        opacity: 1;
+    }
+    70% {
+        transform: scale(0.9);
+    }
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+/* REGLA 10: Estado activo cuando hay items */
+.carrito-count.has-items {
+    animation: pulse 2s infinite !important;
+}
+
+@keyframes pulse {
+    0% {
+        box-shadow: 0 0 0 0 rgba(220, 53, 69, 0.7);
+    }
+    70% {
+        box-shadow: 0 0 0 6px rgba(220, 53, 69, 0);
+    }
+    100% {
+        box-shadow: 0 0 0 0 rgba(220, 53, 69, 0);
+    }
+}
+
+/* REGLA 11: Corrección para el posicionamiento específico del Bootstrap */
+.navbar .nav-link .badge.bg-danger {
+    position: absolute !important;
+    top: -8px !important;
+    right: -8px !important;
+    transform: none !important;
+    margin-left: 0 !important;
+    margin-top: 0 !important;
+}
+
+/* REGLA 12: Asegurar que no interfiera con otros elementos */
+.navbar .carrito-count {
+    pointer-events: none !important;
+}
+
+/* REGLA 13: Corrección específica para las clases start-100 y translate-middle */
+.navbar .position-absolute.top-0.start-100.translate-middle {
+    position: absolute !important;
+    top: -8px !important;
+    right: -8px !important;
+    left: auto !important;
+    transform: none !important;
+    margin-left: 0 !important;
+}

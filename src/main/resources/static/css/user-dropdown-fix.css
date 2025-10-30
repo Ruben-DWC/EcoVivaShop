@@ -1,0 +1,79 @@
+/*
+ * SOLUCIÓN DROPDOWN USUARIO NAVBAR - VANILLA JAVASCRIPT
+ * Sistema simple y limpio con clase 'hidden'
+ */
+
+/* Asegurar que el contenedor dropdown tenga position relative */
+.navbar .nav-item.dropdown {
+    position: relative;
+}
+
+/* Dropdown menu positioning */
+.navbar .dropdown-menu {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    left: auto;
+    z-index: 1050;
+    min-width: 200px;
+    background-color: white;
+    border: 1px solid rgba(0, 0, 0, 0.15);
+    border-radius: 15px;
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.175);
+    margin-top: 0.125rem;
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+    transition: opacity 0.15s linear, transform 0.15s linear, visibility 0.15s linear;
+}
+
+/* Clase hidden para controlar la visibilidad */
+.navbar .dropdown-menu.hidden {
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-10px);
+    pointer-events: none;
+}
+
+/* Botón dropdown debe ser clickeable */
+.navbar .dropdown-toggle {
+    cursor: pointer;
+    text-decoration: none;
+    background: none;
+    border: none;
+    color: inherit;
+    padding: 0.5rem 0.75rem;
+    transition: background-color 0.15s ease-in-out;
+}
+
+/* Remover la flecha por defecto de Bootstrap */
+.navbar .dropdown-toggle::after {
+    display: none;
+}
+
+/* Específico para botones en navbar */
+.navbar .btn.dropdown-toggle {
+    background: transparent;
+    border: none;
+    color: white;
+    text-decoration: none;
+}
+
+/* Estados hover y focus para accesibilidad */
+.navbar .btn.dropdown-toggle:hover,
+.navbar .btn.dropdown-toggle:focus {
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.25);
+}
+
+/* Estilo de los items del dropdown */
+.dropdown-item {
+    transition: background-color 0.15s ease-in-out;
+}
+
+.dropdown-item:hover,
+.dropdown-item:focus {
+    background-color: rgba(0, 0, 0, 0.04);
+}

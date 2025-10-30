@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestión de Productos de Ejemplo | EcoVivaShop Admin</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f8f9fa;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        .navbar {
+            background-color: #28a745 !important;
+            box-shadow: 0 2px 10px rgba(40, 167, 69, 0.2);
+        }
+        
+        .card {
+            border: none;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            background-color: #ffffff;
+            margin-bottom: 1.5rem;
+        }
+        
+        .card-header {
+            background-color: #28a745;
+            color: white;
+            border-radius: 15px 15px 0 0;
+            padding: 1.5rem;
+            font-weight: 600;
+            border-bottom: none;
+        }
+        
+        .btn-success {
+            background-color: #28a745;
+            border-color: #28a745;
+            border-radius: 25px;
+            padding: 0.75rem 2rem;
+            font-weight: 600;
+        }
+        
+        .btn-success:hover {
+            background-color: #218838;
+            border-color: #1e7e34;
+        }
+        
+        .btn-danger {
+            border-radius: 25px;
+            padding: 0.75rem 2rem;
+            font-weight: 600;
+        }
+        
+        .btn-info {
+            border-radius: 25px;
+            padding: 0.75rem 2rem;
+            font-weight: 600;
+        }
+        
+        .loading {
+            display: none;
+        }
+        
+        .status-info {
+            background-color: #e9ecef;
+            border-left: 4px solid #28a745;
+            padding: 1rem;
+            border-radius: 5px;
+            margin-bottom: 1rem;
+        }
+        
+        .feature-list {
+            list-style: none;
+            padding: 0;
+        }
+        
+        .feature-list li {
+            padding: 0.5rem 0;
+            border-bottom: 1px solid #e9ecef;
+        }
+        
+        .feature-list li:last-child {
+            border-bottom: none;
+        }
+        
+        .feature-list li i {
+            color: #28a745;
+            margin-right: 0.5rem;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navbar usando fragment -->
+    <div th:replace="~{fragments/admin-navbar :: admin-navbar}"></div>
+
+    <!-- Contenido principal -->
+    <div class="container mt-4">
+        <div class="row">
+            <div class="col-md-8">
+                <!-- Información sobre productos de ejemplo -->
+                <div class="card">
+                    <div class="card-header">
+                        <i class="bi bi-box-seam me-2"></i>
+                        Productos de Ejemplo con Imágenes Reales
+                    </div>
+                    <div class="card-body">
+                        <p class="lead">
+                            Este sistema permite crear productos de ejemplo con imágenes reales descargadas desde Unsplash.
+                        </p>
+                        
+                        <div class="status-info">
+                            <strong>Estado actual:</strong>
+                            <span th:if="${hayProductos}" class="text-success">
+                                <i class="bi bi-check-circle"></i> Ya existen productos en la base de datos
+                            </span>
+                            <span th:unless="${hayProductos}" class="text-warning">
+                                <i class="bi bi-exclamation-triangle"></i> No hay productos en la base de datos
+                            </span>
+                        </div>
+                        
+                        <h5>Características del sistema:</h5>
+                        <ul class="feature-list">
+                            <li><i class="bi bi-check-circle-fill"></i> Crea 20+ productos de ejemplo</li>
+                            <li><i class="bi bi-check-circle-fill"></i> Descarga imágenes reales desde Unsplash</li>
+                            <li><i class="bi bi-check-circle-fill"></i> Organiza productos por categorías</li>
+                            <li><i class="bi bi-check-circle-fill"></i> Optimiza imágenes automáticamente</li>
+                            <li><i class="bi bi-check-circle-fill"></i> Almacena metadatos de imágenes</li>
+                            <li><i class="bi bi-check-circle-fill"></i> Sistema de archivos organizado</li>
+                        </ul>
+                        
+                        <div class="alert alert-info">
+                            <i class="bi bi-info-circle me-2"></i>
+                            <strong>Nota:</strong> El proceso de descarga puede tomar algunos minutos dependiendo de la conexión a internet.
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Resultados -->
+                <div class="card" id="resultCard" style="display: none;">
+                    <div class="card-header">
+                        <i class="bi bi-info-circle me-2"></i>
+                        Resultado de la Operación
+                    </div>
+                    <div class="card-body">
+                        <div id="resultContent"></div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-4">
+                <!-- Acciones -->
+                <div class="card">
+                    <div class="card-header">
+                        <i class="bi bi-gear me-2"></i>
+                        Acciones
+                    </div>
+                    <div class="card-body">
+                        <div class="d-grid gap-2">
+                            <button class="btn btn-success" onclick="crearProductos()" th:disabled="${hayProductos}">
+                                <i class="bi bi-plus-circle me-2"></i>
+                                Crear Productos de Ejemplo
+                            </button>
+                            
+                            <button class="btn btn-info" onclick="verificarEstado()">
+                                <i class="bi bi-info-circle me-2"></i>
+                                Verificar Estado
+                            </button>
+                            
+                            <button class="btn btn-danger" onclick="eliminarProductos()" th:disabled="${!hayProductos}">
+                                <i class="bi bi-trash me-2"></i>
+                                Eliminar Todos los Productos
+                            </button>
+                        </div>
+                        
+                        <div class="loading text-center mt-3" id="loadingSpinner">
+                            <div class="spinner-border text-success" role="status">
+                                <span class="visually-hidden">Cargando...</span>
+                            </div>
+                            <p class="mt-2">Procesando...</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Información adicional -->
+                <div class="card">
+                    <div class="card-header">
+                        <i class="bi bi-lightbulb me-2"></i>
+                        Información Técnica
+                    </div>
+                    <div class="card-body">
+                        <p><strong>Categorías incluidas:</strong></p>
+                        <ul class="list-unstyled">
+                            <li>• Electrónicos</li>
+                            <li>• Ropa y Moda</li>
+                            <li>• Hogar y Jardín</li>
+                            <li>• Deportes y Fitness</li>
+                            <li>• Alimentación</li>
+                            <li>• Mascotas</li>
+                        </ul>
+                        
+                        <p><strong>Almacenamiento:</strong></p>
+                        <ul class="list-unstyled">
+                            <li>• Directorio: <code>uploads/products/</code></li>
+                            <li>• Formato: JPEG optimizado</li>
+                            <li>• Tamaño: 400x400px</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        function showLoading() {
+            document.getElementById('loadingSpinner').style.display = 'block';
+            document.querySelectorAll('button').forEach(btn => btn.disabled = true);
+        }
+        
+        function hideLoading() {
+            document.getElementById('loadingSpinner').style.display = 'none';
+            document.querySelectorAll('button').forEach(btn => btn.disabled = false);
+        }
+        
+        function showResult(content, type = 'info') {
+            const resultCard = document.getElementById('resultCard');
+            const resultContent = document.getElementById('resultContent');
+            
+            let alertClass = 'alert-info';
+            let iconClass = 'bi-info-circle';
+            
+            if (type === 'success') {
+                alertClass = 'alert-success';
+                iconClass = 'bi-check-circle';
+            } else if (type === 'error') {
+                alertClass = 'alert-danger';
+                iconClass = 'bi-exclamation-triangle';
+            }
+            
+            resultContent.innerHTML = `
+                <div class="alert ${alertClass}">
+                    <i class="bi ${iconClass} me-2"></i>
+                    ${content}
+                </div>
+            `;
+            
+            resultCard.style.display = 'block';
+            resultCard.scrollIntoView({ behavior: 'smooth' });
+        }
+        
+        function crearProductos() {
+            if (!confirm('¿Estás seguro de que quieres crear los productos de ejemplo? Esta operación puede tomar varios minutos.')) {
+                return;
+            }
+            
+            showLoading();
+            
+            fetch('/admin/data/productos/crear', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => response.text())
+            .then(data => {
+                if (data.includes('exitosamente')) {
+                    showResult('✅ ' + data, 'success');
+                    setTimeout(() => location.reload(), 2000);
+                } else {
+                    showResult('❌ ' + data, 'error');
+                }
+            })
+            .catch(error => {
+                showResult('❌ Error de conexión: ' + error.message, 'error');
+            })
+            .finally(() => {
+                hideLoading();
+            });
+        }
+        
+        function eliminarProductos() {
+            if (!confirm('¿Estás seguro de que quieres ELIMINAR TODOS los productos? Esta acción no se puede deshacer.')) {
+                return;
+            }
+            
+            showLoading();
+            
+            fetch('/admin/data/productos/eliminar', {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => response.text())
+            .then(data => {
+                if (data.includes('exitosamente')) {
+                    showResult('✅ ' + data, 'success');
+                    setTimeout(() => location.reload(), 2000);
+                } else {
+                    showResult('❌ ' + data, 'error');
+                }
+            })
+            .catch(error => {
+                showResult('❌ Error de conexión: ' + error.message, 'error');
+            })
+            .finally(() => {
+                hideLoading();
+            });
+        }
+        
+        function verificarEstado() {
+            showLoading();
+            
+            fetch('/admin/data/productos/estado')
+            .then(response => response.text())
+            .then(data => {
+                showResult('📊 ' + data, 'info');
+            })
+            .catch(error => {
+                showResult('❌ Error al verificar estado: ' + error.message, 'error');
+            })
+            .finally(() => {
+                hideLoading();
+            });
+        }
+    </script>
+</body>
+</html>

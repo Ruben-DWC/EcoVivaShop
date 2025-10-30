@@ -1,0 +1,1249 @@
+/* ==================================
+   TEMA VERDE ECOVIVASHOP - DISEÑO COMPLETO
+   Fondo verde transparente con letras visibles
+   ================================== */
+
+/* VARIABLES CSS PARA COLORES */
+:root {
+    --primary-green: #038554;
+    --secondary-green: #03bb85;
+    --accent-green: #028a63;
+    --light-green: rgba(3, 187, 133, 0.1);
+    --text-dark: #2d5016;
+    --success-green: #28a745;
+}
+
+/* FONDO VERDE TRANSPARENTE PARA TODA LA APLICACIÓN */
+body {
+    background: linear-gradient(135deg, rgba(40, 167, 69, 0.1) 0%, rgba(32, 201, 151, 0.1) 50%, rgba(200, 250, 200, 0.1) 100%) !important;
+    color: var(--text-dark) !important;
+    min-height: 100vh;
+}
+
+/* NAVBAR CON COLORES ESPECÍFICOS #038554 y #03bb85 */
+.navbar {
+    background: linear-gradient(135deg, #038554 0%, #03bb85 50%, #028a63 100%) !important;
+    border-bottom: 3px solid #03bb85 !important;
+    box-shadow: 0 2px 15px rgba(3, 187, 133, 0.4) !important;
+}
+
+.navbar-brand {
+    color: #ffffff !important;
+    font-weight: bold !important;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+.navbar-nav .nav-link {
+    color: #e8f7f2 !important;
+    font-weight: 500 !important;
+    transition: all 0.3s ease;
+}
+
+.navbar-nav .nav-link:hover {
+    color: #ffffff !important;
+    background: rgba(3, 187, 133, 0.3) !important;
+    border-radius: 20px;
+    transform: translateY(-2px);
+}
+
+.navbar-nav .nav-link.active {
+    color: #ffffff !important;
+    background: linear-gradient(45deg, #038554, #03bb85) !important;
+    border-radius: 20px;
+}
+
+/* CARDS CON FONDO VERDE DE LA PALETA */
+.card {
+    background: linear-gradient(135deg, rgba(3, 133, 84, 0.15) 0%, rgba(3, 187, 133, 0.15) 100%) !important;
+    -webkit-backdrop-filter: blur(10px) !important;
+    backdrop-filter: blur(10px) !important;
+    border: 2px solid rgba(3, 187, 133, 0.3) !important;
+    box-shadow: 0 8px 25px rgba(3, 187, 133, 0.2) !important;
+    transition: all 0.3s ease !important;
+}
+
+.card:hover {
+    background: linear-gradient(135deg, rgba(3, 133, 84, 0.25) 0%, rgba(3, 187, 133, 0.25) 100%) !important;
+    border-color: #03bb85 !important;
+    transform: translateY(-5px);
+    box-shadow: 0 12px 35px rgba(3, 187, 133, 0.3) !important;
+}
+
+.card-body {
+    background: transparent !important;
+}
+
+/* TEXTO OSCURO VERDE PARA MÁXIMA VISIBILIDAD */
+h1, h2, h3, h4, h5, h6 {
+    color: #1e3a0f !important;
+    font-weight: 700 !important;
+    text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.8);
+}
+
+p, .card-text, span, div {
+    color: #2d5016 !important;
+    font-weight: 600 !important;
+    text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.8);
+}
+
+.text-muted {
+    color: #4a7c23 !important;
+    font-weight: 600 !important;
+}
+
+.text-success {
+    color: #1e3a0f !important;
+    font-weight: 700 !important;
+}
+
+/* BOTONES CON COLORES DE LA PALETA VERDE */
+.btn {
+    border-radius: 25px !important;
+    font-weight: 700 !important;
+    border: 2px solid transparent !important;
+    transition: all 0.3s ease !important;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+.btn-success {
+    background: linear-gradient(45deg, #038554, #03bb85) !important;
+    color: #ffffff !important;
+    border-color: #038554 !important;
+}
+
+.btn-success:hover {
+    background: linear-gradient(45deg, #027044, #02a06b) !important;
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px rgba(3, 187, 133, 0.4) !important;
+}
+
+.btn-outline-success {
+    background: rgba(255, 255, 255, 0.9) !important;
+    color: #038554 !important;
+    border-color: #03bb85 !important;
+    font-weight: 700 !important;
+}
+
+.btn-outline-success:hover {
+    background: linear-gradient(45deg, #038554, #03bb85) !important;
+    color: #ffffff !important;
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px rgba(3, 187, 133, 0.4) !important;
+}
+
+.btn-primary {
+    background: linear-gradient(45deg, #03bb85, #17a2b8) !important;
+    color: #ffffff !important;
+    border-color: #17a2b8 !important;
+}
+
+.btn-info {
+    background: linear-gradient(45deg, #17a2b8, #138496) !important;
+    color: #ffffff !important;
+}
+
+.btn-warning {
+    background: linear-gradient(45deg, #ffc107, #e0a800) !important;
+    color: #1e3a0f !important;
+    font-weight: 700 !important;
+}
+
+.btn-danger {
+    background: linear-gradient(45deg, #dc3545, #c82333) !important;
+    color: #ffffff !important;
+}
+
+/* ICONOS CON ESTILOS VERDES */
+.bi {
+    color: inherit !important;
+    transition: all 0.3s ease;
+}
+
+/* Iconos en círculos con gradientes verdes */
+.rounded-circle {
+    border: 3px solid #28a745 !important;
+    box-shadow: 0 4px 15px rgba(40, 167, 69, 0.3) !important;
+}
+
+.bg-success {
+    background: linear-gradient(45deg, #28a745, #20c997) !important;
+    color: #ffffff !important;
+}
+
+.bg-primary {
+    background: linear-gradient(45deg, #20c997, #17a2b8) !important;
+    color: #ffffff !important;
+}
+
+.bg-info {
+    background: linear-gradient(45deg, #17a2b8, #138496) !important;
+    color: #ffffff !important;
+}
+
+.bg-warning {
+    background: linear-gradient(45deg, #ffc107, #e0a800) !important;
+    color: #1e3a0f !important;
+}
+
+.bg-danger {
+    background: linear-gradient(45deg, #dc3545, #c82333) !important;
+    color: #ffffff !important;
+}
+
+/* FORMULARIOS CON TEMA VERDE */
+.form-control, .form-select {
+    background: rgba(255, 255, 255, 0.9) !important;
+    border: 2px solid rgba(40, 167, 69, 0.3) !important;
+    color: #2d5016 !important;
+    font-weight: 600 !important;
+    border-radius: 15px !important;
+}
+
+.form-control:focus, .form-select:focus {
+    background: rgba(255, 255, 255, 1) !important;
+    border-color: #28a745 !important;
+    box-shadow: 0 0 0 0.2rem rgba(40, 167, 69, 0.25) !important;
+    color: #1e3a0f !important;
+}
+
+.form-label {
+    color: #1e3a0f !important;
+    font-weight: 700 !important;
+    text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.8);
+}
+
+.input-group-text {
+    background: linear-gradient(45deg, #e8f5e8, #f0f9f0) !important;
+    border: 2px solid rgba(40, 167, 69, 0.3) !important;
+    color: #1e3a0f !important;
+    font-weight: 600 !important;
+}
+
+/* ALERTAS CON TEMA VERDE */
+.alert {
+    background: rgba(212, 237, 218, 0.9) !important;
+    border: 2px solid #28a745 !important;
+    color: #155724 !important;
+    font-weight: 600 !important;
+    border-radius: 20px !important;
+}
+
+.alert-success {
+    background: linear-gradient(45deg, rgba(212, 237, 218, 0.9), rgba(195, 230, 203, 0.9)) !important;
+    border-color: #28a745 !important;
+    color: #155724 !important;
+}
+
+/* TABLAS CON TEMA VERDE */
+.table {
+    background: rgba(255, 255, 255, 0.9) !important;
+    color: #2d5016 !important;
+    border-radius: 15px !important;
+    overflow: hidden;
+}
+
+.table thead th {
+    background: linear-gradient(45deg, #28a745, #20c997) !important;
+    color: #ffffff !important;
+    font-weight: 700 !important;
+    border: none !important;
+}
+
+.table tbody tr {
+    background: rgba(255, 255, 255, 0.8) !important;
+    color: #2d5016 !important;
+    font-weight: 600 !important;
+}
+
+.table tbody tr:hover {
+    background: linear-gradient(135deg, rgba(3, 133, 84, 0.1) 0%, rgba(3, 187, 133, 0.1) 100%) !important;
+    transform: scale(1.01);
+}
+
+/* DROPDOWN CON TEMA VERDE */
+.dropdown-menu {
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(3, 187, 133, 0.05) 100%) !important;
+    border: 2px solid rgba(3, 187, 133, 0.3) !important;
+    border-radius: 15px !important;
+    -webkit-backdrop-filter: blur(10px) !important;
+    backdrop-filter: blur(10px) !important;
+}
+
+.dropdown-item {
+    color: #2d5016 !important;
+    font-weight: 600 !important;
+    border-radius: 10px !important;
+    margin: 5px !important;
+}
+
+.dropdown-item:hover {
+    background: linear-gradient(45deg, #038554, #03bb85) !important;
+    color: #ffffff !important;
+}
+
+/* BADGES CON TEMA VERDE */
+.badge {
+    font-weight: 600 !important;
+    border-radius: 15px !important;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+/* HERO SECTIONS */
+.hero-gradient {
+    background: linear-gradient(135deg, #28a745 0%, #20c997 50%, #17a2b8 100%) !important;
+    color: #ffffff !important;
+}
+
+/* SIDEBAR Y NAVEGACIÓN */
+.list-group-item {
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(3, 187, 133, 0.05) 100%) !important;
+    color: #2d5016 !important;
+    border: 2px solid rgba(3, 187, 133, 0.2) !important;
+    font-weight: 600 !important;
+    border-radius: 15px !important;
+    margin: 5px !important;
+}
+
+.list-group-item:hover {
+    background: linear-gradient(135deg, rgba(3, 133, 84, 0.1) 0%, rgba(3, 187, 133, 0.1) 100%) !important;
+    border-color: #03bb85 !important;
+    transform: translateX(10px);
+}
+
+.list-group-item.active {
+    background: linear-gradient(45deg, #038554, #03bb85) !important;
+    border-color: #038554 !important;
+    color: #ffffff !important;
+}
+
+/* MODAL CON TEMA VERDE */
+.modal-content {
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(3, 187, 133, 0.05) 100%) !important;
+    border: 2px solid rgba(3, 187, 133, 0.3) !important;
+    border-radius: 20px !important;
+    -webkit-backdrop-filter: blur(10px) !important;
+    backdrop-filter: blur(10px) !important;
+}
+
+.modal-header {
+    background: linear-gradient(45deg, #038554, #03bb85) !important;
+    color: #ffffff !important;
+    border-bottom: none !important;
+}
+
+.modal-body, .modal-footer {
+    color: #2d5016 !important;
+    font-weight: 600 !important;
+}
+
+/* PAGINATION CON TEMA VERDE */
+.page-link {
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(3, 187, 133, 0.05) 100%) !important;
+    color: #2d5016 !important;
+    border: 2px solid rgba(3, 187, 133, 0.3) !important;
+    font-weight: 600 !important;
+}
+
+.page-link:hover, .page-item.active .page-link {
+    background: linear-gradient(45deg, #038554, #03bb85) !important;
+    color: #ffffff !important;
+    border-color: #038554 !important;
+}
+
+/* EFECTOS ESPECIALES */
+.card-hover-effect:hover {
+    background: linear-gradient(135deg, rgba(3, 133, 84, 0.2) 0%, rgba(3, 187, 133, 0.2) 100%) !important;
+}
+
+/* SCROLLBAR VERDE */
+::-webkit-scrollbar {
+    width: 12px;
+}
+
+::-webkit-scrollbar-track {
+    background: rgba(40, 167, 69, 0.1);
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: linear-gradient(45deg, #28a745, #20c997);
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(45deg, #20c997, #17a2b8);
+}
+
+/* ANIMACIONES VERDES */
+@keyframes greenPulse {
+    0% { box-shadow: 0 0 0 0 rgba(40, 167, 69, 0.7); }
+    70% { box-shadow: 0 0 0 10px rgba(40, 167, 69, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(40, 167, 69, 0); }
+}
+
+.btn:focus, .btn:active {
+    animation: greenPulse 1s infinite;
+}
+
+/* FOOTER CON COLORES DE LA PALETA */
+footer {
+    background: linear-gradient(135deg, #038554 0%, #03bb85 50%, #028a63 100%) !important;
+    color: #ffffff !important;
+    border-top: 3px solid #03bb85 !important;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+/* HERO SECTIONS CON GRADIENTES DE LA PALETA */
+.hero-gradient {
+    background: linear-gradient(135deg, #038554 0%, #03bb85 50%, #17a2b8 100%) !important;
+    color: #ffffff !important;
+}
+
+.hero-gradient:hover {
+    background: linear-gradient(135deg, #027044 0%, #02a06b 50%, #138496 100%) !important;
+    transform: scale(1.02) !important;
+    transition: all 0.3s ease !important;
+}
+
+/* ICONOS CON ESTILOS DE LA PALETA */
+.bg-success {
+    background: linear-gradient(45deg, #038554, #03bb85) !important;
+    color: #ffffff !important;
+}
+
+/* ANIMACIONES CON COLORES DE LA PALETA */
+@keyframes greenPulse {
+    0% { box-shadow: 0 0 0 0 rgba(3, 187, 133, 0.7); }
+    70% { box-shadow: 0 0 0 10px rgba(3, 187, 133, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(3, 187, 133, 0); }
+}
+
+/* SCROLLBAR CON COLORES DE LA PALETA */
+::-webkit-scrollbar-thumb {
+    background: linear-gradient(45deg, #038554, #03bb85);
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(45deg, #03bb85, #17a2b8);
+}
+
+/* ASEGURAR CONTRASTE EN TEXTO PEQUEÑO */
+small, .small {
+    color: #038554 !important;
+    font-weight: 600 !important;
+}
+
+/* LINKS CON COLORES DE LA PALETA */
+a {
+    color: #038554 !important;
+    font-weight: 600 !important;
+    text-decoration: none !important;
+}
+
+a:hover {
+    color: #027044 !important;
+    text-decoration: underline !important;
+}
+
+/* ==================================
+   ESTILOS ESPECÍFICOS PARA EVITAR FONDOS BLANCOS
+   ================================== */
+
+/* Hero Section específico para que no se vea blanco al hacer hover */
+.hero-gradient:hover {
+    background: linear-gradient(135deg, #027044 0%, #02a06b 50%, #138496 100%) !important;
+    transform: scale(1.02) !important;
+    transition: all 0.3s ease !important;
+}
+
+/* Cards del panel de control con gradientes de la paleta */
+.card-body {
+    background: transparent !important;
+}
+
+/* Eliminar cualquier fondo blanco residual */
+.card-hover-effect:hover {
+    background: linear-gradient(135deg, rgba(3, 133, 84, 0.2) 0%, rgba(3, 187, 133, 0.2) 100%) !important;
+}
+
+/* Productos del catálogo con gradientes */
+.product-card {
+    background: linear-gradient(135deg, rgba(3, 133, 84, 0.1) 0%, rgba(3, 187, 133, 0.1) 100%) !important;
+    border: 2px solid rgba(3, 187, 133, 0.3) !important;
+}
+
+.product-card:hover {
+    background: linear-gradient(135deg, rgba(3, 133, 84, 0.2) 0%, rgba(3, 187, 133, 0.2) 100%) !important;
+    border-color: #03bb85 !important;
+}
+
+/* Filtros del catálogo */
+.card-header {
+    background: linear-gradient(135deg, #038554, #03bb85) !important;
+    color: #ffffff !important;
+    border: none !important;
+}
+
+/* Tablas con gradientes */
+.table thead th {
+    background: linear-gradient(45deg, #038554, #03bb85) !important;
+    color: #ffffff !important;
+    font-weight: 700 !important;
+    border: none !important;
+}
+
+.table tbody tr:hover {
+    background: linear-gradient(135deg, rgba(3, 133, 84, 0.1) 0%, rgba(3, 187, 133, 0.1) 100%) !important;
+    transform: scale(1.01);
+}
+
+/* Dropdown menus */
+.dropdown-menu {
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(3, 187, 133, 0.05) 100%) !important;
+    border: 2px solid rgba(3, 187, 133, 0.3) !important;
+    border-radius: 15px !important;
+    -webkit-backdrop-filter: blur(10px) !important;
+    backdrop-filter: blur(10px) !important;
+}
+
+.dropdown-item:hover {
+    background: linear-gradient(45deg, #038554, #03bb85) !important;
+    color: #ffffff !important;
+}
+
+/* List groups */
+.list-group-item {
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(3, 187, 133, 0.05) 100%) !important;
+    color: #2d5016 !important;
+    border: 2px solid rgba(3, 187, 133, 0.2) !important;
+    font-weight: 600 !important;
+    border-radius: 15px !important;
+    margin: 5px !important;
+}
+
+.list-group-item:hover {
+    background: linear-gradient(135deg, rgba(3, 133, 84, 0.1) 0%, rgba(3, 187, 133, 0.1) 100%) !important;
+    border-color: #03bb85 !important;
+    transform: translateX(10px);
+}
+
+.list-group-item.active {
+    background: linear-gradient(45deg, #038554, #03bb85) !important;
+    border-color: #038554 !important;
+    color: #ffffff !important;
+}
+
+/* Modal con gradientes */
+.modal-content {
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(3, 187, 133, 0.05) 100%) !important;
+    border: 2px solid rgba(3, 187, 133, 0.3) !important;
+    border-radius: 20px !important;
+    -webkit-backdrop-filter: blur(10px) !important;
+    backdrop-filter: blur(10px) !important;
+}
+
+.modal-header {
+    background: linear-gradient(45deg, #038554, #03bb85) !important;
+    color: #ffffff !important;
+    border-bottom: none !important;
+}
+
+/* PAGINATION MEJORADA */
+.page-link {
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(3, 187, 133, 0.05) 100%) !important;
+    color: #2d5016 !important;
+    border: 2px solid rgba(3, 187, 133, 0.3) !important;
+    font-weight: 600 !important;
+}
+
+.page-link:hover, .page-item.active .page-link {
+    background: linear-gradient(45deg, #038554, #03bb85) !important;
+    color: #ffffff !important;
+    border-color: #038554 !important;
+}
+
+/* EFECTO DE TEXTO ANIMADO PARA EL HERO TITLE
+   ================================== */
+
+/* Contenedor principal del texto animado */
+.animated-text-container {
+    position: relative;
+    display: inline-block;
+    overflow: hidden;
+    min-height: 5rem;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+}
+
+/* Texto animado con efecto de barrido */
+.animated-text {
+    position: relative;
+    font-size: 4rem;
+    font-weight: 900;
+    background: linear-gradient(45deg, #ffffff, #f0fff0);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    text-shadow: 0 4px 8px rgba(0,0,0,0.3);
+    animation: textFade 0.8s ease-in-out;
+    transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+@keyframes textFade {
+    0% {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Diferentes colores para cada frase */
+.text-brand {
+    background: linear-gradient(45deg, #ffffff, #f0fff0) !important;
+    -webkit-background-clip: text !important;
+    background-clip: text !important;
+    -webkit-text-fill-color: transparent !important;
+}
+
+.text-trust {
+    background: linear-gradient(45deg, #FFD700, #FFA500) !important;
+    -webkit-background-clip: text !important;
+    background-clip: text !important;
+    -webkit-text-fill-color: transparent !important;
+}
+
+.text-eco {
+    background: linear-gradient(45deg, #00FF7F, #32CD32) !important;
+    -webkit-background-clip: text !important;
+    background-clip: text !important;
+    -webkit-text-fill-color: transparent !important;
+}
+
+.text-future {
+    background: linear-gradient(45deg, #00CED1, #20B2AA) !important;
+    -webkit-background-clip: text !important;
+    background-clip: text !important;
+    -webkit-text-fill-color: transparent !important;
+}
+
+.text-green {
+    background: linear-gradient(45deg, #90EE90, #98FB98) !important;
+    -webkit-background-clip: text !important;
+    background-clip: text !important;
+    -webkit-text-fill-color: transparent !important;
+}
+
+/* Efecto de barrido/wipe */
+.text-wipe-effect {
+    position: relative;
+    overflow: hidden;
+}
+
+.text-wipe-effect::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, 
+        transparent 0%, 
+        rgba(255, 255, 255, 0.8) 50%, 
+        transparent 100%);
+    animation: wipeEffect 0.6s ease-in-out;
+}
+
+@keyframes wipeEffect {
+    0% {
+        left: -100%;
+    }
+    100% {
+        left: 100%;
+    }
+}
+
+/* Efecto de typing con cursor */
+.typing-cursor {
+    display: inline-block;
+    width: 4px;
+    height: 1.2em;
+    background: #ffffff;
+    margin-left: 8px;
+    border-radius: 2px;
+    animation: cursor-blink 1.2s infinite;
+    align-self: flex-end;
+    margin-bottom: 0.2em;
+}
+
+@keyframes cursor-blink {
+    0%, 50% { opacity: 1; }
+    51%, 100% { opacity: 0; }
+}
+
+/* Efecto de escala para énfasis */
+.text-scale {
+    animation: textScale 0.5s ease-in-out;
+}
+
+@keyframes textScale {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); }
+}
+
+/* Responsive para el texto animado */
+@media (max-width: 768px) {
+    .animated-text {
+        font-size: 2.5rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .animated-text {
+        font-size: 2rem;
+    }
+}
+
+/* ==================================
+   EFECTOS AVANZADOS INSPIRADOS EN CODEPEN
+   ================================== */
+
+/* Efecto Glow/Neon Hover para botones principales */
+.btn-glow {
+    position: relative;
+    background: linear-gradient(45deg, var(--primary-green), var(--secondary-green));
+    border: none;
+    border-radius: 50px;
+    padding: 15px 35px;
+    color: #ffffff;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    cursor: pointer;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    box-shadow: 0 0 20px rgba(3, 133, 84, 0.3);
+}
+
+.btn-glow::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+    transition: left 0.5s;
+}
+
+.btn-glow:hover::before {
+    left: 100%;
+}
+
+.btn-glow:hover {
+    box-shadow: 
+        0 0 5px var(--secondary-green),
+        0 0 25px var(--secondary-green),
+        0 0 50px var(--secondary-green),
+        0 0 100px var(--secondary-green);
+    transform: translateY(-3px);
+}
+
+/* Efecto Rainbow Border Hover */
+.btn-rainbow {
+    position: relative;
+    background: #1a1a1a;
+    color: #ffffff;
+    border: none;
+    border-radius: 15px;
+    padding: 15px 30px;
+    font-weight: 600;
+    cursor: pointer;
+    overflow: hidden;
+}
+
+.btn-rainbow::before {
+    content: '';
+    position: absolute;
+    top: -2px;
+    left: -2px;
+    right: -2px;
+    bottom: -2px;
+    background: linear-gradient(45deg, 
+        #ff0000, #ff7700, #ffdd00, #00ff00, 
+        #0099ff, #6600ff, #ff0099, #ff0000);
+    border-radius: 15px;
+    z-index: -1;
+    animation: rainbow-border 3s linear infinite;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.btn-rainbow:hover::before {
+    opacity: 1;
+}
+
+@keyframes rainbow-border {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Efecto Wave/Ripple en cards */
+.card-ripple {
+    position: relative;
+    overflow: hidden;
+    cursor: pointer;
+}
+
+.card-ripple::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    background: radial-gradient(circle, rgba(3, 187, 133, 0.3) 0%, transparent 70%);
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    transition: width 0.6s ease, height 0.6s ease;
+}
+
+.card-ripple:hover::before {
+    width: 300px;
+    height: 300px;
+}
+
+/* Efecto Floating/Levitación */
+.floating {
+    animation: floating 3s ease-in-out infinite;
+}
+
+@keyframes floating {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-10px); }
+}
+
+/* Efecto Pulse para iconos importantes */
+.pulse-glow {
+    animation: pulse-glow 2s ease-in-out infinite alternate;
+}
+
+@keyframes pulse-glow {
+    from {
+        filter: drop-shadow(0 0 5px var(--secondary-green));
+    }
+    to {
+        filter: drop-shadow(0 0 20px var(--secondary-green)) drop-shadow(0 0 35px var(--secondary-green));
+    }
+}
+
+/* Efecto Text Glow */
+.text-glow {
+    color: var(--secondary-green);
+    text-shadow: 
+        0 0 5px var(--secondary-green),
+        0 0 10px var(--secondary-green),
+        0 0 15px var(--secondary-green);
+    animation: text-flicker 2s ease-in-out infinite alternate;
+}
+
+@keyframes text-flicker {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.8; }
+}
+
+/* Efecto Morphing Button */
+.btn-morph {
+    background: linear-gradient(45deg, var(--primary-green), var(--secondary-green));
+    border: none;
+    border-radius: 30px;
+    padding: 12px 30px;
+    color: #ffffff;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    position: relative;
+    overflow: hidden;
+}
+
+.btn-morph:hover {
+    border-radius: 10px;
+    transform: scale(1.1);
+    background: linear-gradient(45deg, var(--secondary-green), #17a2b8);
+}
+
+/* Efecto Liquid/Blob */
+.blob-effect {
+    background: linear-gradient(45deg, var(--primary-green), var(--secondary-green));
+    border-radius: 30% 70% 70% 30% / 30% 30% 70% 70%;
+    animation: blob 8s ease-in-out infinite;
+    transition: all 0.3s ease;
+}
+
+.blob-effect:hover {
+    animation-play-state: paused;
+    transform: scale(1.1);
+}
+
+@keyframes blob {
+    0%, 100% {
+        border-radius: 30% 70% 70% 30% / 30% 30% 70% 70%;
+    }
+    25% {
+        border-radius: 58% 42% 75% 25% / 76% 46% 54% 24%;
+    }
+    50% {
+        border-radius: 50% 50% 33% 67% / 55% 27% 73% 45%;
+    }
+    75% {
+        border-radius: 33% 67% 58% 42% / 63% 68% 32% 37%;
+    }
+}
+
+/* Scroll to Top Button */
+.scroll-to-top {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    width: 60px;
+    height: 60px;
+    background: linear-gradient(45deg, var(--primary-green), var(--secondary-green)) !important;
+    border: none;
+    border-radius: 50%;
+    color: #ffffff !important;
+    font-size: 1.5rem;
+    cursor: pointer;
+    box-shadow: 0 4px 15px rgba(3, 133, 84, 0.3);
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(100px);
+    transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    z-index: 1000;
+    border: 2px solid rgba(255, 255, 255, 0.2);
+}
+
+/* Asegurar visibilidad del scroll to top button */
+.scroll-to-top {
+    /* Forzar display y posición */
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    
+    /* Asegurar que esté por encima de todo */
+    position: fixed !important;
+    z-index: 9999 !important;
+      /* Prevenir interferencias */
+    outline: none !important;
+    -webkit-user-select: none !important;
+    -moz-user-select: none !important;
+    user-select: none !important;
+    
+    /* Cursor pointer siempre visible */
+    cursor: pointer !important;
+    
+    /* Transiciones suaves */
+    will-change: transform, opacity !important;
+}
+
+/* Estado oculto inicial */
+.scroll-to-top:not(.show) {
+    opacity: 0 !important;
+    visibility: hidden !important;
+    transform: translateY(100px) scale(0.8) !important;
+    pointer-events: none !important;
+}
+
+/* Estado visible */
+.scroll-to-top.show {
+    opacity: 1 !important;
+    visibility: visible !important;
+    transform: translateY(0) scale(1) !important;
+    pointer-events: auto !important;
+}
+
+/* Debug: Fondo temporal para verificar posición */
+.scroll-to-top.debug {
+    background: red !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+    transform: translateY(0) !important;
+}
+
+/* ==================================
+   ASEGURAR QUE NO HAYA INTERFERENCIAS
+   ================================== */
+
+/* Asegurar que las secciones no se desborden */
+.hero-container,
+.stats-section,
+section {
+    max-width: 100vw;
+    overflow-x: hidden;
+}
+
+/* Arreglar el fondo blanco en scroll horizontal */
+body::after {
+    content: '';
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: 100px;
+    height: 100vh;
+    background: linear-gradient(135deg, var(--primary-green), var(--secondary-green));
+    z-index: -1;
+    pointer-events: none;
+}
+
+/* Asegurar que el contenido no se desborde */
+.row {
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+}
+
+.col-lg-6, .col-md-4, .col-md-6, .col-lg-4 {
+    padding-left: 15px;
+    padding-right: 15px;
+}
+
+/* Efecto mejorado para botones existentes */
+.btn-eco.btn-animated {
+    overflow: hidden;
+    position: relative;
+}
+
+.btn-eco.btn-animated::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+    transition: left 0.6s ease;
+}
+
+.btn-eco.btn-animated:hover::after {
+    left: 100%;
+}
+
+/* Responsive para los nuevos botones */
+@media (max-width: 768px) {
+    .btn-fill-bottom,
+    .btn-fill-left,
+    .btn-split-center,
+    .btn-diagonal {
+        padding: 12px 25px;
+        font-size: 0.9rem;
+    }
+    
+    .scroll-to-top {
+        width: 50px;
+        height: 50px;
+        font-size: 1.2rem;
+        bottom: 20px;
+        right: 20px;
+    }
+}
+
+/* Efectos Glow mejorados para todos los botones */
+.btn-fill-bottom:hover,
+.btn-fill-left:hover,
+.btn-split-center:hover,
+.btn-diagonal:hover {
+    box-shadow: 
+        0 10px 30px rgba(3, 133, 84, 0.4),
+        0 0 20px rgba(3, 187, 133, 0.6),
+        0 0 40px rgba(3, 187, 133, 0.3),
+        0 0 0 10px rgba(3, 187, 133, 0.1),
+        inset 0 0 20px rgba(255, 255, 255, 0.1);
+    text-shadow: 0 0 10px rgba(255, 255, 255, 0.8);
+    animation: buttonGlow 1.5s ease-in-out infinite alternate;
+}
+
+@keyframes buttonGlow {
+    0% {
+        filter: brightness(1) saturate(1);
+    }
+    100% {
+        filter: brightness(1.1) saturate(1.2);
+    }
+}
+
+/* Efecto de ondas adicional en hover */
+.btn-fill-bottom:hover::after,
+.btn-fill-left:hover::after,
+.btn-split-center:hover::after,
+.btn-diagonal:hover::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(circle at center, transparent 30%, rgba(255, 255, 255, 0.1) 70%);
+    border-radius: 50px;
+    animation: waveEffect 1s ease-out;
+    pointer-events: none;
+}
+
+@keyframes waveEffect {
+    0% {
+        transform: scale(0);
+        opacity: 1;
+    }
+    100% {
+        transform: scale(1.2);
+        opacity: 0;
+    }
+}
+
+/* Mejoras para el estado activo */
+.btn-fill-bottom:active,
+.btn-fill-left:active,
+.btn-split-center:active,
+.btn-diagonal:active {
+    transform: translateY(-1px) scale(0.98);
+    transition: all 0.1s ease;
+}
+
+/* Efectos para iconos dentro de los botones */
+.btn-fill-bottom i,
+.btn-fill-left i,
+.btn-split-center i,
+.btn-diagonal i {
+    transition: all 0.3s ease;
+    position: relative;
+    z-index: 2;
+}
+
+.btn-fill-bottom:hover i,
+.btn-fill-left:hover i,
+.btn-split-center:hover i,
+.btn-diagonal:hover i {
+    transform: scale(1.1) rotate(5deg);
+    filter: drop-shadow(0 0 5px rgba(255, 255, 255, 0.6));
+}
+
+/* Efecto de carga/loading para botones */
+.btn-loading {
+    position: relative;
+    pointer-events: none;
+}
+
+.btn-loading::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 20px;
+    height: 20px;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-top: 2px solid #ffffff;
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    animation: spin 1s linear infinite;
+}
+
+.btn-loading span {
+    opacity: 0;
+}
+
+@keyframes spin {
+    0% { transform: translate(-50%, -50%) rotate(0deg); }
+    100% { transform: translate(-50%, -50%) rotate(360deg); }
+}
+
+/* Mejoras adicionales para el footer */
+.footer-main {
+    position: relative;
+    z-index: 2;
+}
+
+.footer-section h5 {
+    position: relative;
+    margin-bottom: 1.5rem;
+}
+
+.footer-section h5::after {
+    content: '';
+    position: absolute;
+    bottom: -5px;
+    left: 0;
+    width: 40px;
+    height: 2px;
+    background: linear-gradient(90deg, rgba(255, 255, 255, 0.8), transparent);
+    border-radius: 2px;
+}
+
+.footer-links li {
+    margin-bottom: 8px;
+    transition: all 0.3s ease;
+}
+
+.footer-links li:hover {
+    transform: translateX(5px);
+}
+
+.footer-links a {
+    color: rgba(255, 255, 255, 0.8);
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.footer-links a:hover {
+    color: #ffffff;
+    text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+}
+
+.footer-links a::before {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    width: 0;
+    height: 1px;
+    background: rgba(255, 255, 255, 0.6);
+    transition: width 0.3s ease;
+}
+
+.footer-links a:hover::before {
+    width: 100%;
+}
+
+.eco-feature {
+    margin-bottom: 10px;
+    transition: all 0.3s ease;
+}
+
+.eco-feature:hover {
+    transform: translateX(5px);
+}
+
+.eco-feature i {
+    margin-right: 10px;
+    transition: all 0.3s ease;
+}
+
+.eco-feature:hover i {
+    transform: scale(1.2);
+    filter: brightness(1.3);
+}
+
+/* Efectos adicionales para el scroll to top */
+.scroll-to-top:focus {
+    outline: none;
+    box-shadow: 
+        0 15px 40px rgba(3, 133, 84, 0.5),
+        0 0 0 3px rgba(255, 255, 255, 0.3),
+        0 0 60px rgba(3, 187, 133, 0.8);
+}
+
+@keyframes rotate {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}

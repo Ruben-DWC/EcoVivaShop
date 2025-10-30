@@ -1,0 +1,1214 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <!-- Meta tags básicos -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>EcoVivaShop | Inicio</title>
+    
+    <!-- Favicons -->
+    <link rel="apple-touch-icon" sizes="180x180" href="/img/apple-touch-icon.png">
+    <link rel="icon" type="image/png" href="/img/apple-touch-icon.png">
+    <link rel="shortcut icon" href="/img/favicon.ico">
+    <link rel="icon" type="image/x-icon" href="/img/favicon.ico">
+    <link rel="icon" type="image/png" sizes="16x16" href="/img/favicon-16x16.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/img/favicon-32x32.png">
+    <link rel="icon" sizes="192x192" href="/img/android-chrome-192x192.png">
+    <link rel="icon" sizes="512x512" href="/img/android-chrome-512x512.png">
+    <link rel="manifest" href="/img/site.webmanifest">
+    
+    <!-- CSS externos -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <link rel="stylesheet" href="/css/ecovivashop-theme.css">
+    <style>
+        /* FIX DEFINITIVO: Permitir scroll vertical completo */
+        html {
+            overflow-x: hidden !important;
+            overflow-y: auto !important;
+            height: auto !important; /* SOBRESCRIBIR height: 100% del styles.css */
+            min-height: 100vh !important;
+            max-height: none !important;
+            scroll-behavior: smooth !important;
+        }
+        
+        body {
+            overflow-x: hidden !important;
+            overflow-y: visible !important;
+            height: auto !important; /* SOBRESCRIBIR height: 100% del styles.css */
+            min-height: 100vh !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            position: relative !important;
+            display: block !important; /* Cambiar de flex a block para permitir scroll normal */
+        }
+        
+        /* Asegurar que el main y containers permitan contenido completo */
+        main {
+            height: auto !important;
+            min-height: 100vh !important;
+            max-height: none !important;
+            overflow: visible !important;
+            width: 100% !important;
+            flex: 1 !important; /* Para que el main ocupe el espacio disponible */
+        }
+        
+        .container, .container-fluid {
+            height: auto !important;
+            min-height: 0 !important;
+            max-height: none !important;
+            overflow: visible !important;
+        }
+        
+        :root {
+            --primary-green: var(--eco-primary);
+            --secondary-green: var(--eco-primary-light);
+            --accent-green: var(--eco-primary-dark);
+            --light-green: var(--eco-primary-alpha);
+        }
+
+        /* Hero Section con Animaciones */
+        .hero-container {
+            background: var(--eco-gradient-primary);
+            min-height: 100vh; /* Altura mínima, no máxima */
+            height: auto; /* Permitir altura automática */
+            position: relative;
+            overflow: visible !important; /* PERMITIR que el contenido se muestre */
+            display: flex;
+            align-items: center;
+        }
+
+        .hero-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="20" cy="20" r="2" fill="rgba(255,255,255,0.1)"/><circle cx="80" cy="40" r="1" fill="rgba(255,255,255,0.1)"/><circle cx="40" cy="80" r="1.5" fill="rgba(255,255,255,0.1)"/><circle cx="90" cy="20" r="1" fill="rgba(255,255,255,0.1)"/><circle cx="30" cy="50" r="2" fill="rgba(255,255,255,0.1)"/></svg>');
+            animation: float 20s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 2;
+        }
+
+        .hero-title {
+            font-size: 4rem;
+            font-weight: 900;
+            color: #ffffff !important; /* Texto blanco sólido */
+            text-shadow: 3px 3px 6px rgba(0,0,0,0.7) !important; /* Sombra más fuerte */
+            background: none !important; /* Quitar gradiente transparente */
+            -webkit-background-clip: unset !important;
+            -webkit-text-fill-color: unset !important;
+            background-clip: unset !important;
+        }
+
+        .hero-subtitle {
+            font-size: 1.5rem;
+            color: #ffffff !important;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.6);
+            font-weight: 600;
+        }
+
+        /* Botones Avanzados */
+        .btn-eco {
+            position: relative;
+            padding: 15px 40px;
+            font-size: 1.2rem;
+            font-weight: 700;
+            border: none;
+            border-radius: 50px;
+            background: linear-gradient(45deg, #ffffff, #f8fff8);
+            color: var(--primary-green);
+            text-decoration: none;
+            display: inline-block;
+            transition: all 0.3s ease;
+            overflow: hidden;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+        }
+
+        .btn-eco::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(45deg, var(--primary-green), var(--secondary-green));
+            transition: left 0.5s ease;
+            z-index: -1;
+        }
+
+        .btn-eco:hover {
+            color: #ffffff !important;
+            transform: translateY(-3px);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.3);
+        }
+
+        .btn-eco:hover::before {
+            left: 0;
+        }
+
+        .btn-eco-outline {
+            background: transparent;
+            color: #ffffff;
+            border: 3px solid #ffffff;
+        }
+
+        .btn-eco-outline::before {
+            background: #ffffff;
+        }
+
+        .btn-eco-outline:hover {
+            color: var(--primary-green) !important;
+        }
+
+        /* Sección de Características con Efectos */
+        .feature-card {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 2rem;
+            height: 100%;
+            transition: all 0.5s ease;
+            border: 2px solid transparent;
+            backdrop-filter: blur(10px);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .feature-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, var(--light-green), rgba(3, 187, 133, 0.05));
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-10px) scale(1.02);
+            border-color: var(--secondary-green);
+            box-shadow: 0 20px 40px rgba(3, 133, 84, 0.2);
+        }
+
+        .feature-card:hover::before {
+            opacity: 1;
+        }
+
+        .feature-icon {
+            width: 100px;
+            height: 100px;
+            background: linear-gradient(45deg, var(--primary-green), var(--secondary-green));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1.5rem;
+            position: relative;
+            z-index: 2;
+            transition: all 0.3s ease;
+        }
+
+        .feature-card:hover .feature-icon {
+            transform: rotate(360deg) scale(1.1);
+        }
+
+        .feature-icon i {
+            font-size: 3rem;
+            color: #ffffff;
+        }
+
+        /* Sección de Estadísticas */
+        .stats-section {
+            background: linear-gradient(135deg, var(--primary-green) 0%, var(--secondary-green) 100%);
+            color: #ffffff;
+            position: relative;
+        }
+
+        /* MEJORAS DE CONTRASTE PARA MEJOR LEGIBILIDAD */
+        .stats-number {
+            font-size: 3rem;
+            font-weight: 900;
+            display: block;
+            color: #ffffff !important; /* Texto blanco para mejor contraste */
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5); /* Sombra para mejor legibilidad */
+        }
+
+        .stats-label {
+            font-size: 1.2rem;
+            opacity: 1;
+            color: #ffffff !important; /* Texto blanco para mejor contraste */
+            font-weight: 600;
+            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.4); /* Sombra para mejor legibilidad */
+        }
+
+        /* MEJORAS DE CONTRASTE PARA BOTONES */
+        .btn-fill-bottom, .btn-fill-left {
+            background: #ffffff !important;
+            color: var(--primary-green) !important;
+            border: 3px solid #ffffff !important;
+            font-weight: 900 !important;
+            text-shadow: none !important;
+            font-size: 1.1rem !important;
+            padding: 15px 30px !important;
+            border-radius: 50px !important;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3) !important;
+        }
+        
+        .btn-fill-bottom:hover, .btn-fill-left:hover {
+            background: var(--primary-green) !important;
+            color: #ffffff !important;
+            border-color: #ffffff !important;
+            transform: translateY(-3px) !important;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.4) !important;
+        }
+
+        /* MEJORAS PARA TEXTO DEL HERO */
+        .text-glow {
+            color: #ffffff !important;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.8) !important;
+            font-weight: 700 !important;
+        }
+
+        /* MEJORAS PARA TEXTO ANIMADO */
+        .text-brand, .text-future, .text-eco, .text-sustainable {
+            color: #ffffff !important;
+            text-shadow: 3px 3px 6px rgba(0,0,0,0.8) !important;
+            font-weight: 900 !important;
+            background: none !important;
+            -webkit-background-clip: unset !important;
+            -webkit-text-fill-color: unset !important;
+            background-clip: unset !important;
+        }
+
+        /* Parallax Wave Effect */
+        .wave {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            overflow: hidden;
+            line-height: 0;
+        }
+
+        .wave svg {
+            position: relative;
+            display: block;
+            width: calc(100% + 1.3px);
+            height: 100px;
+        }
+
+        .wave .shape-fill {
+            fill: #ffffff;
+        }
+
+        /* Animaciones personalizadas */
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        .pulse-animation {
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        /* Efectos de scroll */
+        .scroll-indicator {
+            position: absolute;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: #ffffff;
+            font-size: 2rem;
+            animation: bounce 2s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% { transform: translate(-50%, 0); }
+            40% { transform: translate(-50%, -10px); }
+            60% { transform: translate(-50%, -5px); }
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .hero-title {
+                font-size: 2.5rem;
+            }
+            .hero-subtitle {
+                font-size: 1.2rem;
+            }
+            .btn-eco {
+                padding: 12px 30px;
+                font-size: 1rem;
+            }
+        }
+    </style>
+</head>
+<body class="eco-bg">
+    <!-- Navbar público para landing page -->
+    <nav class="navbar navbar-expand-lg shadow-lg sticky-top eco-navbar-modern">
+        <div class="container">
+            <a class="navbar-brand fw-bold d-flex align-items-center eco-brand-modern" th:href="@{/}">
+                <i class="bi bi-tree-fill me-2 fs-3"></i>
+                <span>EcoVivaShop</span>
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" 
+                    aria-controls="navbarNav" aria-expanded="false" aria-label="Alternar navegación">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
+                <ul class="navbar-nav">
+                    <li class="nav-item">
+                        <a class="nav-link" th:href="@{/}">Inicio</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" th:href="@{/auth/registro}">Regístrate</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" th:href="@{/auth/login}">Iniciar Sesión</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main>
+        <!-- Hero Section Mejorado -->
+        <section class="hero-container">
+            <div class="container">
+                <div class="row align-items-center">                    <div class="col-lg-6 hero-content" data-aos="fade-right" data-aos-duration="1000">                        <div class="animated-text-container">
+                            <h1 class="animated-text text-brand mb-4" id="heroTitle">EcoVivaShop</h1>
+                            <span class="typing-cursor" id="cursor"></span>
+                            <!-- Partículas alrededor del texto -->
+                            <div class="text-particles">
+                                <div class="text-particle"></div>
+                                <div class="text-particle"></div>
+                                <div class="text-particle"></div>
+                                <div class="text-particle"></div>
+                                <div class="text-particle"></div>
+                            </div>
+                        </div>
+                        <p class="hero-subtitle mb-5">
+                            🌱 Transforma tu estilo de vida con productos sostenibles. 
+                            Únete a la revolución verde y marca la diferencia.
+                        </p>                        <div class="d-flex gap-3 flex-wrap">
+                            <a href="/auth/registro" class="btn-fill-bottom btn-animated" data-aos="zoom-in" data-aos-delay="200">
+                                <i class="bi bi-rocket-takeoff me-2"></i>Comenzar Ahora
+                            </a>
+                            <a href="/auth/login" class="btn-fill-left btn-magnetic" data-aos="zoom-in" data-aos-delay="400">
+                                <i class="bi bi-box-arrow-in-right me-2"></i>Iniciar Sesión
+                            </a>
+                        </div>
+                    </div><div class="col-lg-6 text-center" data-aos="fade-left" data-aos-duration="1000" data-aos-delay="300">
+                        <div class="floating blob-effect d-inline-block p-5">
+                            <i class="bi bi-globe-americas display-1 text-white mb-3 pulse-glow" style="font-size: clamp(3rem, 8vw, 10rem);"></i>
+                        </div>
+                        <p class="text-white fs-4 fw-light text-glow">
+                            <i class="bi bi-leaf me-2"></i>Cuida el planeta mientras compras
+                        </p>
+                        <!-- Partículas flotantes -->
+                        <div class="particles">
+                            <div class="particle"></div>
+                            <div class="particle"></div>
+                            <div class="particle"></div>
+                            <div class="particle"></div>
+                            <div class="particle"></div>
+                            <div class="particle"></div>
+                            <div class="particle"></div>
+                            <div class="particle"></div>
+                            <div class="particle"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="scroll-indicator">
+                <i class="bi bi-chevron-down"></i>
+            </div>
+            <div class="wave">
+                <svg data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 120" preserveAspectRatio="none" width="100%">
+                    <path d="M985.66,92.83C906.67,72,823.78,31,743.84,14.19c-82.26-17.34-168.06-16.33-250.45.39-57.84,11.73-114,31.07-172,41.86A600.21,600.21,0,0,1,0,27.35V120H1200V95.8C1132.19,118.92,1055.71,111.31,985.66,92.83Z" class="shape-fill"></path>
+                </svg>
+            </div>
+        </section>
+        
+        <!-- Estadísticas Section -->
+        <section class="stats-section py-5 position-relative">
+            <div class="container">
+                <div class="row text-center">
+                    <div class="col-md-3 mb-4" data-aos="fade-up" data-aos-delay="100">
+                        <span class="stats-number" data-count="500">0</span>
+                        <div class="stats-label">Productos Eco</div>
+                    </div>
+                    <div class="col-md-3 mb-4" data-aos="fade-up" data-aos-delay="200">
+                        <span class="stats-number" data-count="1200">0</span>
+                        <div class="stats-label">Clientes Felices</div>
+                    </div>
+                    <div class="col-md-3 mb-4" data-aos="fade-up" data-aos-delay="300">
+                        <span class="stats-number" data-count="50">0</span>
+                        <div class="stats-label">Ciudades</div>
+                    </div>
+                    <div class="col-md-3 mb-4" data-aos="fade-up" data-aos-delay="400">
+                        <span class="stats-number" data-count="95">0</span>
+                        <div class="stats-label">% Satisfacción</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Features Section Mejorado -->
+        <section class="py-5">
+            <div class="container">
+                <div class="text-center mb-5" data-aos="fade-up">
+                    <h2 class="fw-bold mb-4" style="color: var(--primary-green); font-size: 3rem;">
+                        ¿Por qué EcoVivaShop?
+                    </h2>
+                    <p class="lead" style="color: var(--accent-green); font-size: 1.3rem;">
+                        Descubre las ventajas de elegir un estilo de vida sostenible
+                    </p>
+                </div>
+                
+                <div class="row g-5">                    <div class="col-lg-4" data-aos="flip-left" data-aos-delay="100">
+                        <div class="feature-card text-center card-ripple wave-animation">
+                            <div class="feature-icon floating">
+                                <i class="bi bi-bag-check-fill"></i>
+                            </div>
+                            <h5 class="fw-bold mb-3" style="color: var(--primary-green);">Productos Certificados</h5>
+                            <p style="color: var(--accent-green);">
+                                Cada producto está verificado por estándares ecológicos internacionales. 
+                                Calidad garantizada y compromiso ambiental.
+                            </p>
+                            <div class="mt-3">
+                                <span class="badge gradient-border" style="background: var(--secondary-green);">100% Eco</span>
+                                <span class="badge" style="background: var(--primary-green);">Certificado</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-lg-4" data-aos="flip-left" data-aos-delay="300">
+                        <div class="feature-card text-center card-ripple wave-animation">
+                            <div class="feature-icon floating" style="animation-delay: 1s;">
+                                <i class="bi bi-people-fill"></i>
+                            </div>
+                            <h5 class="fw-bold mb-3" style="color: var(--primary-green);">Comunidad Verde</h5>
+                            <p style="color: var(--accent-green);">
+                                Conecta con miles de personas que comparten tu pasión por el medio ambiente. 
+                                Aprende, comparte y crece juntos.
+                            </p>
+                            <div class="mt-3">
+                                <span class="badge" style="background: var(--secondary-green);">1200+ Miembros</span>
+                                <span class="badge gradient-border" style="background: var(--primary-green);">Activa 24/7</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-lg-4" data-aos="flip-left" data-aos-delay="500">
+                        <div class="feature-card text-center card-ripple wave-animation">
+                            <div class="feature-icon floating" style="animation-delay: 2s;">
+                                <i class="bi bi-award-fill"></i>
+                            </div>
+                            <h5 class="fw-bold mb-3" style="color: var(--primary-green);">Impacto Medible</h5>
+                            <p style="color: var(--accent-green);">
+                                Rastrea tu huella de carbono y ve el impacto positivo real de tus compras. 
+                                Cada compra cuenta para el planeta.
+                            </p>
+                            <div class="mt-3">
+                                <span class="badge" style="background: var(--secondary-green);">-30% CO2</span>
+                                <span class="badge gradient-border" style="background: var(--primary-green);">Verificado</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Call to Action Mejorado -->
+        <section class="py-5 position-relative" style="background: linear-gradient(135deg, var(--light-green), rgba(3, 187, 133, 0.1));">
+            <div class="container text-center">
+                <div data-aos="zoom-in" data-aos-duration="800">
+                    <h3 class="fw-bold mb-3" style="color: var(--primary-green); font-size: 2.5rem;">
+                        <i class="bi bi-lightning-charge-fill me-2"></i>¿Listo para el Cambio?
+                    </h3>
+                    <p class="mb-5 fs-5" style="color: var(--accent-green);">
+                        Únete a la revolución verde. Cada compra es un voto por el futuro del planeta.
+                    </p>                    <div class="d-flex gap-4 justify-content-center flex-wrap">
+                        <a href="/auth/registro" class="btn-split-center btn-animated" data-aos="slide-up" data-aos-delay="200" id="btnRegistro">
+                            <i class="bi bi-person-plus me-2"></i>Crear Cuenta
+                        </a>
+                        <a href="/auth/login" class="btn-diagonal btn-magnetic" data-aos="slide-up" data-aos-delay="400" id="btnLogin">
+                            <i class="bi bi-box-arrow-in-right me-2"></i>Ya Tengo Cuenta
+                        </a>
+                    </div>
+                </div>
+                
+                <!-- Features adicionales -->
+                <div class="row mt-5 g-4">
+                    <div class="col-md-4" data-aos="fade-up" data-aos-delay="600">
+                        <div class="text-center">
+                            <i class="bi bi-truck display-4 mb-3" style="color: var(--secondary-green);"></i>
+                            <h5 style="color: var(--primary-green);">Envío Gratis</h5>
+                            <p style="color: var(--accent-green);">En compras superiores a S/ 200</p>
+                        </div>
+                    </div>
+                    <div class="col-md-4" data-aos="fade-up" data-aos-delay="700">
+                        <div class="text-center">
+                            <i class="bi bi-shield-check display-4 mb-3" style="color: var(--secondary-green);"></i>
+                            <h5 style="color: var(--primary-green);">Garantía Verde</h5>
+                            <p style="color: var(--accent-green);">30 días de satisfacción</p>
+                        </div>
+                    </div>
+                    <div class="col-md-4" data-aos="fade-up" data-aos-delay="800">
+                        <div class="text-center">
+                            <i class="bi bi-headset display-4 mb-3" style="color: var(--secondary-green);"></i>
+                            <h5 style="color: var(--primary-green);">Soporte 24/7</h5>
+                            <p style="color: var(--accent-green);">Siempre aquí para ayudarte</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Debug info -->
+                <div class="mt-5 text-muted">
+                    <small>
+                        Enlaces directos: 
+                        <a href="/auth/registro" class="text-decoration-none">Registro</a> | 
+                        <a href="/auth/login" class="text-decoration-none">Login</a> |
+                        <a href="/client/home" class="text-decoration-none">Cliente</a> |
+                        <a href="/admin/portal_administrador" class="text-decoration-none">Admin</a>
+                    </small>
+                </div>
+            </div>
+        </section>    </main>    <!-- Scroll to Top Button Mejorado -->
+    <button class="scroll-to-top" id="scrollToTop" title="Volver arriba" aria-label="Volver al inicio de la página">
+        <i class="bi bi-arrow-up" aria-hidden="true"></i>
+    </button>
+
+    <!-- Footer -->
+    <div th:replace="~{fragments/footer :: footer}"></div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // FIX INMEDIATO PARA SCROLL - EJECUTAR ANTES QUE CUALQUIER OTRA COSA
+        (function forceScrollFix() {
+            console.log('🔧 Aplicando fix de scroll...');
+            
+            // Remover cualquier CSS que limite la altura
+            const style = document.createElement('style');
+            style.textContent = `
+                html, body {
+                    height: auto !important;
+                    max-height: none !important;
+                    overflow-y: auto !important;
+                    overflow-x: hidden !important;
+                }
+                .hero-container {
+                    overflow: visible !important;
+                    max-height: none !important;
+                }
+            `;
+            document.head.appendChild(style);
+            
+            // Forzar recalculo del layout
+            setTimeout(() => {
+                document.body.style.height = 'auto';
+                document.documentElement.style.height = 'auto';
+                console.log('✅ Fix de scroll aplicado correctamente');
+            }, 100);
+        })();
+    </script>
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>    <script>
+        // Inicializar AOS
+        AOS.init({
+            duration: 1000,
+            once: true,
+            offset: 100
+        });
+
+        // ===== FIX CRÍTICO: FORZAR SCROLL VERTICAL =====
+        (function() {
+            'use strict';
+            
+            console.log('🚨 APLICANDO FIX CRÍTICO DE SCROLL...');
+            
+            // Elementos críticos
+            const html = document.documentElement;
+            const body = document.body;
+            
+            // Forzar estilos que permitan scroll
+            function forceScrollStyles() {
+                [html, body].forEach(el => {
+                    el.style.setProperty('overflow-x', 'hidden', 'important');
+                    el.style.setProperty('overflow-y', 'auto', 'important');
+                    el.style.setProperty('height', 'auto', 'important');
+                    el.style.setProperty('min-height', '100vh', 'important');
+                    el.style.setProperty('max-height', 'none', 'important');
+                    el.style.setProperty('position', 'relative', 'important');
+                });
+            }
+            
+            // Aplicar inmediatamente
+            forceScrollStyles();
+            
+            // Verificar después del DOM
+            setTimeout(() => {
+                // Containers problemáticos
+                const containers = document.querySelectorAll('main, .container, .container-fluid, .hero-container');
+                containers.forEach(el => {
+                    if (el) {
+                        el.style.setProperty('overflow', 'visible', 'important');
+                        el.style.setProperty('height', 'auto', 'important');
+                        el.style.setProperty('max-height', 'none', 'important');
+                    }
+                });
+                
+                // Verificar altura del documento
+                const docHeight = html.scrollHeight;
+                const winHeight = window.innerHeight;
+                
+                console.log('📏 Altura documento:', docHeight, 'Altura ventana:', winHeight);
+                
+                if (docHeight > winHeight) {
+                    console.log('✅ Scroll debería funcionar');
+                    
+                    // Test de scroll
+                    html.scrollTop = 100;
+                    setTimeout(() => html.scrollTop = 0, 200);
+                } else {
+                    console.warn('⚠️ Documento muy corto para scroll');
+                }
+            }, 300);
+            
+            // Re-aplicar en resize
+            window.addEventListener('resize', forceScrollStyles);
+        })();        // Scroll to Top Button Animation con color forzado y inicialización mejorada
+        const scrollToTopBtn = document.getElementById('scrollToTop');
+        
+        // Asegurar el color correcto del botón
+        function ensureButtonColor() {
+            if (scrollToTopBtn) {
+                scrollToTopBtn.style.background = 'linear-gradient(45deg, var(--primary-green), var(--secondary-green))';
+                scrollToTopBtn.style.color = '#ffffff';
+                scrollToTopBtn.style.border = '2px solid rgba(255, 255, 255, 0.2)';
+                const icon = scrollToTopBtn.querySelector('i');
+                if (icon) {
+                    icon.style.color = '#ffffff';
+                }
+            }
+        }
+        
+        // Función para manejar el scroll
+        function handleScroll() {
+            if (!scrollToTopBtn) return;
+            
+            if (window.pageYOffset > 300) {
+                scrollToTopBtn.classList.add('show');
+                ensureButtonColor(); // Asegurar color al mostrar
+            } else {
+                scrollToTopBtn.classList.remove('show');
+            }
+        }
+          // Inicializar el botón cuando el DOM esté listo
+        function initScrollToTop() {
+            if (!scrollToTopBtn) {
+                console.warn('Scroll to top button not found');
+                return;
+            }
+            
+            // Configuración inicial
+            ensureButtonColor();
+            
+            // Event listeners
+            window.addEventListener('scroll', handleScroll);
+            
+            // FIX: Asegurar que el click funcione correctamente
+            scrollToTopBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                
+                // Múltiples métodos para asegurar que funcione
+                document.documentElement.scrollTop = 0; // Para Chrome, Firefox, IE y Opera
+                document.body.scrollTop = 0; // Para Safari
+                
+                // Smooth scroll como backup
+                window.scrollTo({
+                    top: 0,
+                    left: 0,
+                    behavior: 'smooth'
+                });
+                
+                console.log('Scroll to top ejecutado');
+            });
+
+            // Asegurar color en hover
+            scrollToTopBtn.addEventListener('mouseenter', () => {
+                scrollToTopBtn.style.background = 'linear-gradient(45deg, var(--secondary-green), var(--primary-green))';
+                scrollToTopBtn.style.transform = 'translateY(-8px) scale(1.15)';
+            });
+
+            scrollToTopBtn.addEventListener('mouseleave', () => {
+                scrollToTopBtn.style.background = 'linear-gradient(45deg, var(--primary-green), var(--secondary-green))';
+                scrollToTopBtn.style.transform = scrollToTopBtn.classList.contains('show') ? 'translateY(0) scale(1)' : 'translateY(100px) scale(1)';
+            });
+            
+            // Focus para accesibilidad
+            scrollToTopBtn.addEventListener('focus', () => {
+                scrollToTopBtn.style.outline = '3px solid rgba(255, 255, 255, 0.3)';
+            });
+            
+            scrollToTopBtn.addEventListener('blur', () => {
+                scrollToTopBtn.style.outline = 'none';
+            });
+            
+            console.log('Scroll to top button initialized successfully');
+        }
+        
+        // Inicializar cuando el DOM esté completamente cargado
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initScrollToTop);
+        } else {
+            initScrollToTop();
+        }
+
+        // Contador animado para estadísticas
+        function animateCounter(element) {
+            const target = parseInt(element.getAttribute('data-count'));
+            const duration = 2000;
+            const step = target / (duration / 16);
+            let current = 0;
+            
+            const timer = setInterval(() => {
+                current += step;
+                if (current >= target) {
+                    current = target;
+                    clearInterval(timer);
+                }
+                element.textContent = Math.floor(current);
+            }, 16);
+        }
+
+        // Observador para activar contadores cuando sean visibles
+        const statsObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const counters = entry.target.querySelectorAll('[data-count]');
+                    counters.forEach(animateCounter);
+                    statsObserver.unobserve(entry.target);
+                }
+            });
+        });
+
+        // Observar la sección de estadísticas
+        document.addEventListener('DOMContentLoaded', () => {
+            const statsSection = document.querySelector('.stats-section');
+            if (statsSection) {
+                statsObserver.observe(statsSection);
+            }
+        });        // Efecto Magnetic mejorado para los nuevos botones
+        const magneticButtons = document.querySelectorAll('.btn-magnetic, .btn-fill-left, .btn-diagonal');
+        
+        magneticButtons.forEach(btn => {
+            btn.addEventListener('mousemove', (e) => {
+                const rect = btn.getBoundingClientRect();
+                const x = e.clientX - rect.left - rect.width / 2;
+                const y = e.clientY - rect.top - rect.height / 2;
+                
+                // Efecto magnético más suave
+                btn.style.transform = `translate(${x * 0.2}px, ${y * 0.2}px) scale(1.05)`;
+            });
+            
+            btn.addEventListener('mouseleave', () => {
+                btn.style.transform = 'translate(0px, 0px) scale(1)';
+                btn.style.transition = 'transform 0.3s ease';
+                
+                // Remover transition después para no interferir con el efecto magnético
+                setTimeout(() => {
+                    btn.style.transition = '';
+                }, 300);
+            });
+            
+            btn.addEventListener('mouseenter', () => {
+                btn.style.transition = '';
+            });
+        });
+
+        // Wave animation trigger on scroll
+        const waveElements = document.querySelectorAll('.wave-animation');
+        
+        const waveObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('animate');
+                    setTimeout(() => {
+                        entry.target.classList.remove('animate');
+                    }, 1000);
+                }
+            });
+        }, { threshold: 0.5 });
+
+        waveElements.forEach(element => {
+            waveObserver.observe(element);
+        });
+
+        // Ripple effect for cards
+        document.querySelectorAll('.card-ripple').forEach(card => {
+            card.addEventListener('click', function(e) {
+                // Create ripple effect
+                const ripple = document.createElement('div');
+                const rect = this.getBoundingClientRect();
+                const size = Math.max(rect.width, rect.height);
+                const x = e.clientX - rect.left - size / 2;
+                const y = e.clientY - rect.top - size / 2;
+                
+                ripple.style.width = ripple.style.height = size + 'px';
+                ripple.style.left = x + 'px';
+                ripple.style.top = y + 'px';
+                ripple.classList.add('ripple-effect');
+                
+                this.appendChild(ripple);
+                
+                setTimeout(() => {
+                    ripple.remove();
+                }, 600);
+            });
+        });
+
+        // Parallax effect for hero section
+        window.addEventListener('scroll', () => {
+            const scrolled = window.pageYOffset;
+            const parallaxElements = document.querySelectorAll('.particles');
+            
+            parallaxElements.forEach(element => {
+                const speed = 0.5;
+                element.style.transform = `translateY(${scrolled * speed}px)`;
+            });
+        });
+
+        // Typing effect for hero title
+        function typeWriter(element, text, speed = 100) {
+            let i = 0;
+            element.innerHTML = '';
+            
+            function type() {
+                if (i < text.length) {
+                    element.innerHTML += text.charAt(i);
+                    i++;
+                    setTimeout(type, speed);
+                }
+            }
+            type();
+        }        // Animated Text Effect - Cycling through different phrases
+        const textPhrases = [
+            { text: "EcoVivaShop", class: "text-brand", duration: 3000 },
+            { text: "Tu Tienda de Confianza", class: "text-trust", duration: 2500 },
+            { text: "Productos Ecológicos", class: "text-eco", duration: 2500 },
+            { text: "El Futuro Verde", class: "text-future", duration: 2500 },
+            { text: "Vida Sostenible", class: "text-green", duration: 2500 }
+        ];
+
+        let currentPhraseIndex = 0;
+        const heroTitle = document.getElementById('heroTitle');
+        const cursor = document.getElementById('cursor');
+
+        // Función para crear efecto de brillo
+        function addGlowEffect(element) {
+            element.classList.add('text-glow-active');
+            setTimeout(() => {
+                element.classList.remove('text-glow-active');
+            }, 1000);
+        }
+
+        // Función para animar las partículas
+        function animateTextParticles() {
+            const particles = document.querySelectorAll('.text-particle');
+            particles.forEach((particle, index) => {
+                setTimeout(() => {
+                    particle.style.animation = 'none';
+                    setTimeout(() => {
+                        particle.style.animation = 'float-around-text 4s ease-in-out infinite';
+                    }, 10);
+                }, index * 200);
+            });
+        }
+
+        function changeText() {
+            if (!heroTitle) return;
+            
+            // Agregar efecto de barrido y ondas
+            heroTitle.classList.add('text-wipe-effect', 'text-wave-bg');
+            
+            // Efecto de salida con fade
+            heroTitle.style.opacity = '0';
+            heroTitle.style.transform = 'translateX(-30px) scale(0.95)';
+            
+            setTimeout(() => {
+                // Cambiar el texto y la clase
+                const currentPhrase = textPhrases[currentPhraseIndex];
+                heroTitle.textContent = currentPhrase.text;
+                
+                // Remover todas las clases de color previas
+                heroTitle.classList.remove('text-brand', 'text-trust', 'text-eco', 'text-future', 'text-green');
+                
+                // Agregar la nueva clase de color
+                heroTitle.classList.add(currentPhrase.class);
+                
+                // Efecto de entrada
+                heroTitle.style.opacity = '1';
+                heroTitle.style.transform = 'translateX(0) scale(1)';
+                heroTitle.style.transition = 'all 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94)';
+                
+                // Agregar efectos visuales
+                addGlowEffect(heroTitle);
+                animateTextParticles();
+                
+                // Limpiar efectos después de la transición
+                setTimeout(() => {
+                    heroTitle.classList.remove('text-wipe-effect', 'text-wave-bg');
+                    heroTitle.style.transition = '';
+                }, 600);
+                
+                // Mover al siguiente índice
+                currentPhraseIndex = (currentPhraseIndex + 1) % textPhrases.length;
+                
+                // Programar el siguiente cambio
+                setTimeout(changeText, currentPhrase.duration);
+            }, 300);
+        }
+
+        // Typing effect mejorado con sonido visual
+        function typeWriter(element, text, speed = 100) {
+            let i = 0;
+            element.innerHTML = '';
+            cursor.style.opacity = '1';
+            
+            function type() {
+                if (i < text.length) {
+                    element.innerHTML += text.charAt(i);
+                    
+                    // Efecto de escala sutil en cada letra
+                    element.style.transform = 'scale(1.01)';
+                    setTimeout(() => {
+                        element.style.transform = 'scale(1)';
+                    }, 50);
+                    
+                    i++;
+                    setTimeout(type, speed);
+                } else {
+                    // Ocultar cursor después del typing inicial
+                    setTimeout(() => {
+                        cursor.style.opacity = '0';
+                    }, 1000);
+                    
+                    // Iniciar el ciclo de cambio de texto después del typing inicial
+                    setTimeout(() => {
+                        changeText();
+                    }, 2000);
+                }
+            }
+            type();
+        }
+
+        // Initialize animated text effect
+        window.addEventListener('load', () => {
+            const heroTitle = document.getElementById('heroTitle');
+            if (heroTitle) {
+                // Configurar transiciones CSS
+                heroTitle.style.transition = 'transform 0.1s ease, opacity 0.3s ease';
+                
+                // Iniciar con efecto de typing para el primer texto
+                const firstPhrase = textPhrases[0];
+                typeWriter(heroTitle, firstPhrase.text, 120);
+                
+                // Mover al siguiente índice después del typing inicial
+                currentPhraseIndex = 1;
+            }
+        });
+
+        // Auto scroll suave al hacer click en el indicador
+        document.querySelector('.scroll-indicator')?.addEventListener('click', () => {
+            document.querySelector('.stats-section').scrollIntoView({
+                behavior: 'smooth'
+            });
+        });
+
+        // Enhanced button hover effects
+        document.querySelectorAll('.btn-glow, .btn-rainbow, .btn-morph').forEach(btn => {
+            btn.addEventListener('mouseenter', function() {
+                // Add extra glow effect
+                this.style.filter = 'brightness(1.2)';
+            });
+            
+            btn.addEventListener('mouseleave', function() {
+                this.style.filter = 'brightness(1)';
+            });
+        });
+
+        // Smooth scroll for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // Dynamic gradient background animation
+        let gradientAngle = 0;
+        setInterval(() => {
+            gradientAngle += 1;
+            const heroContainer = document.querySelector('.hero-container');
+            if (heroContainer) {
+                heroContainer.style.background = `linear-gradient(${gradientAngle}deg, var(--primary-green) 0%, var(--secondary-green) 50%, #17a2b8 100%)`;
+            }
+        }, 100);
+
+        // Eventos de tracking para debug
+        document.getElementById('btnRegistro')?.addEventListener('click', function(e) {
+            console.log('Clic en botón de registro desde CTA');
+            // Add analytics tracking here
+        });
+
+        document.getElementById('btnLogin')?.addEventListener('click', function(e) {
+            console.log('Clic en botón de login');
+            // Add analytics tracking here
+        });
+
+        // Performance optimization: Throttle scroll events
+        function throttle(func, limit) {
+            let inThrottle;
+            return function() {
+                const args = arguments;
+                const context = this;
+                if (!inThrottle) {
+                    func.apply(context, args);
+                    inThrottle = true;
+                    setTimeout(() => inThrottle = false, limit);
+                }
+            }
+        }
+
+        // Apply throttling to scroll events
+        window.addEventListener('scroll', throttle(() => {
+            // Scroll-based animations here
+        }, 16));
+
+        // Prevenir scroll horizontal y asegurar layout correcto
+        function preventHorizontalScroll() {
+            // Asegurar que no haya scroll horizontal, pero SÍ permitir scroll vertical
+            document.body.style.overflowX = 'hidden';
+            document.body.style.overflowY = 'auto'; // IMPORTANTE: Permitir scroll vertical
+            document.documentElement.style.overflowX = 'hidden';
+            document.documentElement.style.overflowY = 'auto'; // IMPORTANTE: Permitir scroll vertical
+            
+            // Asegurar altura mínima del body para permitir scroll
+            document.body.style.minHeight = '100vh';
+            document.documentElement.style.minHeight = '100vh';
+            
+            // Verificar elementos que se puedan salir del viewport (solo horizontal)
+            const allElements = document.querySelectorAll('*');
+            allElements.forEach(element => {
+                const rect = element.getBoundingClientRect();
+                if (rect.right > window.innerWidth) {
+                    console.warn('Elemento se sale del viewport:', element);
+                    element.style.maxWidth = '100%';
+                    // No aplicar overflow hidden a todos los elementos
+                }
+            });
+        }
+
+        // Inicializar al cargar la página
+        document.addEventListener('DOMContentLoaded', () => {
+            preventHorizontalScroll();
+            ensureButtonColor();
+            
+            // DEBUG: Forzar que el scroll funcione
+            console.log('🔧 Iniciando debug del scroll...');
+            
+            // Forzar altura mínima del body
+            document.body.style.minHeight = 'calc(100vh + 1000px)';
+            document.documentElement.style.minHeight = 'calc(100vh + 1000px)';
+            
+            // Verificar estilos que puedan estar bloqueando el scroll
+            const computedBodyStyles = window.getComputedStyle(document.body);
+            const computedHtmlStyles = window.getComputedStyle(document.documentElement);
+            
+            console.log('📊 Body overflow-y:', computedBodyStyles.overflowY);
+            console.log('📊 HTML overflow-y:', computedHtmlStyles.overflowY);
+            console.log('📊 Body height:', computedBodyStyles.height);
+            console.log('📊 Document height:', document.documentElement.scrollHeight);
+            console.log('📊 Window height:', window.innerHeight);
+            
+            // Forzar scroll vertical si está bloqueado
+            if (computedBodyStyles.overflowY === 'hidden' || computedHtmlStyles.overflowY === 'hidden') {
+                console.warn('⚠️ Scroll vertical bloqueado, corrigiendo...');
+                document.body.style.overflowY = 'auto !important';
+                document.documentElement.style.overflowY = 'auto !important';
+            }
+            
+            // Test de scroll manual
+            setTimeout(() => {
+                console.log('🧪 Probando scroll automático...');
+                window.scrollTo({ top: 100, behavior: 'smooth' });
+                
+                setTimeout(() => {
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                    console.log('✅ Test de scroll completado');
+                }, 1000);
+            }, 2000);
+        });
+
+        // Verificar en resize
+        window.addEventListener('resize', preventHorizontalScroll);
+
+        // Mejorar el efecto de los botones animados
+        document.querySelectorAll('.btn-animated').forEach(btn => {
+            btn.addEventListener('mouseenter', function() {
+                this.style.transform = 'translateY(-2px) scale(1.02)';
+            });
+            
+            btn.addEventListener('mouseleave', function() {
+                this.style.transform = 'translateY(0) scale(1)';
+            });
+        });
+
+        // Debug: Verificar que el botón funcione correctamente
+        console.log('Verificando scroll to top button...');
+        
+        // Mostrar información de debug
+        setTimeout(() => {
+            const btn = document.getElementById('scrollToTop');
+            if (btn) {
+                console.log('✅ Scroll to top button encontrado');
+                console.log('Posición:', btn.getBoundingClientRect());
+                console.log('Estilos computed:', window.getComputedStyle(btn));
+                
+                // Test temporal: hacer visible el botón por 3 segundos
+                btn.classList.add('show');
+                setTimeout(() => {
+                    if (window.pageYOffset < 300) {
+                        btn.classList.remove('show');
+                    }
+                }, 3000);
+            } else {
+                console.error('❌ Scroll to top button NO encontrado');
+            }
+        }, 1000);
+    </script>
+</body>
+</html>

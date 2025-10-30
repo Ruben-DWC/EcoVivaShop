@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Debug - Productos EcoVivaShop</title>
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            margin: 20px; 
+            line-height: 1.6;
+        }
+        .test-section { 
+            margin: 20px 0; 
+            padding: 15px; 
+            border: 1px solid #ddd; 
+            border-radius: 5px;
+        }
+        .success { background-color: #d4edda; }
+        .error { background-color: #f8d7da; }
+        .info { background-color: #d1ecf1; }
+        pre { background: #f8f9fa; padding: 10px; border-radius: 3px; }
+    </style>
+</head>
+<body>
+    <h1>Debug Test - Productos Admin EcoVivaShop</h1>
+    
+    <div class="test-section info">
+        <h2>Información del Sistema</h2>
+        <p><strong>Servidor:</strong> Spring Boot en puerto 8081</p>
+        <p><strong>URL Admin:</strong> <a href="http://localhost:8081/admin/productos" target="_blank" rel="noopener">http://localhost:8081/admin/productos</a></p>
+        <p><strong>Base de Datos:</strong> PostgreSQL</p>
+        <p><strong>Template:</strong> /admin/productos/gestion.html</p>
+    </div>
+
+    <div class="test-section">
+        <h2>Pruebas a Realizar</h2>
+        <ol>
+            <li><strong>Verificar acceso directo a página:</strong>
+                <br><a href="http://localhost:8081/admin/productos" target="_blank" rel="noopener">Abrir Gestión de Productos</a>
+            </li>
+            <li><strong>Verificar login si es necesario:</strong>
+                <br><a href="http://localhost:8081/login" target="_blank" rel="noopener">Página de Login</a>
+            </li>
+            <li><strong>Verificar endpoint API:</strong>
+                <br><a href="http://localhost:8081/api/productos" target="_blank" rel="noopener">API de Productos (si existe)</a>
+            </li>
+        </ol>
+    </div>
+
+    <div class="test-section">
+        <h2>Problemas Identificados y Soluciones</h2>
+        
+        <h3>❌ Problema: Solo se muestra 1 producto</h3>
+        <p><strong>Causa posible:</strong> Filtros de paginación o consulta limitada</p>
+        <p><strong>Solución:</strong> Verificar parámetros de paginación en el controlador</p>
+
+        <h3>❌ Problema: CSS en línea visible</h3>
+        <p><strong>Causa posible:</strong> Error en la renderización del template Thymeleaf</p>
+        <p><strong>Solución:</strong> Verificar sintaxis de Thymeleaf y referencias CSS</p>
+
+        <h3>✅ Soluciones Implementadas:</h3>
+        <ul>
+            <li>Template moderno completamente reescrito</li>
+            <li>Controlador con paginación adecuada</li>
+            <li>Servicio con métodos de búsqueda y filtrado</li>
+            <li>Diseño responsivo con Bootstrap 5</li>
+        </ul>
+    </div>
+
+    <div class="test-section">
+        <h2>Verificaciones Adicionales</h2>
+        
+        <h3>1. Verificar Productos en Base de Datos</h3>
+        <pre>
+SELECT p.id_producto, p.nombre, p.categoria, p.precio, 
+       i.stock, i.stock_maximo
+FROM tb_producto p 
+LEFT JOIN tb_inventario i ON p.id_producto = i.id_producto 
+ORDER BY p.id_producto;
+        </pre>
+
+        <h3>2. Verificar Configuración Thymeleaf</h3>
+        <p>Asegurar que templates se cargan desde <code>src/main/resources/templates/</code></p>
+
+        <h3>3. Verificar Logs del Servidor</h3>
+        <p>Buscar errores 500, problemas de templating o SQL</p>
+    </div>
+
+    <div class="test-section success">
+        <h2>Estado Actual del Sistema</h2>
+        <ul>
+            <li>✅ Servidor ejecutándose en puerto 8081</li>
+            <li>✅ Aplicación compilada sin errores</li>
+            <li>✅ Template gestion.html actualizado con diseño moderno</li>
+            <li>✅ Controlador ProductoController configurado con paginación</li>
+            <li>✅ Servicio ProductoService con métodos de búsqueda</li>
+            <li>⚠️ Necesita verificación visual en navegador</li>
+        </ul>
+    </div>
+
+    <div class="test-section">
+        <h2>Próximos Pasos de Debug</h2>
+        <ol>
+            <li>Abrir http://localhost:8081/admin/productos en el navegador</li>
+            <li>Verificar si se requiere autenticación (login)</li>
+            <li>Revisar consola de desarrollador (F12) para errores JavaScript/CSS</li>
+            <li>Verificar Network tab para ver si las peticiones HTTP son exitosas</li>
+            <li>Si persiste el problema, revisar logs del servidor</li>
+        </ol>
+    </div>
+
+    <script>
+        console.log("Debug Test Page loaded");
+        console.log("Testing EcoVivaShop admin productos page");
+    </script>
+</body>
+</html>

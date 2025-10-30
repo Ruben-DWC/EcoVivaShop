@@ -1,0 +1,569 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Catálogo Eco | EcoVivaShop</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        :root {
+            --eco-primary: #27AE60;
+            --eco-secondary: #2ECC71;
+            --eco-accent: #F39C12;
+            --eco-light: #E8F8F5;
+            --eco-dark: #1E8449;
+        }
+
+        body {
+            background: linear-gradient(135deg, #e8f5e8, #f0fdf4);
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        .header-section {
+            background: linear-gradient(135deg, var(--eco-primary), var(--eco-secondary));
+            color: white;
+            padding: 3rem 0;
+            margin-bottom: 2rem;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header-section::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 200%;
+            height: 200%;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="2" fill="rgba(255,255,255,0.1)"/></svg>') repeat;
+            animation: float 20s infinite linear;
+        }
+
+        @keyframes float {
+            0% { transform: translate(-50%, -50%) rotate(0deg); }
+            100% { transform: translate(-50%, -50%) rotate(360deg); }
+        }
+        
+        .filter-section {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+            margin-bottom: 2rem;
+            overflow: hidden;
+        }
+        
+        .product-image-container {
+            height: 200px;
+            border-radius: 8px 8px 0 0;
+        }
+        
+        .product-image {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .product-card {
+            transition: all 0.3s ease;
+            border: none;
+            box-shadow: 0 2px 15px rgba(0,0,0,0.1);
+            border-radius: 15px;
+            overflow: hidden;
+        }
+        
+        .product-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+        }
+
+        .stock-badge {
+            font-size: 0.7rem;
+            padding: 0.3rem 0.6rem;
+            border-radius: 20px;
+        }
+
+        .category-badge {
+            font-size: 0.7rem;
+            padding: 0.3rem 0.6rem;
+            border-radius: 20px;
+        }
+        
+        .btn-eco {
+            background: linear-gradient(135deg, var(--eco-primary), var(--eco-secondary));
+            border: none;
+            color: white;
+            padding: 0.6rem 1.5rem;
+            border-radius: 10px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(39, 174, 96, 0.3);
+        }
+        
+        .btn-eco:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(39, 174, 96, 0.4);
+            color: white;
+        }
+
+        .form-control, .form-select {
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .form-control:focus, .form-select:focus {
+            border-color: var(--eco-primary);
+            box-shadow: 0 0 0 0.2rem rgba(39, 174, 96, 0.25);
+        }
+        
+        .pagination-section {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+            margin-top: 2rem;
+        }
+
+        .page-link {
+            border: none;
+            color: var(--eco-primary);
+            font-weight: 500;
+            padding: 0.6rem 1rem;
+            margin: 0 0.2rem;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .page-link:hover {
+            background: var(--eco-light);
+            color: var(--eco-dark);
+            transform: translateY(-1px);
+        }
+
+        .page-item.active .page-link {
+            background: var(--eco-primary);
+            border-color: var(--eco-primary);
+            color: white;
+            box-shadow: 0 4px 10px rgba(39, 174, 96, 0.3);
+        }
+
+        .fade-in {
+            animation: fadeIn 0.8s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @media (max-width: 768px) {
+            .header-section {
+                padding: 2rem 0;
+            }
+            
+            .filter-section .row {
+                row-gap: 1rem;
+            }
+            
+            .product-card {
+                margin-bottom: 1.5rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Navigation -->
+    <div th:replace="~{fragments/client-navbar :: client-navbar}"></div>
+
+    <!-- Header Section -->
+    <div class="header-section">
+        <div class="container">
+            <div class="row">
+                <div class="col-12">
+                    <h1 class="display-4 fw-bold mb-3">🌱 Catálogo Eco-Amigable</h1>
+                    <p class="lead">Descubre productos sostenibles que cuidan el planeta</p>
+                    <div class="mt-3">
+                        <span class="badge bg-light text-dark fs-6 px-3 py-2 rounded-pill">
+                            <i class="bi bi-check-circle-fill text-success me-2"></i>
+                            <span th:text="${totalItems != null ? totalItems + ' productos disponibles' : '125 productos disponibles'}">125 productos disponibles</span>
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <!-- Filter Section -->
+        <div class="filter-section">
+            <!-- Quick Search Bar -->
+            <div class="p-3 bg-white border-bottom rounded-top">
+                <div class="row align-items-center">
+                    <div class="col-md-6">
+                        <div class="input-group">
+                            <span class="input-group-text bg-light border-end-0">
+                                <i class="bi bi-search text-muted"></i>
+                            </span>
+                            <input type="text" class="form-control border-start-0 ps-0" 
+                                   id="quickSearch" 
+                                   placeholder="Buscar productos..." 
+                                   th:value="${busqueda}" 
+                                   onkeypress="if(event.key==='Enter') buscarRapido()">
+                            <button class="btn btn-eco" type="button" onclick="buscarRapido()">
+                                <i class="bi bi-search me-1"></i>Buscar
+                            </button>
+                        </div>
+                    </div>
+                    <div class="col-md-6 text-end">
+                        <span class="me-3 text-muted">
+                            <i class="bi bi-info-circle me-1"></i>
+                            Página <strong th:text="${currentPage != null ? currentPage + 1 : 1}">1</strong> 
+                            de <strong th:text="${totalPages != null ? totalPages : 1}">1</strong>
+                        </span>
+                        <button class="btn btn-outline-secondary btn-sm me-2" type="button" 
+                                data-bs-toggle="collapse" data-bs-target="#filtrosAvanzados" 
+                                aria-expanded="false">
+                            <i class="bi bi-funnel-fill"></i> Filtros
+                        </button>
+                        <button class="btn btn-outline-info btn-sm" type="button" onclick="limpiarFiltros()">
+                            <i class="bi bi-arrow-clockwise"></i> Limpiar
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Advanced Filters (Collapsible) -->
+            <div class="collapse" id="filtrosAvanzados">
+                <div class="p-4 bg-light border-bottom">
+                    <form method="get" th:action="@{/client/catalogo}" id="formFiltros" class="row g-3">
+                        <div class="col-md-3">
+                            <label class="form-label fw-semibold">
+                                <i class="bi bi-tag-fill text-primary me-1"></i>Categoría
+                            </label>
+                            <select class="form-select" name="categoria" title="Seleccionar categoría de productos" 
+                                    onchange="this.form.submit()">
+                                <option value="">🏷️ Todas las categorías</option>
+                                <option th:each="cat : ${categorias}" th:value="${cat}" 
+                                        th:text="${'📦 ' + cat}" th:selected="${categoria == cat}">Categoria</option>
+                            </select>
+                        </div>
+                        
+                        <div class="col-md-3">
+                            <label class="form-label fw-semibold">
+                                <i class="bi bi-currency-dollar text-success me-1"></i>Rango de Precio
+                            </label>
+                            <div class="row g-1">
+                                <div class="col-6">
+                                    <input type="number" class="form-control" name="minPrecio" 
+                                           th:value="${minPrecio}" placeholder="Min S/" min="0" step="0.01">
+                                </div>
+                                <div class="col-6">
+                                    <input type="number" class="form-control" name="maxPrecio" 
+                                           th:value="${maxPrecio}" placeholder="Max S/" min="0" step="0.01">
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-2">
+                            <label class="form-label fw-semibold">
+                                <i class="bi bi-sort-down text-info me-1"></i>Ordenar
+                            </label>
+                            <select class="form-select" name="sortBy" title="Ordenar productos por" 
+                                    onchange="this.form.submit()">
+                                <option value="">📊 Relevancia</option>
+                                <option value="nombre" th:selected="${sortBy == 'nombre'}">🔤 Nombre A-Z</option>
+                                <option value="precio" th:selected="${sortBy == 'precio'}">💰 Precio</option>
+                                <option value="categoria" th:selected="${sortBy == 'categoria'}">📂 Categoría</option>
+                                <option value="fechaCreacion" th:selected="${sortBy == 'fechaCreacion'}">🆕 Más Recientes</option>
+                            </select>
+                        </div>
+                        
+                        <div class="col-md-2">
+                            <label class="form-label fw-semibold">
+                                <i class="bi bi-arrow-up-down me-1"></i>Dirección
+                            </label>
+                            <select class="form-select" name="sortDir" title="Dirección de ordenamiento" 
+                                    onchange="this.form.submit()">
+                                <option value="asc" th:selected="${sortDir == 'asc'}">⬆️ Ascendente</option>
+                                <option value="desc" th:selected="${sortDir != null and sortDir == 'desc'}">⬇️ Descendente</option>
+                            </select>
+                        </div>
+                        
+                        <div class="col-md-2">
+                            <label class="form-label fw-semibold">
+                                <i class="bi bi-grid-3x3-gap me-1"></i>Por página
+                            </label>
+                            <select class="form-select" name="size" title="Productos por página" 
+                                    onchange="this.form.submit()">
+                                <option value="12" th:selected="${size == null or size == 12}">12 productos</option>
+                                <option value="24" th:selected="${size == 24}">24 productos</option>
+                                <option value="36" th:selected="${size == 36}">36 productos</option>
+                                <option value="48" th:selected="${size == 48}">48 productos</option>
+                            </select>
+                        </div>
+                        
+                        <!-- Hidden fields -->
+                        <input type="hidden" name="busqueda" th:value="${busqueda}">
+                        <input type="hidden" name="page" value="0">
+                        
+                        <div class="col-12 text-center">
+                            <button type="submit" class="btn btn-eco me-2">
+                                <i class="bi bi-funnel"></i> Aplicar Filtros
+                            </button>
+                            <button type="button" class="btn btn-outline-secondary" onclick="limpiarFiltros()">
+                                <i class="bi bi-x-circle"></i> Limpiar Todo
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Products Grid -->
+        <div th:if="${productos != null and productos.hasContent()}" class="fade-in">
+            <div class="row g-4">
+                <div class="col-xl-3 col-lg-4 col-md-6" th:each="producto : ${productos.content}">
+                    <div class="card product-card h-100">
+                        <!-- Product Image -->
+                        <div class="product-image-container position-relative">
+                            <!-- Stock Badge -->
+                            <div class="position-absolute top-0 end-0 m-2" style="z-index: 10;">
+                                <span th:if="${producto.stock != null and producto.stock > 10}" 
+                                      class="badge bg-success stock-badge">Disponible</span>
+                                <span th:if="${producto.stock != null and producto.stock <= 10 and producto.stock > 0}" 
+                                      class="badge bg-warning text-dark stock-badge">Pocas unidades</span>
+                                <span th:if="${producto.stock == null or producto.stock <= 0}" 
+                                      class="badge bg-danger stock-badge">Sin stock</span>
+                            </div>
+                            
+                            <!-- Category Badge -->
+                            <div class="position-absolute top-0 start-0 m-2" style="z-index: 10;">
+                                <span class="badge bg-primary category-badge" th:text="${producto.categoria}">Categoría</span>
+                            </div>
+                            
+                            <!-- Image -->
+                            <div class="product-image">
+                                <div th:if="${producto.imagenes != null and !producto.imagenes.isEmpty() and producto.imagenes[0].nombre != null}">
+                                    <img th:src="@{'/images/' + ${producto.imagenes[0].nombre}}" 
+                                         th:alt="${producto.nombre}" 
+                                         class="img-fluid w-100 h-100" style="object-fit: cover;">
+                                </div>
+                                <div th:unless="${producto.imagenes != null and !producto.imagenes.isEmpty() and producto.imagenes[0].nombre != null}">
+                                    <div class="d-flex align-items-center justify-content-center h-100 text-muted bg-light" style="height: 200px;">
+                                        <div class="text-center">
+                                            <i class="bi bi-image" style="font-size: 3rem;"></i>
+                                            <p class="mt-2 mb-0 small">Sin imagen</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Product Info -->
+                        <div class="card-body d-flex flex-column p-3">
+                            <h5 class="card-title mb-2" th:title="${producto.nombre}">
+                                <span th:text="${#strings.length(producto.nombre) > 50 ? #strings.substring(producto.nombre, 0, 47) + '...' : producto.nombre}">
+                                    Producto
+                                </span>
+                            </h5>
+                            
+                            <div class="product-description mb-3 flex-grow-1">
+                                <p class="card-text text-muted small" 
+                                   th:text="${producto.descripcion != null ? (#strings.length(producto.descripcion) > 120 ? #strings.substring(producto.descripcion, 0, 117) + '...' : producto.descripcion) : 'Producto eco-amigable de alta calidad, diseñado para cuidar el medio ambiente.'}">
+                                    Descripción del producto
+                                </p>
+                            </div>
+                            
+                            <!-- Price -->
+                            <div class="price-display mb-3">
+                                <strong class="text-success fs-5">
+                                    S/ <span th:text="${#numbers.formatDecimal(producto.precio, 1, 2)}">0.00</span>
+                                </strong>
+                            </div>
+                            
+                            <!-- Action Buttons -->
+                            <div class="mt-auto">
+                                <div class="d-grid gap-2">
+                                    <div class="btn-group">
+                                        <button class="btn btn-outline-primary btn-sm flex-fill" 
+                                                th:onclick="'verDetalleProducto(' + ${producto.id} + ')'"
+                                                title="Ver información detallada del producto">
+                                            <i class="bi bi-eye"></i> Detalles
+                                        </button>
+                                        <button class="btn btn-eco btn-sm flex-fill" 
+                                                th:onclick="'agregarAlCarrito(this, ' + ${producto.id} + ', \'' + ${#strings.escapeJavaScript(producto.nombre)} + '\')'"
+                                                th:disabled="${producto.stock == null or producto.stock <= 0}"
+                                                th:title="${producto.stock != null and producto.stock > 0 ? 'Agregar al carrito' : 'Producto sin stock'}">
+                                            <i class="bi bi-cart-plus"></i> 
+                                            <span th:text="${producto.stock != null and producto.stock > 0 ? 'Agregar' : 'Sin Stock'}">Agregar</span>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- No Products -->
+        <div th:unless="${productos != null and productos.hasContent()}" class="text-center py-5 fade-in">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body p-5">
+                    <i class="bi bi-search text-muted mb-3" style="font-size: 4rem;"></i>
+                    <h3 class="text-muted mb-3">No se encontraron productos</h3>
+                    <p class="text-muted mb-4">
+                        Intenta ajustar los filtros de búsqueda o explorar otras categorías
+                    </p>
+                    <button class="btn btn-eco" onclick="limpiarFiltros()">
+                        <i class="bi bi-arrow-clockwise me-2"></i>Ver Todos los Productos
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Enhanced Pagination -->
+        <div th:if="${productos != null and productos.hasContent() and totalPages > 1}" class="pagination-section fade-in">
+            <div class="p-4">
+                <div class="row align-items-center">
+                    <!-- Pagination Info -->
+                    <div class="col-md-6 mb-3 mb-md-0">
+                        <div class="text-muted">
+                            <i class="bi bi-info-circle me-2"></i>
+                            Mostrando 
+                            <strong th:text="${(currentPage * size) + 1}">1</strong> - 
+                            <strong th:text="${currentPage * size + productos.content.size()}">12</strong> 
+                            de <strong th:text="${totalItems}">125</strong> productos
+                        </div>
+                    </div>
+                    
+                    <!-- Pagination Controls -->
+                    <div class="col-md-6">
+                        <nav aria-label="Navegación de páginas">
+                            <ul class="pagination justify-content-md-end justify-content-center mb-0">
+                                <!-- Previous Page -->
+                                <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled'">
+                                    <a class="page-link" th:href="@{/client/catalogo(page=${currentPage - 1}, busqueda=${busqueda}, categoria=${categoria}, minPrecio=${minPrecio}, maxPrecio=${maxPrecio}, sortBy=${sortBy}, sortDir=${sortDir}, size=${size})}" 
+                                       title="Página anterior">
+                                        <i class="bi bi-chevron-left"></i> Anterior
+                                    </a>
+                                </li>
+                                
+                                <!-- Page Numbers -->
+                                <li class="page-item" th:each="i : ${#numbers.sequence(0, totalPages - 1)}" 
+                                    th:classappend="${i == currentPage} ? 'active'"
+                                    th:if="${i == 0 or i == totalPages - 1 or (i >= currentPage - 2 and i <= currentPage + 2)}">
+                                    <a class="page-link" th:href="@{/client/catalogo(page=${i}, busqueda=${busqueda}, categoria=${categoria}, minPrecio=${minPrecio}, maxPrecio=${maxPrecio}, sortBy=${sortBy}, sortDir=${sortDir}, size=${size})}" 
+                                       th:text="${i + 1}">1</a>
+                                </li>
+                                
+                                <!-- Next Page -->
+                                <li class="page-item" th:classappend="${currentPage >= totalPages - 1} ? 'disabled'">
+                                    <a class="page-link" th:href="@{/client/catalogo(page=${currentPage + 1}, busqueda=${busqueda}, categoria=${categoria}, minPrecio=${minPrecio}, maxPrecio=${maxPrecio}, sortBy=${sortBy}, sortDir=${sortDir}, size=${size})}" 
+                                       title="Página siguiente">
+                                        Siguiente <i class="bi bi-chevron-right"></i>
+                                    </a>
+                                </li>
+                            </ul>
+                        </nav>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <div th:replace="~{fragments/footer :: footer}"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        console.log('🌱 EcoVivaShop - Catálogo Eco-Amigable v7.0 COMPLETO');
+        
+        // Función para búsqueda rápida
+        function buscarRapido() {
+            const termino = document.getElementById('quickSearch').value.trim();
+            const url = new URL(window.location.href);
+            url.searchParams.set('busqueda', termino);
+            url.searchParams.set('page', '0');
+            window.location.href = url.toString();
+        }
+        
+        // Función para limpiar filtros
+        function limpiarFiltros() {
+            window.location.href = '/client/catalogo';
+        }
+        
+        // Función para ver detalle del producto
+        function verDetalleProducto(productoId) {
+            console.log('👁️ Ver detalle del producto:', productoId);
+            mostrarNotificacion(`Detalle del producto ${productoId} (página en desarrollo)`, 'info');
+        }
+        
+        // Función para agregar productos al carrito
+        function agregarAlCarrito(button, productoId, nombreProducto) {
+            // Deshabilitar el botón temporalmente
+            const originalHtml = button.innerHTML;
+            button.disabled = true;
+            button.innerHTML = '<i class="bi bi-spinner spinner-border spinner-border-sm"></i> Agregando...';
+            
+            // Simular agregado al carrito (aquí puedes implementar la lógica real)
+            setTimeout(() => {
+                // Mostrar mensaje de éxito
+                mostrarNotificacion('✅ ' + nombreProducto + ' agregado al carrito exitosamente', 'success');
+                
+                // Actualizar contador del carrito
+                actualizarContadorCarrito();
+                
+                // Restaurar el botón
+                button.disabled = false;
+                button.innerHTML = originalHtml;
+            }, 1000);
+        }
+        
+        // Función para mostrar notificaciones
+        function mostrarNotificacion(mensaje, tipo) {
+            // Crear elemento de notificación
+            const notification = document.createElement('div');
+            notification.className = `alert alert-${tipo === 'success' ? 'success' : (tipo === 'info' ? 'info' : 'danger')} alert-dismissible fade show position-fixed`;
+            notification.style.cssText = 'top: 20px; right: 20px; z-index: 9999; min-width: 300px;';
+            notification.innerHTML = `
+                ${mensaje}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            `;
+            
+            // Agregar al DOM
+            document.body.appendChild(notification);
+            
+            // Auto-remover después de 4 segundos
+            setTimeout(() => {
+                if (notification.parentNode) {
+                    notification.remove();
+                }
+            }, 4000);
+        }
+        
+        // Función para actualizar contador del carrito
+        function actualizarContadorCarrito() {
+            fetch('/client/carrito/count')
+                .then(response => response.json())
+                .then(data => {
+                    const contadores = document.querySelectorAll('.carrito-count');
+                    contadores.forEach(contador => {
+                        contador.textContent = data.count || 0;
+                    });
+                })
+                .catch(error => console.error('Error actualizando contador:', error));
+        }
+        
+        // Inicialización
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('✅ Catálogo listo - Productos cargados correctamente');
+            actualizarContadorCarrito();
+        });
+    </script>
+</body>
+</html>

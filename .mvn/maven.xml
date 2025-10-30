@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ruleset comparisonMethod="maven"
+         xmlns="http://mojo.codehaus.org/versions-maven-plugin/rule/2.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://mojo.codehaus.org/versions-maven-plugin/rule/2.0.0 
+                             http://mojo.codehaus.org/versions-maven-plugin/xsd/rule-2.0.0.xsd">
+    <ignoreVersions>
+    <!-- Ignorar versiones beta, alpha, RC -->
+    <ignoreVersion type="regex">.*[.-](alpha|beta|rc|cr|snapshot|m\d+).*</ignoreVersion>
+    
+    <!-- Ignorar versiones específicas de Spring Boot -->
+    <ignoreVersion type="regex">3\.(3|4|5)\..*</ignoreVersion>
+    
+    <!-- Mantener versión actual de Spring Boot -->
+    <ignoreVersion type="regex">3\.2\.(1[1-9]|2[0-9]).*</ignoreVersion>
+    
+    <!-- Ignorar específicamente versión 3.5.2 -->
+    <ignoreVersion>3.5.1</ignoreVersion>
+    <ignoreVersion>3.5.2</ignoreVersion>
+    <ignoreVersion>3.5.3</ignoreVersion>
+  </ignoreVersions>
+    <rules>
+    <rule groupId="org.springframework.boot" artifactId="spring-boot-starter-parent">
+      <ignoreVersions>
+        <ignoreVersion type="regex">3\.(3|4|5)\..*</ignoreVersion>
+        <ignoreVersion>3.5.1</ignoreVersion>
+        <ignoreVersion>3.5.2</ignoreVersion>
+        <ignoreVersion>3.5.3</ignoreVersion>
+      </ignoreVersions>
+    </rule>
+  </rules>
+</ruleset>

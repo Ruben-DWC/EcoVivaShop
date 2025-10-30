@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/head :: head('Mis Pedidos | EcoVivaShop')}">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Mis Pedidos | EcoVivaShop</title>
+</head>
+<body class="eco-bg">
+    <div th:replace="~{fragments/client-navbar :: client-navbar}"></div>
+    
+    <main class="container my-5">
+        <!-- CONTENEDOR PRINCIPAL MODERNO -->
+        <div class="client-profile-container">
+            <!-- ENCABEZADO DE PEDIDOS -->
+            <div class="client-profile-header">
+                <div class="client-profile-avatar">
+                    <i class="bi bi-bag-check-fill" style="font-size: 3rem;"></i>
+                </div>
+                <h2 class="client-profile-name">📦 Mis Pedidos</h2>
+                <p class="client-profile-email">Gestiona y revisa el estado de todos tus pedidos</p>
+            </div>
+
+            <!-- FILTROS Y BÚSQUEDA -->
+            <div class="client-info-section">
+                <h3 class="client-section-title">
+                    <i class="bi bi-search"></i>
+                    Buscar y Filtrar
+                </h3>
+                <div class="row g-4">
+                    <div class="col-md-6">
+                        <label for="searchOrder" class="client-form-label">
+                            <i class="bi bi-search me-1"></i>Buscar Pedido
+                        </label>
+                        <input type="text" class="client-form-control" id="searchOrder" placeholder="Número de pedido o producto">
+                    </div>
+                    <div class="col-md-3">
+                        <label for="statusFilter" class="client-form-label">
+                            <i class="bi bi-funnel me-1"></i>Estado
+                        </label>
+                        <select class="client-form-control" id="statusFilter">
+                            <option value="">Todos los estados</option>
+                            <option value="pendiente">Pendiente</option>
+                            <option value="confirmado">Confirmado</option>
+                            <option value="procesando">Procesando</option>
+                            <option value="enviado">Enviado</option>
+                            <option value="entregado">Entregado</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <label for="dateFilter" class="client-form-label">
+                            <i class="bi bi-calendar me-1"></i>Período
+                        </label>
+                        <select class="client-form-control" id="dateFilter">
+                            <option value="">Todo el tiempo</option>
+                            <option value="30">Últimos 30 días</option>
+                            <option value="90">Últimos 3 meses</option>
+                            <option value="365">Último año</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="d-flex justify-content-center mt-4">
+                    <button id="filterButton" class="client-btn-primary">
+                        <i class="bi bi-search"></i>
+                        Aplicar Filtros
+                    </button>
+                </div>
+            </div>
+
+            <!-- LISTA DE PEDIDOS -->
+            <div class="client-info-section">
+                <h3 class="client-section-title">
+                    <i class="bi bi-list-ul"></i>
+                    Historial de Pedidos <span class="badge bg-success ms-2" th:text="${totalPedidos}">0</span>
+                </h3>
+                
+                <!-- Mensaje cuando no hay pedidos -->
+                <div th:if="${#lists.isEmpty(pedidos)}" class="text-center py-5">
+                    <i class="bi bi-inbox" style="font-size: 4rem; color: #9CA3AF;"></i>
+                    <h4 class="mt-3 text-muted">No tienes pedidos aún</h4>
+                    <p class="text-muted">Cuando realices tu primera compra, aparecerá aquí.</p>
+                    <a th:href="@{/client/catalogo}" class="client-btn-primary mt-3">
+                        <i class="bi bi-cart-plus"></i>
+                        Explorar Productos
+                    </a>
+                </div>
+                
+                <!-- Lista de pedidos reales -->
+                <div th:each="pedido : ${pedidos}" class="client-order-card">
+                    <div class="client-order-header">
+                        <div>
+                            <h4 class="client-order-id" th:text="'Pedido #' + ${pedido.numeroPedido}">Pedido #ECO-2024-001234</h4>
+                            <p style="color: #64748b; margin: 0; font-weight: 600;">
+                                <i class="bi bi-calendar me-1"></i>
+                                <span>Realizado el </span>
+                                <span th:text="${#temporals.format(pedido.fechaPedido, 'dd MMMM, yyyy')}">8 de junio, 2024</span>
+                            </p>
+                        </div>
+                        <span th:class="'client-order-status status-' + ${pedido != null and pedido.estado != null ? pedido.estado.toLowerCase() : 'procesando'}"
+                              th:text="${pedido != null and pedido.estado != null ? pedido.estado : 'PROCESANDO'}">Procesando</span>
+                    </div>
+                    <div class="mb-3">
+                        <p style="color: #0891b2; font-weight: 600; margin-bottom: 8px;">
+                            <strong th:text="${pedido.detalles != null ? 'Ver productos' : 'Sin productos'}">3 productos</strong>
+                        </p>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div class="fw-bold" style="color: #16a34a; font-size: 1.4rem;" 
+                                 th:text="${pedido.total != null ? 'S/ ' + #numbers.formatDecimal(pedido.total, 0, 2) : 'S/ 0.00'}">S/ 232.00</div>
+                            <div class="d-flex gap-2">
+                                <button class="client-btn-secondary btn-view-order" th:data-numero-pedido="${pedido.numeroPedido}">
+                                    <i class="bi bi-eye"></i>
+                                    Ver Detalles
+                                </button>
+                                <button th:if="${pedido != null and pedido.estado != null and pedido.estado == 'ENVIADO'}" class="client-btn-secondary btn-track-order" th:data-numero-pedido="${pedido.numeroPedido}">
+                                    <i class="bi bi-geo-alt"></i>
+                                    Rastrear
+                                </button>
+                                <button th:if="${pedido != null and pedido.estado != null and pedido.estado == 'ENTREGADO'}" class="client-btn-primary btn-reorder" th:data-numero-pedido="${pedido.numeroPedido}">
+                                    <i class="bi bi-arrow-repeat"></i>
+                                    Reordenar
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Paginación (solo mostrar si hay muchos pedidos) -->
+                <nav th:if="${totalPedidos > 10}" aria-label="Navegación de pedidos" class="mt-4">
+                    <ul class="pagination justify-content-center">
+                        <li class="page-item disabled">
+                            <span class="page-link">Anterior</span>
+                        </li>
+                        <li class="page-item active">
+                            <span class="page-link">1</span>
+                        </li>
+                        <li class="page-item">
+                            <a class="page-link" href="#">Siguiente</a>
+                        </li>
+                    </ul>
+                </nav>
+
+                <!-- Resumen de estadísticas -->
+                <div class="row mt-4" th:if="${!#lists.isEmpty(pedidos)}">
+                    <div class="col-md-3">
+                        <div class="card text-center border-0 bg-light">
+                            <div class="card-body">
+                                <i class="bi bi-bag-check-fill text-success fs-2"></i>
+                                <h4 class="fw-bold text-success mt-2" th:text="${totalPedidos}">12</h4>
+                                <p class="text-muted small mb-0">Total Pedidos</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card text-center border-0 bg-light">
+                            <div class="card-body">
+                                <i class="bi bi-currency-dollar text-success fs-2"></i>
+                                <h4 class="fw-bold text-success mt-2" th:text="'S/ ' + ${#numbers.formatDecimal(totalGastado, 0, 2)}">S/ 1,250</h4>
+                                <p class="text-muted small mb-0">Total Gastado</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card text-center border-0 bg-light">
+                            <div class="card-body">
+                                <i class="bi bi-truck text-info fs-2"></i>
+                                <h4 class="fw-bold text-info mt-2" th:text="${pedidosEnviados}">2</h4>
+                                <p class="text-muted small mb-0">En Camino</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card text-center border-0 bg-light">
+                            <div class="card-body">
+                                <i class="bi bi-check-circle text-primary fs-2"></i>
+                                <h4 class="fw-bold text-primary mt-2" th:text="${pedidosEntregados}">8</h4>
+                                <p class="text-muted small mb-0">Entregados</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Modal de detalles del pedido -->
+    <div class="modal fade" id="orderDetailsModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header bg-success text-white">
+                    <h5 class="modal-title">
+                        <i class="bi bi-receipt me-2"></i>Detalles del Pedido <span id="modalOrderNumber"></span>
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" 
+                            title="Cerrar ventana" aria-label="Cerrar ventana de detalles"></button>
+                </div>
+                <div class="modal-body" id="orderDetailsContent">
+                    <!-- El contenido se cargará dinámicamente -->
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cerrar</button>
+                    <button type="button" class="btn btn-success" onclick="downloadInvoice()">
+                        <i class="bi bi-download me-1"></i>Descargar Factura
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div th:replace="~{fragments/footer :: footer}"></div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/js/client-global.js"></script>
+    <script>
+        // Función para ver detalles del pedido
+        function viewOrder(orderNumber) {
+            console.log('🔍 Ejecutando viewOrder para pedido:', orderNumber);
+            document.getElementById('modalOrderNumber').textContent = orderNumber;
+            
+            // Llamada AJAX para obtener detalles reales del pedido
+            fetch(`/client/pedido-detalle/${orderNumber}`)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('No se pudieron cargar los detalles del pedido');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    if (data.success) {
+                        document.getElementById('orderDetailsContent').innerHTML = buildOrderDetailsHTML(data);
+                        const modal = new bootstrap.Modal(document.getElementById('orderDetailsModal'));
+                        modal.show();
+                    } else {
+                        document.getElementById('orderDetailsContent').innerHTML = `
+                            <div class="alert alert-danger">
+                                <i class="bi bi-exclamation-triangle"></i>
+                                ${data.message || 'Error al cargar los detalles del pedido'}
+                            </div>
+                        `;
+                        const modal = new bootstrap.Modal(document.getElementById('orderDetailsModal'));
+                        modal.show();
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    document.getElementById('orderDetailsContent').innerHTML = `
+                        <div class="alert alert-danger">
+                            <i class="bi bi-exclamation-triangle"></i>
+                            Error al cargar los detalles del pedido. Por favor, inténtelo de nuevo.
+                        </div>
+                    `;
+                    const modal = new bootstrap.Modal(document.getElementById('orderDetailsModal'));
+                    modal.show();
+                });
+        }
+
+        // Función para construir el HTML de detalles del pedido
+        function buildOrderDetailsHTML(data) {
+            const estadoMap = {
+                'PENDIENTE': { text: 'Pendiente', progress: 25, icon: 'clock' },
+                'CONFIRMADO': { text: 'Confirmado', progress: 50, icon: 'check-circle' },
+                'EN_PREPARACION': { text: 'En preparación', progress: 75, icon: 'arrow-repeat' },
+                'ENVIADO': { text: 'Enviado', progress: 90, icon: 'truck' },
+                'ENTREGADO': { text: 'Entregado', progress: 100, icon: 'check-circle-fill' }
+            };
+            
+            const estado = estadoMap[data.estado] || { text: data.estado, progress: 0, icon: 'question' };
+            
+            let productosHTML = '';
+            data.detalles.forEach(detalle => {
+                productosHTML += `
+                    <tr>
+                        <td>${detalle.producto}</td>
+                        <td>${detalle.cantidad}</td>
+                        <td>S/ ${detalle.precio.toFixed(2)}</td>
+                        <td>S/ ${detalle.subtotal.toFixed(2)}</td>
+                    </tr>
+                `;
+            });
+            
+            return `
+                <div class="order-details">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6 class="fw-bold">Estado del pedido</h6>
+                            <div class="progress mb-3">
+                                <div class="progress-bar bg-success" role="progressbar" style="width: ${estado.progress}%">${estado.progress}%</div>
+                            </div>
+                            <div class="d-flex align-items-center mb-3">
+                                <i class="bi bi-${estado.icon} text-success me-2 fs-5"></i>
+                                <span class="fw-bold">${estado.text}</span>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <h6 class="fw-bold">Información del pedido</h6>
+                            <p><strong>Número:</strong> ${data.numeroPedido}</p>
+                            <p><strong>Fecha:</strong> ${data.fecha}</p>
+                            <p><strong>Total:</strong> S/ ${data.total.toFixed(2)}</p>
+                            <p><strong>Método de pago:</strong> ${data.metodoPago}</p>
+                        </div>
+                    </div>
+                    
+                    <hr>
+                    
+                    <h6 class="fw-bold">Productos (${data.detalles.length})</h6>
+                    <div class="table-responsive">
+                        <table class="table table-sm">
+                            <thead>
+                                <tr>
+                                    <th>Producto</th>
+                                    <th>Cantidad</th>
+                                    <th>Precio</th>
+                                    <th>Subtotal</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${productosHTML}
+                            </tbody>
+                            <tfoot>
+                                <tr>
+                                    <th colspan="3">Total</th>
+                                    <th>S/ ${data.total.toFixed(2)}</th>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Función para rastrear pedido
+        function trackOrder(orderNumber) {
+            console.log('🔍 Ejecutando trackOrder para pedido:', orderNumber);
+            alert('🚚 Rastreando pedido ' + orderNumber + '\\n\\nÚltima actualización: En camino hacia destino\\nTiempo estimado: 2-3 días hábiles');
+        }
+
+        // Función para reordenar artículos
+        function reorderItems(orderNumber) {
+            if (confirm('¿Deseas agregar los productos de este pedido a tu carrito?')) {
+                alert('✅ Productos agregados al carrito exitosamente');
+                // Aquí se redirigiría al carrito o se mostrarían los productos agregados
+            }
+        }
+
+        // Función para filtrar pedidos
+        function filterOrders() {
+            const search = document.getElementById('searchOrder').value.toLowerCase();
+            const status = document.getElementById('statusFilter').value.toLowerCase();
+            const orderCards = document.querySelectorAll('.client-order-card');
+            
+            orderCards.forEach(card => {
+                const orderText = card.textContent.toLowerCase();
+                const statusElement = card.querySelector('.client-order-status');
+                const orderStatus = statusElement ? statusElement.textContent.toLowerCase() : '';
+                
+                const matchesSearch = search === '' || orderText.includes(search);
+                const matchesStatus = status === '' || orderStatus.includes(status);
+                
+                if (matchesSearch && matchesStatus) {
+                    card.style.display = 'block';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        }
+
+        // Función para descargar factura
+        function downloadInvoice() {
+            const orderNumber = document.getElementById('modalOrderNumber').textContent;
+            if (orderNumber) {
+                // Crear enlace de descarga
+                const link = document.createElement('a');
+                link.href = '/client/descargar-boleta?numeroPedido=' + encodeURIComponent(orderNumber);
+                link.download = 'factura_' + orderNumber + '.pdf';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                
+                // Mostrar mensaje de éxito
+                alert('📄 Descargando factura para pedido ' + orderNumber);
+            } else {
+                alert('❌ Error: No se pudo obtener el número de pedido');
+            }
+        }
+
+        // Event listeners
+        document.addEventListener('DOMContentLoaded', function() {
+            // Botón de filtrar
+            const filterButton = document.getElementById('filterButton');
+            if (filterButton) {
+                filterButton.addEventListener('click', filterOrders);
+            }
+
+            // Filtro en tiempo real mientras se escribe
+            const searchInput = document.getElementById('searchOrder');
+            if (searchInput) {
+                searchInput.addEventListener('keyup', filterOrders);
+            }
+
+            // Filtro automático al cambiar estado
+            const statusFilter = document.getElementById('statusFilter');
+            if (statusFilter) {
+                statusFilter.addEventListener('change', filterOrders);
+            }
+
+            // Event listeners para botones de ver detalles y rastrear
+            document.addEventListener('click', function(e) {
+                console.log('🔍 Click detectado en:', e.target);
+                
+                if (e.target.closest('.btn-view-order')) {
+                    const button = e.target.closest('.btn-view-order');
+                    const numeroPedido = button.getAttribute('data-numero-pedido');
+                    console.log('🔍 Ver detalles del pedido:', numeroPedido);
+                    viewOrder(numeroPedido);
+                }
+                
+                if (e.target.closest('.btn-track-order')) {
+                    const button = e.target.closest('.btn-track-order');
+                    const numeroPedido = button.getAttribute('data-numero-pedido');
+                    console.log('🔍 Rastrear pedido:', numeroPedido);
+                    trackOrder(numeroPedido);
+                }
+                
+                if (e.target.closest('.btn-reorder')) {
+                    const button = e.target.closest('.btn-reorder');
+                    const numeroPedido = button.getAttribute('data-numero-pedido');
+                    console.log('🔍 Reordenar pedido:', numeroPedido);
+                    reorderItems(numeroPedido);
+                }
+            });
+        });
+    </script>
+</body>
+</html>

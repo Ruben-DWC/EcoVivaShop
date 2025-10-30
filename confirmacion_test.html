@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="_csrf" content="zUgMN59gjB6qKA6wcd2WvTEOIco6-zv3YgxhEpr7pw9th9Pe9H4_U6oBv3-HHz6CQvCiiQQ9DPNfwwPaV21ZKqjJkjdUt7G7"/>
+    <meta name="_csrf_header" content="X-CSRF-TOKEN"/>
+    <title>Iniciar Sesión | EcoVivaShop</title>
+    
+    <!-- Favicons -->
+    <link rel="apple-touch-icon" sizes="180x180" href="/img/apple-touch-icon.png">
+    <link rel="icon" type="image/png" href="/img/apple-touch-icon.png">
+    <link rel="shortcut icon" href="/img/favicon.ico">
+    <link rel="icon" type="image/x-icon" href="/img/favicon.ico">
+    <link rel="icon" type="image/png" sizes="16x16" href="/img/favicon-16x16.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/img/favicon-32x32.png">
+    <link rel="icon" sizes="192x192" href="/img/android-chrome-192x192.png">
+    <link rel="icon" sizes="512x512" href="/img/android-chrome-512x512.png">
+    <link rel="manifest" href="/img/site.webmanifest">
+    
+    <!-- CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+    <!-- EcoVivaShop Modern Theme - Sistema de Diseño Principal -->
+    <link rel="stylesheet" href="/css/ecovivashop-theme.css">
+    <!-- Client Styles -->
+    <link rel="stylesheet" href="/css/client-styles.css">
+    <!-- Navbar Dropdown Fix -->
+    <link rel="stylesheet" href="/css/navbar-dropdown-fix.css">
+</head>
+<body class="eco-bg">
+    <nav class="navbar navbar-expand-lg eco-navbar-modern shadow-lg sticky-top">
+    <div class="container">        <a class="navbar-brand d-flex align-items-center eco-brand-modern"
+            href="/">
+            <i class="bi bi-tree-fill me-2 fs-3 eco-text-white"></i>
+            <span class="fw-bold fs-4 eco-text-white">EcoVivaShop</span>
+        </a>
+        
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" title="Abrir menú de navegación" aria-label="Abrir menú de navegación">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        
+        <div class="collapse navbar-collapse" id="navbarNav">            <!-- Enlaces para usuarios no autenticados -->
+            <ul class="navbar-nav me-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="/">Inicio</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/productos">Productos</a>
+                </li>
+            </ul>
+              <!-- Enlaces para clientes autenticados -->
+            
+              <!-- Enlaces para administradores -->
+            
+            
+            <!-- Información del usuario autenticado -->
+                        <!-- Enlaces para usuarios no autenticados -->
+            <ul class="navbar-nav">
+                <li class="nav-item">
+                    <a class="nav-link" href="/auth/login">Iniciar Sesión</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link btn btn-success text-white ms-2 px-3" href="/auth/registro">Registrarse</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+    <main class="container my-5">
+        <div class="row justify-content-center">
+            <div class="col-md-6 col-lg-5">
+                <!-- Hero Card -->
+                <div class="card shadow-lg border-0 rounded-4 mb-4" style="background: linear-gradient(135deg, #28a745 0%, #20c997 100%); color: white;">
+                    <div class="card-body p-4 text-center">
+                        <i class="bi bi-leaf-fill display-3 mb-3"></i>
+                        <h1 class="fw-bold mb-2">EcoVivaShop</h1>
+                        <p class="mb-0 opacity-75">Tu tienda sostenible de confianza</p>
+                    </div>
+                </div>
+
+                <div class="card shadow-lg border-0 rounded-4" style="background: linear-gradient(135deg, #ffffff 0%, #f8fff8 100%);">
+                    <div class="card-body p-4 p-md-5">
+                        <div class="text-center mb-4">
+                            <div class="bg-success bg-gradient rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px;">
+                                <i class="bi bi-person-circle text-white display-5"></i>
+                            </div>
+                            <h2 class="mt-3 mb-4 fw-bold text-success">Iniciar Sesión</h2>
+                            <p class="text-muted">Accede a tu cuenta eco-sostenible</p>
+                        </div><form action="/login" method="post" class="needs-validation" id="loginForm" novalidate><input type="hidden" name="_csrf" value="zUgMN59gjB6qKA6wcd2WvTEOIco6-zv3YgxhEpr7pw9th9Pe9H4_U6oBv3-HHz6CQvCiiQQ9DPNfwwPaV21ZKqjJkjdUt7G7"/>
+                            <input type="hidden" name="_csrf" value="zUgMN59gjB6qKA6wcd2WvTEOIco6-zv3YgxhEpr7pw9th9Pe9H4_U6oBv3-HHz6CQvCiiQQ9DPNfwwPaV21ZKqjJkjdUt7G7" />
+                            
+                                                        <div class="input-group mb-3">
+                                <span class="input-group-text border-success" style="background: linear-gradient(45deg, #e8f5e8, #f0f9f0);"><i class="bi bi-envelope text-success"></i></span>
+                                <input type="email" class="form-control border-success" id="username" name="username" placeholder="Correo electrónico" required style="background-color: #f8fff8;">
+                            </div>
+                            <div class="input-group mb-4 position-relative">
+                                <span class="input-group-text border-success" style="background: linear-gradient(45deg, #e8f5e8, #f0f9f0);"><i class="bi bi-lock text-success"></i></span>
+                                <input type="password" class="form-control border-success" id="password" name="password" placeholder="Contraseña" required minlength="4" style="background-color: #f8fff8;">
+                                <button type="button" class="btn btn-outline-success border-success" id="togglePass" tabindex="-1"
+                                        title="Mostrar/ocultar contraseña" aria-label="Mostrar u ocultar contraseña">
+                                    <i class="bi bi-eye"></i>
+                                </button>
+                            </div>
+                            <div class="d-grid gap-3">
+                                <button type="submit" class="btn btn-lg shadow" style="background: linear-gradient(45deg, #28a745, #20c997); color: white; border: none; border-radius: 25px; font-weight: 600;">
+                                    <i class="bi bi-box-arrow-in-right me-2"></i>Ingresar a EcoVivaShop
+                                </button>
+                                <a href="/auth/registro" class="btn btn-outline-success btn-lg" style="border-radius: 25px; font-weight: 600;">
+                                    <i class="bi bi-person-plus me-2"></i>Crear cuenta nueva
+                                </a>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+    <footer class="eco-footer-improved">
+    <div class="footer-wave">
+        <svg data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 120" preserveAspectRatio="none">
+            <path d="M321.39,56.44c58-10.79,114.16-30.13,172-41.86,82.39-16.72,168.19-17.73,250.45-.39C823.78,31,906.67,72,985.66,92.83c70.05,18.48,146.53,26.09,214.34,3V0H0V27.35A600.21,600.21,0,0,0,321.39,56.44Z" class="shape-fill"></path>
+        </svg>
+    </div>
+    
+    <div class="footer-main">
+        <div class="container">
+            <div class="row g-4">
+                <!-- Columna del Logo y Descripción -->
+                <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="100">
+                    <div class="footer-section">
+                        <div class="footer-logo mb-3">
+                            <i class="bi bi-tree-fill me-2 text-white"></i>
+                            <span class="footer-brand">EcoVivaShop</span>
+                        </div>
+                        <p class="footer-description">
+                            Tu socio en sostenibilidad. Transformamos el mundo un producto eco-friendly a la vez.
+                        </p>
+                        <div class="footer-stats">
+                            <div class="stat-item">
+                                <span class="stat-number">500+</span>
+                                <span class="stat-label">Productos</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-number">1200+</span>
+                                <span class="stat-label">Clientes</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Columna de Enlaces Rápidos -->
+                <div class="col-lg-2 col-md-6" data-aos="fade-up" data-aos-delay="200">
+                    <div class="footer-section">
+                        <h5 class="footer-title">Enlaces</h5>
+                        <ul class="footer-links">
+                            <li><a href="/"><i class="bi bi-house me-2"></i>Inicio</a></li>
+                            <li><a href="/auth/registro"><i class="bi bi-person-plus me-2"></i>Registro</a></li>
+                            <li><a href="/auth/login"><i class="bi bi-box-arrow-in-right me-2"></i>Login</a></li>
+                            <li><a href="/client/home"><i class="bi bi-shop me-2"></i>Tienda</a></li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <!-- Columna de Información -->
+                <div class="col-lg-3 col-md-6" data-aos="fade-up" data-aos-delay="300">
+                    <div class="footer-section">
+                        <h5 class="footer-title">Compromiso Verde</h5>
+                        <div class="eco-features">
+                            <div class="eco-feature">
+                                <i class="bi bi-shield-check eco-text-primary"></i>
+                                <span>100% Productos Certificados</span>
+                            </div>
+                            <div class="eco-feature">
+                                <i class="bi bi-truck eco-text-primary"></i>
+                                <span>Envío Carbono Neutral</span>
+                            </div>
+                            <div class="eco-feature">
+                                <i class="bi bi-recycle eco-text-primary"></i>
+                                <span>Packaging Reciclable</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Columna de Redes Sociales -->
+                <div class="col-lg-3 col-md-6" data-aos="fade-up" data-aos-delay="400">
+                    <div class="footer-section">
+                        <h5 class="footer-title">Síguenos</h5>
+                        <p class="social-text">Únete a nuestra comunidad verde</p>
+                        <div class="social-links">
+                            <a href="https://www.facebook.com/" target="_blank" rel="noopener" class="social-btn facebook" title="Facebook">
+                                <i class="bi bi-facebook"></i>
+                            </a>
+                            <a href="https://wa.me/" target="_blank" rel="noopener" class="social-btn whatsapp" title="WhatsApp">
+                                <i class="bi bi-whatsapp"></i>
+                            </a>
+                            <a href="https://www.instagram.com/" target="_blank" rel="noopener" class="social-btn instagram" title="Instagram">
+                                <i class="bi bi-instagram"></i>
+                            </a>
+                            <a href="https://m.me/" target="_blank" rel="noopener" class="social-btn messenger" title="Messenger">
+                                <i class="bi bi-messenger"></i>
+                            </a>
+                        </div>
+                        
+                        <!-- Newsletter -->
+                        <div class="newsletter-section mt-4">
+                            <h6 class="newsletter-title">Newsletter Verde</h6>
+                            <div class="newsletter-form">
+                                <input type="email" placeholder="tu@email.com" class="newsletter-input">                                <button class="newsletter-btn" title="Suscribirse al newsletter">
+                                    <i class="bi bi-send"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Footer Bottom -->
+    <div class="footer-bottom">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-md-6">
+                    <p class="copyright">
+                        <i class="bi bi-c-circle me-1"></i>
+                        2025 EcoVivaShop. Todos los derechos reservados.
+                    </p>
+                </div>
+                <div class="col-md-6 text-md-end">
+                    <div class="footer-badges">
+                        <span class="eco-badge">
+                            <i class="bi bi-award-fill me-1"></i>Certificado Verde
+                        </span>
+                        <span class="eco-badge">
+                            <i class="bi bi-leaf-fill me-1"></i>100% Ecológico
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</footer>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        (() => {
+            'use strict';
+            const form = document.getElementById('loginForm');
+            form.addEventListener('submit', event => {
+                if (!form.checkValidity()) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                }
+                form.classList.add('was-validated');
+            });
+            const togglePass = document.getElementById('togglePass');
+            const passInput = document.getElementById('password');
+            togglePass.addEventListener('click', () => {
+                const type = passInput.type === 'password' ? 'text' : 'password';
+                passInput.type = type;
+                togglePass.querySelector('i').classList.toggle('bi-eye');
+                togglePass.querySelector('i').classList.toggle('bi-eye-slash');
+            });
+        })();
+    </script>
+    <style>
+        .eco-login-card {
+            transition: box-shadow 0.3s, transform 0.3s;
+            box-shadow: 0 4px 24px rgba(44, 62, 80, 0.10);
+        }
+        .eco-login-card:hover {
+            box-shadow: 0 8px 32px rgba(44, 62, 80, 0.15);
+            transform: translateY(-4px) scale(1.03);
+        }
+        .eco-btn-login {
+            background: linear-gradient(90deg, #43a047 0%, #388e3c 100%);
+            border: none;
+            transition: background 0.2s, box-shadow 0.2s, transform 0.1s;
+        }
+        .eco-btn-login:active {
+            transform: scale(0.98);
+        }
+        .eco-btn-login:hover {
+            background: linear-gradient(90deg, #388e3c 0%, #43a047 100%);
+            box-shadow: 0 2px 8px rgba(44, 62, 80, 0.10);
+        }
+        .input-group-text {
+            background: #f4fbf6;
+            border-right: 0;
+        }
+        .form-control:focus {
+            box-shadow: none;
+        }
+        .input-group .form-control {
+            border-left: 0;
+        }
+    </style>
+</body>
+</html>

@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/head :: head('Prueba de Correos | EcoVivaShop')}">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Prueba de Correos | EcoVivaShop</title>
+</head>
+<body class="bg-light">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container">
+            <a class="navbar-brand" href="/">
+                <i class="bi bi-leaf-fill text-success me-2"></i>EcoVivaShop - Prueba de Correos
+            </a>
+        </div>
+    </nav>
+
+    <main class="container py-5">
+        <div class="row">
+            <div class="col-12">
+                <div class="text-center mb-5">
+                    <h1 class="h3 fw-bold text-success">📧 Sistema de Prueba de Correos Electrónicos</h1>
+                    <p class="text-muted">Herramienta para probar los diferentes tipos de correos de EcoVivaShop</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Email Test Cards -->
+        <div class="row g-4">
+            <!-- Correo de Bienvenida Usuario -->
+            <div class="col-md-6">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-header bg-success text-white">
+                        <h5 class="card-title mb-0">
+                            <i class="bi bi-person-plus me-2"></i>Correo de Bienvenida - Usuario
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <p class="card-text">Envía un correo de bienvenida para nuevos usuarios registrados.</p>
+                        <form id="bienvenidaForm">
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Correo Electrónico</label>
+                                <input type="email" class="form-control" id="emailBienvenida" required 
+                                       placeholder="usuario@ejemplo.com">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Nombre del Usuario</label>
+                                <input type="text" class="form-control" id="nombreBienvenida" 
+                                       placeholder="Juan Pérez" value="Juan Pérez">
+                            </div>
+                            <button type="submit" class="btn btn-success w-100">
+                                <i class="bi bi-send me-2"></i>Enviar Correo de Bienvenida
+                            </button>
+                        </form>
+                        <div id="resultBienvenida" class="mt-3"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Correo de Bienvenida Admin -->
+            <div class="col-md-6">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-header bg-dark text-white">
+                        <h5 class="card-title mb-0">
+                            <i class="bi bi-shield-lock me-2"></i>Correo de Bienvenida - Admin
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <p class="card-text">Envía un correo de bienvenida para nuevos administradores.</p>
+                        <form id="adminForm">
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Correo Electrónico</label>
+                                <input type="email" class="form-control" id="emailAdmin" required 
+                                       placeholder="admin@ejemplo.com">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Nombre del Admin</label>
+                                <input type="text" class="form-control" id="nombreAdmin" 
+                                       placeholder="María García" value="María García">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Rol</label>
+                                <select class="form-select" id="rolAdmin" title="Seleccione el rol del administrador">
+                                    <option value="Super Administrador">Super Administrador</option>
+                                    <option value="Admin de Productos">Admin de Productos</option>
+                                    <option value="Admin de Clientes">Admin de Clientes</option>
+                                    <option value="Admin de Reportes">Admin de Reportes</option>
+                                </select>
+                            </div>
+                            <button type="submit" class="btn btn-dark w-100">
+                                <i class="bi bi-send me-2"></i>Enviar Correo Admin
+                            </button>
+                        </form>
+                        <div id="resultAdmin" class="mt-3"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Correo de Confirmación de Pedido -->
+            <div class="col-md-6">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-header bg-info text-white">
+                        <h5 class="card-title mb-0">
+                            <i class="bi bi-cart-check me-2"></i>Confirmación de Pedido
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <p class="card-text">Envía confirmación de pedido realizado.</p>
+                        <form id="pedidoForm">
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Correo del Cliente</label>
+                                <input type="email" class="form-control" id="emailPedido" required 
+                                       placeholder="cliente@ejemplo.com">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Nombre del Cliente</label>
+                                <input type="text" class="form-control" id="nombrePedido" 
+                                       placeholder="Ana López" value="Ana López">
+                            </div>
+                            <div class="row g-2">
+                                <div class="col-md-6">
+                                    <label class="form-label fw-bold">N° Pedido</label>
+                                    <input type="text" class="form-control" id="numeroPedido" 
+                                           value="ECO-2024-1001" placeholder="Número de pedido" title="Ingrese el número de pedido">
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label fw-bold">Total</label>
+                                    <input type="number" class="form-control" id="totalPedido" 
+                                           value="89.99" step="0.01" placeholder="Total del pedido" title="Ingrese el total del pedido">
+                                </div>
+                            </div>
+                            <button type="submit" class="btn btn-info w-100 mt-3">
+                                <i class="bi bi-send me-2"></i>Enviar Confirmación
+                            </button>
+                        </form>
+                        <div id="resultPedido" class="mt-3"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Información del Sistema -->
+            <div class="col-md-6">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-header bg-warning text-dark">
+                        <h5 class="card-title mb-0">
+                            <i class="bi bi-info-circle me-2"></i>Información del Sistema
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <h6 class="fw-bold">📋 Configuración Requerida:</h6>
+                        <ul class="list-unstyled">
+                            <li class="mb-2">
+                                <i class="bi bi-check-circle text-success me-2"></i>
+                                Configurar <code>spring.mail.username</code>
+                            </li>
+                            <li class="mb-2">
+                                <i class="bi bi-check-circle text-success me-2"></i>
+                                Configurar <code>spring.mail.password</code>
+                            </li>
+                            <li class="mb-2">
+                                <i class="bi bi-exclamation-triangle text-warning me-2"></i>
+                                Usar contraseña de aplicación de Gmail
+                            </li>
+                        </ul>
+
+                        <h6 class="fw-bold mt-4">🎯 Templates Disponibles:</h6>
+                        <ul class="list-unstyled small">
+                            <li><code>email/bienvenida.html</code></li>
+                            <li><code>email/bienvenida-admin.html</code></li>
+                            <li><code>email/confirmacion-pedido.html</code></li>
+                        </ul>
+
+                        <button class="btn btn-warning w-100 mt-3" onclick="mostrarInfo()">
+                            <i class="bi bi-gear me-2"></i>Ver Configuración Completa
+                        </button>
+                        <div id="infoSistema" class="mt-3"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Status Messages -->
+        <div class="row mt-5">
+            <div class="col-12">
+                <div id="globalStatus" class="text-center"></div>
+            </div>
+        </div>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <style>
+        .card {
+            border-radius: 1rem;
+            transition: transform 0.3s ease;
+        }
+        .card:hover {
+            transform: translateY(-3px);
+        }
+        .card-header {
+            border-radius: 1rem 1rem 0 0 !important;
+        }
+        code {
+            background: #f8f9fa;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 0.9em;
+        }
+    </style>
+
+    <script>
+        // Función para mostrar resultados
+        function showResult(elementId, isSuccess, message, data = null) {
+            const element = document.getElementById(elementId);
+            const alertClass = isSuccess ? 'alert-success' : 'alert-danger';
+            const icon = isSuccess ? 'bi-check-circle' : 'bi-x-circle';
+            
+            let html = `
+                <div class="alert ${alertClass} alert-dismissible fade show" role="alert">
+                    <i class="bi ${icon} me-2"></i>
+                    <strong>${message}</strong>
+            `;
+            
+            if (data && isSuccess) {
+                html += `
+                    <hr>
+                    <small>
+                        <strong>Destinatario:</strong> ${data.destinatario}<br>
+                        <strong>Enviado:</strong> ${new Date().toLocaleString()}
+                    </small>
+                `;
+            }
+            
+            html += `
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            `;
+            
+            element.innerHTML = html;
+        }
+
+        // Correo de Bienvenida Usuario
+        document.getElementById('bienvenidaForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const email = document.getElementById('emailBienvenida').value;
+            const nombre = document.getElementById('nombreBienvenida').value;
+            
+            try {
+                const response = await fetch(`/test/email/bienvenida?email=${encodeURIComponent(email)}&nombre=${encodeURIComponent(nombre)}`);
+                const data = await response.json();
+                
+                showResult('resultBienvenida', data.status === 'success', data.message, data);
+            } catch (error) {
+                showResult('resultBienvenida', false, 'Error de conexión: ' + error.message);
+            }
+        });
+
+        // Correo de Bienvenida Admin
+        document.getElementById('adminForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const email = document.getElementById('emailAdmin').value;
+            const nombre = document.getElementById('nombreAdmin').value;
+            const rol = document.getElementById('rolAdmin').value;
+            
+            try {
+                const response = await fetch(`/test/email/bienvenida-admin?email=${encodeURIComponent(email)}&nombre=${encodeURIComponent(nombre)}&rol=${encodeURIComponent(rol)}`);
+                const data = await response.json();
+                
+                showResult('resultAdmin', data.status === 'success', data.message, data);
+            } catch (error) {
+                showResult('resultAdmin', false, 'Error de conexión: ' + error.message);
+            }
+        });
+
+        // Correo de Confirmación de Pedido
+        document.getElementById('pedidoForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const email = document.getElementById('emailPedido').value;
+            const nombre = document.getElementById('nombrePedido').value;
+            const pedido = document.getElementById('numeroPedido').value;
+            const total = document.getElementById('totalPedido').value;
+            
+            try {
+                const response = await fetch(`/test/email/confirmacion-pedido?email=${encodeURIComponent(email)}&nombre=${encodeURIComponent(nombre)}&pedido=${encodeURIComponent(pedido)}&total=${encodeURIComponent(total)}`);
+                const data = await response.json();
+                
+                showResult('resultPedido', data.status === 'success', data.message, data);
+            } catch (error) {
+                showResult('resultPedido', false, 'Error de conexión: ' + error.message);
+            }
+        });
+
+        // Mostrar información del sistema
+        async function mostrarInfo() {
+            try {
+                const response = await fetch('/test/email/info');
+                const data = await response.json();
+                
+                const infoElement = document.getElementById('infoSistema');
+                infoElement.innerHTML = `
+                    <div class="card bg-light mt-3">
+                        <div class="card-body">
+                            <h6 class="fw-bold">Estado del Servicio:</h6>
+                            <p class="text-success mb-2">${data.status}</p>
+                            
+                            <h6 class="fw-bold">Endpoints de Prueba:</h6>
+                            <ul class="list-unstyled small">
+                                ${data.endpoints_prueba.map(endpoint => `<li><code>${endpoint}</code></li>`).join('')}
+                            </ul>
+                        </div>
+                    </div>
+                `;
+            } catch (error) {
+                document.getElementById('infoSistema').innerHTML = `
+                    <div class="alert alert-danger mt-3">
+                        Error al obtener información: ${error.message}
+                    </div>
+                `;
+            }
+        }
+
+        // Auto-llenar campos de ejemplo
+        document.addEventListener('DOMContentLoaded', function() {
+            // Generar emails de ejemplo únicos
+            const timestamp = Date.now();
+            document.getElementById('emailBienvenida').value = `usuario${timestamp}@ejemplo.com`;
+            document.getElementById('emailAdmin').value = `admin${timestamp}@ejemplo.com`;
+            document.getElementById('emailPedido').value = `cliente${timestamp}@ejemplo.com`;
+        });
+    </script>
+</body>
+</html>

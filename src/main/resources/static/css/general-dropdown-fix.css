@@ -1,0 +1,53 @@
+/*
+ * CORRECCIONES PARA DROPDOWNS FUERA DEL NAVBAR
+ * Asegura que los dropdowns en páginas como productos, pedidos, etc. funcionen correctamente
+ */
+
+/* Dropdowns fuera del navbar - Restaurar funcionalidad completa */
+.dropdown:not(.navbar .dropdown) .dropdown-toggle {
+    pointer-events: all !important;
+    cursor: pointer !important;
+    position: relative !important;
+    z-index: 1 !important;
+}
+
+.dropdown:not(.navbar .dropdown) .dropdown-item {
+    pointer-events: all !important;
+    cursor: pointer !important;
+    position: relative !important;
+    z-index: inherit !important;
+    display: block !important;
+}
+
+.dropdown:not(.navbar .dropdown) .dropdown-item * {
+    pointer-events: all !important;
+}
+
+.dropdown:not(.navbar .dropdown) .dropdown-menu {
+    z-index: 1050 !important;
+    position: absolute !important;
+    display: none !important;
+}
+
+.dropdown:not(.navbar .dropdown) .dropdown-menu.show {
+    display: block !important;
+    z-index: 1050 !important;
+    position: absolute !important;
+}
+
+/* Asegurar que los íconos dentro de dropdown items sean clickeables */
+.dropdown:not(.navbar .dropdown) .dropdown-item i,
+.dropdown:not(.navbar .dropdown) .dropdown-item svg {
+    pointer-events: all !important;
+}
+
+/* Hover effects para mejor UX */
+.dropdown:not(.navbar .dropdown) .dropdown-item:hover {
+    background-color: rgba(0, 123, 255, 0.1) !important;
+    cursor: pointer !important;
+}
+
+/* Asegurar que el contenedor dropdown tenga position relative */
+.dropdown:not(.navbar .dropdown) {
+    position: relative !important;
+}

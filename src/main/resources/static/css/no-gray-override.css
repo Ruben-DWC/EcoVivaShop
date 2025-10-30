@@ -1,0 +1,222 @@
+/* ==================================
+   ELIMINACIÓN TOTAL Y FORZADA DE FONDOS GRISES
+   Aplica a TODAS las páginas del proyecto
+   ================================== */
+
+/* FORZAR FONDO BLANCO EN TODO */
+* {
+    background-color: inherit !important;
+}
+
+body {
+    background: linear-gradient(135deg, #f8fff8, #ffffff) !important;
+}
+
+.card, .card-body, .card-header, .card-footer {
+    background: white !important;
+    background-color: white !important;
+    background-image: none !important;
+}
+
+/* Eliminar TODOS los fondos grises de Bootstrap */
+.bg-light, .bg-secondary, .bg-muted, [class*="bg-light"], [class*="bg-secondary"] {
+    background: white !important;
+    background-color: white !important;
+}
+
+/* Productos del catálogo específicamente */
+.product-card, .product-card .card-body {
+    background: white !important;
+    background-color: white !important;
+    border: 2px solid #e9ecef !important;
+}
+
+/* Panel de control del home */
+.card h3, .card h4, .card h5, .card h6 {
+    color: #2c3e50 !important;
+}
+
+.card p, .card-text {
+    color: #495057 !important;
+    font-weight: 500;
+}
+
+/* Eliminar texto blanco que no se ve */
+.text-white:not(.btn):not(.badge):not(.bg-success):not(.bg-primary):not(.bg-info):not(.bg-warning):not(.bg-danger):not(.rounded-circle) {
+    color: #2c3e50 !important;
+}
+
+.text-muted, .text-secondary {
+    color: #495057 !important;
+    font-weight: 500;
+}
+
+/* Mantener solo los gradientes específicos que queremos */
+.navbar {
+    background: linear-gradient(135deg, #2c3e50, #34495e) !important;
+}
+
+.btn-success {
+    background: linear-gradient(45deg, #28a745, #20c997) !important;
+    color: white !important;
+}
+
+.bg-success {
+    background: linear-gradient(45deg, #28a745, #20c997) !important;
+    color: white !important;
+}
+
+/* Hero sections específicos */
+.hero-gradient {
+    background: linear-gradient(135deg, #28a745 0%, #20c997 100%) !important;
+    color: white !important;
+}
+
+/* Asegurar que las shadows no sean grises */
+.shadow, .shadow-sm, .shadow-lg {
+    box-shadow: 0 4px 15px rgba(40, 167, 69, 0.15) !important;
+}
+
+/* Cards hover sin gris */
+.card:hover {
+    background: white !important;
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(40, 167, 69, 0.2) !important;
+}
+
+/* Específico para eliminar grises en productos */
+.col-md-6 .card, .col-lg-4 .card {
+    background: white !important;
+    border: 2px solid #e9ecef !important;
+}
+
+/* Alertas sin gris */
+.alert {
+    background: white !important;
+    border: 2px solid #28a745 !important;
+    color: #2c3e50 !important;
+}
+
+.alert-success {
+    background: linear-gradient(45deg, #d4edda, #c3e6cb) !important;
+    border-color: #28a745 !important;
+    color: #155724 !important;
+}
+
+/* Formularios sin gris */
+.form-control, .form-select {
+    background: white !important;
+    background-color: white !important;
+    color: #495057 !important;
+    border: 2px solid #e9ecef !important;
+}
+
+.form-control:focus {
+    background: white !important;
+    border-color: #28a745 !important;
+}
+
+/* Tablas sin gris */
+.table, .table td, .table th {
+    background: white !important;
+    background-color: white !important;
+    color: #495057 !important;
+}
+
+.table-striped tbody tr:nth-of-type(odd) {
+    background: rgba(40, 167, 69, 0.05) !important;
+}
+
+/* Dropdown sin gris */
+.dropdown-menu {
+    background: white !important;
+    border: 2px solid #e9ecef !important;
+}
+
+.dropdown-item {
+    background: white !important;
+    color: #495057 !important;
+}
+
+.dropdown-item:hover {
+    background: linear-gradient(45deg, #28a745, #20c997) !important;
+    color: white !important;
+}
+
+/* Modals sin gris */
+.modal-content, .modal-header, .modal-body, .modal-footer {
+    background: white !important;
+    color: #495057 !important;
+}
+
+/* Navegación sin gris */
+.nav-tabs .nav-link, .nav-pills .nav-link {
+    background: white !important;
+    color: #495057 !important;
+    border: 2px solid #e9ecef !important;
+}
+
+.nav-tabs .nav-link.active, .nav-pills .nav-link.active {
+    background: linear-gradient(45deg, #28a745, #20c997) !important;
+    color: white !important;
+}
+
+/* List groups sin gris */
+.list-group-item {
+    background: white !important;
+    color: #495057 !important;
+    border: 1px solid #e9ecef !important;
+}
+
+.list-group-item.active {
+    background: linear-gradient(45deg, #28a745, #20c997) !important;
+    border-color: #28a745 !important;
+    color: white !important;
+}
+
+/* Progress bars sin gris */
+.progress {
+    background: white !important;
+    border: 2px solid #e9ecef !important;
+}
+
+.progress-bar {
+    background: linear-gradient(45deg, #28a745, #20c997) !important;
+}
+
+/* Breadcrumbs sin gris */
+.breadcrumb {
+    background: white !important;
+    border: 2px solid #e9ecef !important;
+}
+
+/* Pagination sin gris */
+.page-link {
+    background: white !important;
+    color: #495057 !important;
+    border: 2px solid #e9ecef !important;
+}
+
+.page-link:hover, .page-item.active .page-link {
+    background: linear-gradient(45deg, #28a745, #20c997) !important;
+    color: white !important;
+    border-color: #28a745 !important;
+}
+
+/* Input groups sin gris */
+.input-group-text {
+    background: white !important;
+    color: #495057 !important;
+    border: 2px solid #e9ecef !important;
+}
+
+/* Cualquier elemento con clase que contenga 'gray', 'grey', 'muted' */
+[class*="gray"], [class*="grey"], [class*="muted"]:not(.text-muted) {
+    background: white !important;
+    color: #495057 !important;
+}
+
+/* Forzar herencia de color en hijos */
+.card * {
+    color: inherit;
+}

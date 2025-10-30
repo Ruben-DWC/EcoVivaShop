@@ -1,0 +1,831 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/head :: head('Compra Exitosa | EcoVivaShop')}">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Compra Exitosa | EcoVivaShop</title>
+</head>
+<style>
+    :root {
+        --primary-green: #20c997;
+        --secondary-green: #28a745;
+        --accent-teal: #17a2b8;
+        --warm-orange: #ff6b6b;
+        --eco-gold: #ffd700;
+        --success-light: #d4edda;
+        --success-dark: #155724;
+    }
+
+    body {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 25%, #20c997 50%, #28a745 75%, #17a2b8 100%);
+        background-size: 400% 400%;
+        animation: gradientMove 20s ease infinite;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        min-height: 100vh;
+    }
+
+    @keyframes gradientMove {
+        0% { background-position: 0% 50%; }
+        50% { background-position: 100% 50%; }
+        100% { background-position: 0% 50%; }
+    }
+
+    .loading-screen {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 9999;
+        transition: opacity 0.5s ease;
+    }
+
+    .loading-content {
+        text-align: center;
+        color: white;
+    }
+
+    .success-icon {
+        width: 100px;
+        height: 100px;
+        border: 4px solid white;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 20px;
+        font-size: 3rem;
+        animation: successPulse 2s ease infinite;
+    }
+
+    @keyframes successPulse {
+        0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.7); }
+        50% { transform: scale(1.05); box-shadow: 0 0 0 20px rgba(255, 255, 255, 0); }
+        100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(255, 255, 255, 0); }
+    }
+
+    .confirmation-container {
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(20px);
+        border-radius: 30px;
+        box-shadow: 0 25px 50px rgba(0, 0, 0, 0.2);
+        margin: 2rem auto;
+        max-width: 1000px;
+        overflow: hidden;
+        border: 1px solid rgba(255, 255, 255, 0.3);
+    }
+
+    .confirmation-header {
+        background: linear-gradient(135deg, var(--secondary-green), var(--primary-green));
+        color: white;
+        padding: 3rem;
+        text-align: center;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .confirmation-header::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        left: -50%;
+        width: 200%;
+        height: 200%;
+        background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+        transform: rotate(45deg);
+        animation: shimmer 3s infinite;
+    }
+
+    @keyframes shimmer {
+        0% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
+        100% { transform: translateX(100%) translateY(100%) rotate(45deg); }
+    }
+
+    .header-icon {
+        width: 120px;
+        height: 120px;
+        background: white;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 2rem;
+        font-size: 4rem;
+        color: var(--secondary-green);
+        position: relative;
+        z-index: 1;
+        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+        animation: bounceIn 1s ease;
+    }
+
+    @keyframes bounceIn {
+        0% { transform: scale(0); }
+        50% { transform: scale(1.2); }
+        100% { transform: scale(1); }
+    }
+
+    .confirmation-title {
+        font-size: 3rem;
+        font-weight: 700;
+        margin-bottom: 1rem;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        position: relative;
+        z-index: 1;
+        animation: slideInUp 1s ease 0.5s both;
+    }
+
+    .confirmation-subtitle {
+        font-size: 1.2rem;
+        opacity: 0.9;
+        position: relative;
+        z-index: 1;
+        animation: slideInUp 1s ease 0.7s both;
+    }
+
+    @keyframes slideInUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .confirmation-content {
+        padding: 3rem;
+    }
+
+    .order-card {
+        background: white;
+        border-radius: 20px;
+        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+        margin-bottom: 2rem;
+        overflow: hidden;
+        border: 1px solid rgba(32, 201, 151, 0.2);
+        animation: slideInUp 1s ease 0.9s both;
+    }
+
+    .order-header {
+        background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+        padding: 2rem;
+        border-bottom: 1px solid #dee2e6;
+    }
+
+    .order-info {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 2rem;
+        margin-bottom: 2rem;
+    }
+
+    .info-item {
+        text-align: center;
+        padding: 1.5rem;
+        background: linear-gradient(135deg, rgba(32, 201, 151, 0.1), rgba(40, 167, 69, 0.1));
+        border-radius: 15px;
+        border: 1px solid rgba(32, 201, 151, 0.3);
+    }
+
+    .info-icon {
+        font-size: 2.5rem;
+        color: var(--secondary-green);
+        margin-bottom: 1rem;
+    }
+
+    .info-label {
+        font-size: 0.9rem;
+        color: #6c757d;
+        margin-bottom: 0.5rem;
+        text-transform: uppercase;
+        font-weight: 600;
+        letter-spacing: 1px;
+    }
+
+    .info-value {
+        font-size: 1.2rem;
+        font-weight: 700;
+        color: var(--secondary-green);
+    }
+
+    .order-summary {
+        padding: 2rem;
+    }
+
+    .product-item {
+        display: flex;
+        align-items: center;
+        padding: 1.5rem;
+        background: #f8f9fa;
+        border-radius: 15px;
+        margin-bottom: 1rem;
+        border: 1px solid #e9ecef;
+        transition: all 0.3s ease;
+    }
+
+    .product-item:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        border-color: var(--primary-green);
+    }
+
+    .product-icon {
+        width: 60px;
+        height: 60px;
+        background: linear-gradient(135deg, var(--primary-green), var(--secondary-green));
+        border-radius: 15px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-right: 1.5rem;
+        color: white;
+        font-size: 1.5rem;
+    }
+
+    .product-details {
+        flex-grow: 1;
+    }
+
+    .product-name {
+        font-weight: 700;
+        color: #333;
+        margin-bottom: 0.5rem;
+    }
+
+    .product-meta {
+        color: #6c757d;
+        font-size: 0.9rem;
+    }
+
+    .product-price {
+        font-size: 1.2rem;
+        font-weight: 700;
+        color: var(--secondary-green);
+    }
+
+    .total-section {
+        background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+        padding: 2rem;
+        border-radius: 20px;
+        margin-top: 2rem;
+        border: 1px solid rgba(32, 201, 151, 0.3);
+    }
+
+    .total-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1rem;
+        padding-bottom: 1rem;
+        border-bottom: 1px solid #dee2e6;
+    }
+
+    .total-item:last-child {
+        border-bottom: none;
+        margin-bottom: 0;
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: var(--secondary-green);
+    }
+
+    .action-buttons {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 1.5rem;
+        margin-top: 3rem;
+    }
+
+    .btn-action {
+        padding: 1rem 2rem;
+        border-radius: 25px;
+        font-weight: 700;
+        font-size: 1.1rem;
+        text-decoration: none;
+        text-align: center;
+        transition: all 0.3s ease;
+        border: none;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+    }
+
+    .btn-primary {
+        background: linear-gradient(135deg, var(--primary-green), var(--secondary-green));
+        color: white;
+        box-shadow: 0 10px 25px rgba(32, 201, 151, 0.3);
+    }
+
+    .btn-primary:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 15px 35px rgba(32, 201, 151, 0.4);
+        color: white;
+    }
+
+    .btn-outline {
+        background: white;
+        color: var(--secondary-green);
+        border: 2px solid var(--secondary-green);
+    }
+
+    .btn-outline:hover {
+        background: var(--secondary-green);
+        color: white;
+        transform: translateY(-3px);
+        box-shadow: 0 15px 35px rgba(40, 167, 69, 0.3);
+    }
+
+    .btn-warning {
+        background: linear-gradient(135deg, #ffc107, #ff9800);
+        color: white;
+        box-shadow: 0 10px 25px rgba(255, 193, 7, 0.3);
+    }
+
+    .btn-warning:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 15px 35px rgba(255, 193, 7, 0.4);
+        color: white;
+    }
+
+    .eco-message {
+        background: linear-gradient(135deg, rgba(32, 201, 151, 0.1), rgba(40, 167, 69, 0.1));
+        border: 2px solid var(--primary-green);
+        border-radius: 20px;
+        padding: 2rem;
+        text-align: center;
+        margin-top: 2rem;
+        animation: slideInUp 1s ease 1.1s both;
+    }
+
+    .eco-icon {
+        font-size: 3rem;
+        color: var(--secondary-green);
+        margin-bottom: 1rem;
+    }
+
+    .timeline {
+        background: white;
+        border-radius: 20px;
+        padding: 2rem;
+        margin-top: 2rem;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        border: 1px solid rgba(32, 201, 151, 0.2);
+    }
+
+    .timeline-item {
+        display: flex;
+        align-items: center;
+        margin-bottom: 2rem;
+        position: relative;
+    }
+
+    .timeline-item:last-child {
+        margin-bottom: 0;
+    }
+
+    .timeline-icon {
+        width: 50px;
+        height: 50px;
+        background: linear-gradient(135deg, var(--primary-green), var(--secondary-green));
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 1.2rem;
+        margin-right: 1.5rem;
+        position: relative;
+        z-index: 1;
+    }
+
+    .timeline-item:not(:last-child) .timeline-icon::after {
+        content: '';
+        position: absolute;
+        top: 50px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 2px;
+        height: 60px;
+        background: #dee2e6;
+        z-index: -1;
+    }
+
+    .timeline-content h6 {
+        margin-bottom: 0.5rem;
+        color: var(--secondary-green);
+        font-weight: 700;
+    }
+
+    .timeline-content p {
+        margin: 0;
+        color: #6c757d;
+        font-size: 0.9rem;
+    }
+
+    /* Confetti Animation */
+    .confetti {
+        position: fixed;
+        top: -10px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 10px;
+        height: 10px;
+        background: var(--eco-gold);
+        animation: confetti-fall 3s linear infinite;
+        z-index: 1000;
+    }
+
+    .confetti:nth-child(odd) {
+        background: var(--primary-green);
+        animation-delay: -1s;
+    }
+
+    .confetti:nth-child(even) {
+        background: var(--warm-orange);
+        animation-delay: -2s;
+    }
+
+    @keyframes confetti-fall {
+        0% {
+            transform: translateX(-50%) translateY(-100vh) rotate(0deg);
+            opacity: 1;
+        }
+        100% {
+            transform: translateX(-50%) translateY(100vh) rotate(720deg);
+            opacity: 0;
+        }
+    }
+
+    @media (max-width: 768px) {
+        .confirmation-title {
+            font-size: 2rem;
+        }
+        
+        .header-icon {
+            width: 80px;
+            height: 80px;
+            font-size: 2.5rem;
+        }
+        
+        .order-info {
+            grid-template-columns: 1fr;
+        }
+        
+        .action-buttons {
+            grid-template-columns: 1fr;
+        }
+        
+        .product-item {
+            flex-direction: column;
+            text-align: center;
+        }
+        
+        .product-icon {
+            margin: 0 0 1rem 0;
+        }
+    }
+</style>
+<body>
+    <div class="loading-screen" id="loadingScreen">
+        <div class="loading-content">
+            <div class="success-icon">
+                <i class="bi bi-check"></i>
+            </div>
+            <div class="loading-text">¡Procesando tu compra exitosa!</div>
+        </div>
+    </div>
+
+    <!-- Confetti -->
+    <div class="confetti" style="left: 10%;"></div>
+    <div class="confetti" style="left: 20%;"></div>
+    <div class="confetti" style="left: 30%;"></div>
+    <div class="confetti" style="left: 40%;"></div>
+    <div class="confetti" style="left: 60%;"></div>
+    <div class="confetti" style="left: 70%;"></div>
+    <div class="confetti" style="left: 80%;"></div>
+    <div class="confetti" style="left: 90%;"></div>
+
+    <div th:replace="~{fragments/client-navbar :: client-navbar}"></div>
+
+    <div class="confirmation-container">
+        <!-- Header -->
+        <div class="confirmation-header">
+            <div class="header-icon">
+                <i class="bi bi-check-circle-fill"></i>
+            </div>
+            <h1 class="confirmation-title">¡Compra Exitosa!</h1>
+            <p class="confirmation-subtitle">
+                Tu pedido ha sido procesado correctamente. Te enviaremos una confirmación por email.
+            </p>
+        </div>
+
+        <div class="confirmation-content">
+            <!-- Información del pedido -->
+            <div class="order-card">
+                <div class="order-header">
+                    <h3 class="text-success fw-bold mb-3">
+                        <i class="bi bi-receipt me-2"></i>Detalles del Pedido
+                    </h3>
+                    
+                    <div class="order-info">
+                        <div class="info-item">
+                            <div class="info-icon">
+                                <i class="bi bi-hash"></i>
+                            </div>
+                            <div class="info-label">Número de Pedido</div>
+                            <div class="info-value" th:text="${numeroPedido}">ECO-2024-001</div>
+                        </div>
+                        
+                        <div class="info-item">
+                            <div class="info-icon">
+                                <i class="bi bi-calendar-check"></i>
+                            </div>
+                            <div class="info-label">Fecha de Compra</div>
+                            <div class="info-value" th:text="${#temporals.format(fechaPedido, 'dd/MM/yyyy HH:mm')}">01/01/2024 10:30</div>
+                        </div>
+                        
+                        <div class="info-item">
+                            <div class="info-icon">
+                                <i class="bi bi-credit-card"></i>
+                            </div>
+                            <div class="info-label">Método de Pago</div>
+                            <div class="info-value" th:text="${metodoPago}">Tarjeta de Crédito</div>
+                        </div>
+                        
+                        <div class="info-item">
+                            <div class="info-icon">
+                                <i class="bi bi-truck"></i>
+                            </div>
+                            <div class="info-label">Estado</div>
+                            <div class="info-value">Confirmado</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="order-summary">
+                    <h5 class="text-success mb-4">
+                        <i class="bi bi-box-seam me-2"></i>Productos Comprados
+                    </h5>
+
+                    <!-- Lista de productos -->
+                    <div th:each="item : ${productosComprados}" class="product-item">
+                        <div class="product-icon">
+                            <i class="bi bi-leaf"></i>
+                        </div>
+                        <div class="product-details">
+                            <div class="product-name" th:text="${item.nombre}">Producto Eco</div>
+                            <div class="product-meta">
+                                Cantidad: <span th:text="${item.cantidad}">1</span> × 
+                                S/ <span th:text="${#numbers.formatDecimal(item.precio, 1, 2)}">0.00</span>
+                            </div>
+                        </div>
+                        <div class="product-price">
+                            S/ <span th:text="${#numbers.formatDecimal(item.total, 1, 2)}">0.00</span>
+                        </div>
+                    </div>
+
+                    <!-- Resumen de totales -->
+                    <div class="total-section">
+                        <div class="total-item">
+                            <span>Subtotal:</span>
+                            <span>S/ <span th:text="${#numbers.formatDecimal(subtotal, 1, 2)}">0.00</span></span>
+                        </div>
+
+                        <div class="total-item">
+                            <span>Descuento Eco (5%):</span>
+                            <span class="text-success">-S/ <span th:text="${#numbers.formatDecimal(descuento, 1, 2)}">0.00</span></span>
+                        </div>
+
+                        <div class="total-item">
+                            <span>Envío:</span>
+                            <span th:if="${envio > 0}">S/ <span th:text="${#numbers.formatDecimal(envio, 1, 2)}">0.00</span></span>
+                            <span th:unless="${envio > 0}" class="text-success fw-bold">GRATIS</span>
+                        </div>
+
+                        <div class="total-item">
+                            <span>IGV (18%):</span>
+                            <span>S/ <span th:text="${#numbers.formatDecimal(igv, 1, 2)}">0.00</span></span>
+                        </div>
+
+                        <div class="total-item">
+                            <span>Total Pagado:</span>
+                            <span>S/ <span th:text="${#numbers.formatDecimal(total, 1, 2)}">0.00</span></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Timeline de entrega -->
+            <div class="timeline">
+                <h5 class="text-success mb-4">
+                    <i class="bi bi-truck me-2"></i>Seguimiento de tu Pedido
+                </h5>
+                
+                <div class="timeline-item">
+                    <div class="timeline-icon">
+                        <i class="bi bi-check-circle"></i>
+                    </div>
+                    <div class="timeline-content">
+                        <h6>Pedido Confirmado</h6>
+                        <p>Tu pedido ha sido recibido y confirmado exitosamente.</p>
+                    </div>
+                </div>
+                
+                <div class="timeline-item">
+                    <div class="timeline-icon">
+                        <i class="bi bi-box-seam"></i>
+                    </div>
+                    <div class="timeline-content">
+                        <h6>Preparando Envío</h6>
+                        <p>Estamos preparando tus productos eco-amigables con mucho cuidado.</p>
+                    </div>
+                </div>
+                
+                <div class="timeline-item">
+                    <div class="timeline-icon">
+                        <i class="bi bi-truck"></i>
+                    </div>
+                    <div class="timeline-content">
+                        <h6>En Camino</h6>
+                        <p>Tu pedido será enviado en las próximas 24-48 horas.</p>
+                    </div>
+                </div>
+                
+                <div class="timeline-item">
+                    <div class="timeline-icon">
+                        <i class="bi bi-house-heart"></i>
+                    </div>
+                    <div class="timeline-content">
+                        <h6>Entregado</h6>
+                        <p>Recibirás tu pedido en la dirección especificada.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Mensaje eco-amigable -->
+            <div class="eco-message">
+                <div class="eco-icon">
+                    <i class="bi bi-tree"></i>
+                </div>
+                <h4 class="text-success fw-bold mb-3">¡Gracias por Elegir Productos Eco-Amigables!</h4>
+                <p class="mb-0">
+                    Con tu compra has contribuido a un planeta más sostenible. 
+                    Cada producto que elegiste ayuda a reducir el impacto ambiental y 
+                    promueve un futuro más verde para todos.
+                </p>
+            </div>
+
+            <!-- Botones de acción -->
+            <div class="action-buttons">
+                <a th:href="@{/client/descargar-boleta(numeroPedido=${numeroPedido})}" 
+                   class="btn-action btn-primary">
+                    <i class="bi bi-download"></i>
+                    Descargar Boleta PDF
+                </a>
+                
+                <a th:href="@{/client/catalogo}" class="btn-action btn-outline">
+                    <i class="bi bi-arrow-left"></i>
+                    Continuar Comprando
+                </a>
+                
+                <a th:href="@{/client/pedidos}" class="btn-action btn-warning">
+                    <i class="bi bi-list-ul"></i>
+                    Ver Mis Pedidos
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div th:replace="~{fragments/footer :: footer}"></div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/js/client-global.js"></script>
+    <script>
+        // Pantalla de carga
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('🎉 Página de confirmación cargada');
+            
+            // Remover pantalla de carga
+            setTimeout(function() {
+                const loadingScreen = document.getElementById('loadingScreen');
+                if (loadingScreen) {
+                    loadingScreen.style.opacity = '0';
+                    setTimeout(function() {
+                        loadingScreen.style.display = 'none';
+                    }, 500);
+                }
+            }, 2000);
+            
+            // Crear confetti inicial
+            setTimeout(createInitialConfetti, 1000);
+            
+            // Mostrar mensaje de éxito
+            setTimeout(showSuccessMessage, 2500);
+        });
+
+        // Crear confetti inicial (limitado)
+        function createInitialConfetti() {
+            const colors = ['#20c997', '#28a745', '#ffd700', '#ff6b6b', '#17a2b8'];
+            
+            for (let i = 0; i < 30; i++) {
+                setTimeout(() => {
+                    const confetti = document.createElement('div');
+                    confetti.className = 'confetti';
+                    confetti.style.left = Math.random() * 100 + '%';
+                    confetti.style.background = colors[Math.floor(Math.random() * colors.length)];
+                    confetti.style.animationDelay = Math.random() * 2 + 's';
+                    confetti.style.animationDuration = (Math.random() * 2 + 2) + 's';
+                    document.body.appendChild(confetti);
+                    
+                    // Remover el confetti después de la animación
+                    setTimeout(() => {
+                        if (confetti.parentNode) {
+                            confetti.remove();
+                        }
+                    }, 4000);
+                }, i * 50);
+            }
+        }
+
+        // Notificación de descarga
+        document.addEventListener('click', function(e) {
+            if (e.target.closest('a[href*="descargar-boleta"]')) {
+                setTimeout(() => {
+                    showNotification('¡Tu boleta está siendo descargada! 📄✨', 'success');
+                }, 500);
+            }
+        });
+
+        // Efectos de sonido simulados (visual feedback)
+        function showSuccessMessage() {
+            showNotification('¡Compra procesada exitosamente! 🎉', 'success');
+        }
+        
+        // Función de notificación optimizada
+        function showNotification(message, type) {
+            const typeClass = type === 'success' ? 'success' : 
+                            type === 'warning' ? 'warning' : 
+                            type === 'info' ? 'info' : 'danger';
+                            
+            const notification = document.createElement('div');
+            notification.className = `alert alert-${typeClass} position-fixed`;
+            notification.style.cssText = `
+                top: 20px;
+                right: 20px;
+                z-index: 10001;
+                min-width: 350px;
+                animation: slideInRight 0.5s ease-out;
+                box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+            `;
+            notification.textContent = message;
+            
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                if (notification.parentNode) {
+                    notification.style.animation = 'slideOutRight 0.5s ease-out';
+                    setTimeout(() => {
+                        if (notification.parentNode) {
+                            notification.remove();
+                        }
+                    }, 500);
+                }
+            }, 4000);
+        }
+
+        console.log('🎉 EcoVivaShop - ¡Compra confirmada exitosamente!');
+        console.log('🌱 Gracias por elegir productos eco-amigables');
+    </script>
+
+    <style>
+        @keyframes slideInRight {
+            from {
+                opacity: 0;
+                transform: translateX(100%);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+        
+        @keyframes slideOutRight {
+            from {
+                opacity: 1;
+                transform: translateX(0);
+            }
+            to {
+                opacity: 0;
+                transform: translateX(100%);
+            }
+        }
+    </style>
+</body>
+</html>

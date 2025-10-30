@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/head :: head('Historial de Pedidos | EcoVivaShop Admin')}">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Historial de Pedidos | EcoVivaShop Admin</title>
+</head>
+<body class="eco-bg">
+    <!-- Admin Navbar -->
+    <div th:replace="~{fragments/admin-navbar :: admin-navbar}"></div>
+
+    <main class="container-fluid py-4">
+        <!-- Header -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h1 class="h3 mb-0 text-dark fw-bold">
+                            <i class="bi bi-cart-check text-success me-2"></i>
+                            Historial de Pedidos
+                        </h1>
+                        <p class="text-muted mb-0">Gestiona y monitorea todos los pedidos de EcoVivaShop</p>
+                    </div>
+                    <div>
+                        <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#exportModal">
+                            <i class="bi bi-download me-2"></i>Exportar
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Stats Cards -->
+        <div class="row g-4 mb-4">
+            <div class="col-xl-3 col-md-6">
+                <div class="card border-0 shadow-sm stats-card-1 stats-card-white-text">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center">
+                            <div class="flex-shrink-0">
+                                <i class="bi bi-cart-plus-fill display-6 force-visible-icon"></i>
+                            </div>
+                            <div class="flex-grow-1 ms-3 stats-card-white-text">
+                                <div class="small fw-bold">Total Pedidos</div>
+                                <div class="h4 mb-0" th:text="${totalPedidos ?: 0}">6</div>
+                                <div class="small">Desde el inicio</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xl-3 col-md-6">
+                <div class="card border-0 shadow-sm stats-card-2 stats-card-white-text">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center">
+                            <div class="flex-shrink-0">
+                                <i class="bi bi-clock-fill display-6 force-visible-icon"></i>
+                            </div>
+                            <div class="flex-grow-1 ms-3 stats-card-white-text">
+                                <div class="small fw-bold">Pendientes</div>
+                                <div class="h4 mb-0" th:text="${pedidosPendientes ?: 0}">4</div>
+                                <div class="small">Requieren atención</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xl-3 col-md-6">
+                <div class="card border-0 shadow-sm stats-card-3 stats-card-white-text">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center">
+                            <div class="flex-shrink-0">
+                                <i class="bi bi-check-circle-fill display-6 force-visible-icon"></i>
+                            </div>
+                            <div class="flex-grow-1 ms-3 stats-card-white-text">
+                                <div class="small fw-bold">Completados</div>
+                                <div class="h4 mb-0" th:text="${pedidosEntregados ?: 0}">1</div>
+                                <div class="small">Entregados</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xl-3 col-md-6">
+                <div class="card border-0 shadow-sm stats-card-4 stats-card-dark-text">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center">
+                            <div class="flex-shrink-0">
+                                <i class="bi bi-currency-dollar display-6" style="color: #212529 !important; font-size: 3rem !important;"></i>
+                            </div>
+                            <div class="flex-grow-1 ms-3 stats-card-dark-text">
+                                <div class="small fw-bold">Ingresos Total</div>
+                                <div class="h4 mb-0" th:text="'S/ ' + ${#numbers.formatDecimal(ingresosTotales ?: 0, 1, 2)}">S/ 348.19</div>
+                                <div class="small">Este año</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Filters -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-body">
+                        <form method="get" action="/admin/pedidos" id="filtrosForm">
+                            <div class="row g-3 align-items-end">
+                                <div class="col-md-3">
+                                    <label class="form-label fw-bold" for="statusFilter">Estado del Pedido</label>
+                                    <select class="form-select" name="estado" id="statusFilter" title="Estado del Pedido" th:value="${estado}">
+                                        <option value="">Todos los estados</option>
+                                        <option th:each="est : ${estados}" 
+                                                th:value="${est}" 
+                                                th:text="${est}" 
+                                                th:selected="${est == estado}">Estado</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-3">
+                                    <label class="form-label fw-bold" for="dateFrom">Fecha Desde</label>
+                                    <input type="date" class="form-control" name="fechaDesde" id="dateFrom" title="Fecha Desde" th:value="${fechaDesde}">
+                                </div>
+                                <div class="col-md-3">
+                                    <label class="form-label fw-bold" for="dateTo">Fecha Hasta</label>
+                                    <input type="date" class="form-control" name="fechaHasta" id="dateTo" title="Fecha Hasta" th:value="${fechaHasta}">
+                                </div>
+                                <div class="col-md-3">
+                                    <label class="form-label fw-bold">Buscar</label>
+                                    <div class="input-group">
+                                        <input type="text" class="form-control" name="busqueda" placeholder="ID, cliente, email..." id="searchOrders" th:value="${busqueda}">
+                                        <button class="btn btn-outline-secondary" type="submit" title="Buscar">
+                                            <i class="bi bi-search"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Orders Table -->
+        <div class="row">
+            <div class="col-12">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-header bg-white border-bottom">
+                        <div class="row align-items-center">
+                            <div class="col">
+                                <h5 class="card-title mb-0 text-dark fw-bold">Lista de Pedidos</h5>
+                            </div>
+                            <div class="col-auto">
+                                <div class="btn-group" role="group">
+                                    <input type="radio" class="btn-check" name="viewMode" id="tableView" checked title="Vista de tabla">
+                                    <label class="btn btn-outline-secondary" for="tableView" title="Vista de tabla">
+                                        <i class="bi bi-table"></i>
+                                    </label>
+                                    <input type="radio" class="btn-check" name="viewMode" id="cardView" title="Vista de tarjetas">
+                                    <label class="btn btn-outline-secondary" for="cardView">
+                                        <i class="bi bi-grid-3x3-gap"></i>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table table-hover mb-0" id="ordersTable">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>ID Pedido</th>
+                                        <th>Cliente</th>
+                                        <th>Fecha</th>
+                                        <th>Productos</th>
+                                        <th>Total</th>
+                                        <th>Estado</th>
+                                        <th>Método Pago</th>
+                                        <th>Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr th:each="pedido : ${pedidos.content}" th:if="${pedidos.hasContent()}">
+                                        <td>
+                                            <span class="fw-bold text-primary" th:text="'#' + ${pedido.numeroPedido}">#ECO-2024-1025</span>
+                                        </td>
+                                        <td>
+                                            <div class="d-flex align-items-center">
+                                                <img th:src="${pedido.usuario.fotoPerfil != null ? pedido.usuario.fotoPerfil : '/img/default-profile.svg'}" 
+                                                     alt="Avatar" class="rounded-circle me-2" width="32" height="32">
+                                                <div>
+                                                    <div class="fw-bold" th:text="${pedido.usuario.nombre + ' ' + pedido.usuario.apellido}">Cliente</div>
+                                                    <small class="text-muted" th:text="${pedido.usuario.email}">email@ejemplo.com</small>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div th:text="${#temporals.format(pedido.fechaPedido, 'dd/MM/yyyy')}">15/05/2024</div>
+                                            <small class="text-muted" th:text="${#temporals.format(pedido.fechaPedido, 'HH:mm')}">14:30</small>
+                                        </td>
+                                        <td>
+                                            <div class="d-flex align-items-center">
+                                                <span class="badge bg-info me-2" th:text="${#lists.size(pedido.detalles)} + ' items'">3 items</span>
+                                                <small th:text="${#strings.abbreviate(#strings.listJoin(pedido.detalles.![producto.nombre], ', '), 20)}">Productos...</small>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <span class="fw-bold text-success" th:text="'S/ ' + ${#numbers.formatDecimal(pedido.total, 1, 2)}">S/ 300.50</span>
+                                        </td>
+                                        <td>
+                                            <span th:class="${pedido.estado == 'PENDIENTE' ? 'badge bg-warning' : 
+                                                           (pedido.estado == 'CONFIRMADO' ? 'badge bg-info' :
+                                                           (pedido.estado == 'PREPARANDO' ? 'badge bg-primary' :
+                                                           (pedido.estado == 'ENVIADO' ? 'badge bg-secondary' :
+                                                           (pedido.estado == 'ENTREGADO' ? 'badge bg-success' : 'badge bg-danger'))))}"
+                                                  th:text="${pedido.estado}">Estado</span>
+                                        </td>
+                                        <td>
+                                            <i th:class="${pedido.metodoPago == 'TARJETA' ? 'bi bi-credit-card text-primary me-1' : 
+                                                          (pedido.metodoPago == 'PAYPAL' ? 'bi bi-paypal text-info me-1' : 
+                                                          'bi bi-cash text-success me-1')}"></i>
+                                            <span th:text="${pedido.metodoPago}">Método</span>
+                                        </td>
+                                        <td>
+                                            <div class="btn-group btn-group-sm">
+                                                <a th:href="@{/admin/pedidos/detalle/{id}(id=${pedido.idPedido})}" 
+                                                   class="btn btn-outline-primary" title="Ver detalles">
+                                                    <i class="bi bi-eye"></i>
+                                                </a>
+                                                <button class="btn btn-outline-warning" title="Editar estado" 
+                                                        th:onclick="'editOrderStatus(' + ${pedido.idPedido} + ')'">
+                                                    <i class="bi bi-pencil"></i>
+                                                </button>
+                                                <button class="btn btn-outline-info" title="Imprimir" 
+                                                        th:onclick="'printOrder(' + ${pedido.idPedido} + ')'">
+                                                    <i class="bi bi-printer"></i>
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr th:unless="${pedidos.hasContent()}">
+                                        <td colspan="8" class="text-center py-4">
+                                            <i class="bi bi-inbox text-muted" style="font-size: 3rem;"></i>
+                                            <p class="text-muted mt-2">No se encontraron pedidos</p>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="card-footer bg-white" th:if="${pedidos.totalPages > 1}">
+                        <nav>
+                            <ul class="pagination justify-content-center mb-0">
+                                <!-- Botón Anterior -->
+                                <li th:class="${pedidos.first ? 'page-item disabled' : 'page-item'}">
+                                    <a th:if="${!pedidos.first}" 
+                                       th:href="@{/admin/pedidos(page=${currentPage - 1}, size=${pedidos.size}, estado=${estado}, busqueda=${busqueda})}" 
+                                       class="page-link">Anterior</a>
+                                    <span th:if="${pedidos.first}" class="page-link">Anterior</span>
+                                </li>
+                                
+                                <!-- Números de página -->
+                                <li th:each="i : ${#numbers.sequence(0, pedidos.totalPages - 1)}" 
+                                    th:class="${i == currentPage ? 'page-item active' : 'page-item'}">
+                                    <a th:if="${i != currentPage}" 
+                                       th:href="@{/admin/pedidos(page=${i}, size=${pedidos.size}, estado=${estado}, busqueda=${busqueda})}" 
+                                       th:text="${i + 1}" class="page-link">1</a>
+                                    <span th:if="${i == currentPage}" th:text="${i + 1}" class="page-link">1</span>
+                                </li>
+                                
+                                <!-- Botón Siguiente -->
+                                <li th:class="${pedidos.last ? 'page-item disabled' : 'page-item'}">
+                                    <a th:if="${!pedidos.last}" 
+                                       th:href="@{/admin/pedidos(page=${currentPage + 1}, size=${pedidos.size}, estado=${estado}, busqueda=${busqueda})}" 
+                                       class="page-link">Siguiente</a>
+                                    <span th:if="${pedidos.last}" class="page-link">Siguiente</span>
+                                </li>
+                            </ul>
+                        </nav>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Export Modal -->
+    <div class="modal fade" id="exportModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        <i class="bi bi-download me-2"></i>Exportar Pedidos
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="exportForm">
+                        <div class="mb-3">
+                            <label class="form-label" for="exportFormatSelect">Formato de Exportación</label>
+                            <select class="form-select" id="exportFormatSelect" title="Formato de Exportación">
+                                <option value="pdf">PDF (.pdf)</option>
+                                <option value="excel">Excel (.xlsx)</option>
+                                <option value="csv">CSV (.csv)</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Rango de Fechas (Opcional)</label>
+                            <div class="row g-2">
+                                <div class="col">
+                                    <input type="date" class="form-control" id="fechaInicioExport" placeholder="dd/mm/aaaa" title="Fecha de inicio">
+                                </div>
+                                <div class="col">
+                                    <input type="date" class="form-control" id="fechaFinExport" placeholder="dd/mm/aaaa" title="Fecha de fin">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Estados a Incluir</label>
+                            <select class="form-select" id="estadosExport" title="Estados a incluir">
+                                <option value="todos">Todos los estados</option>
+                                <option value="PENDIENTE">Pendiente</option>
+                                <option value="CONFIRMADO">Confirmado</option>
+                                <option value="ENTREGADO">Entregado</option>
+                                <option value="CANCELADO">Cancelado</option>
+                            </select>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-success" onclick="exportarPedidos()">
+                        <i class="bi bi-download me-2"></i>Exportar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading Indicator -->
+    <div id="loadingIndicator" class="position-fixed top-50 start-50 translate-middle" style="display: none; z-index: 9999;">
+        <div class="card shadow-lg border-0">
+            <div class="card-body text-center p-4">
+                <div class="spinner-border text-success mb-3" role="status">
+                    <span class="visually-hidden">Cargando...</span>
+                </div>
+                <h6 class="mb-0">Generando archivo...</h6>
+                <small class="text-muted">Por favor espere</small>
+            </div>
+        </div>
+    </div>
+
+    <div th:replace="~{fragments/footer :: footer}"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        // =====================================================
+        // FUNCIÓN PRINCIPAL DE EXPORTACIÓN - USA BACKEND
+        // =====================================================
+        function exportarPedidos() {
+            console.log('🚀 Iniciando exportación con backend...');
+            
+            const formato = document.getElementById('exportFormatSelect').value;
+            const fechaInicio = document.getElementById('fechaInicioExport').value;
+            const fechaFin = document.getElementById('fechaFinExport').value;
+            const estados = document.getElementById('estadosExport').value;
+            
+            console.log('📋 Parámetros:', { formato, fechaInicio, fechaFin, estados });
+            
+            // Construir URL con parámetros
+            let url = `/admin/pedidos/exportar/${formato}`;
+            const params = new URLSearchParams();
+            
+            if (fechaInicio) params.append('fechaInicio', fechaInicio);
+            if (fechaFin) params.append('fechaFin', fechaFin);
+            if (estados !== 'todos') params.append('estados', estados);
+            
+            if (params.toString()) {
+                url += '?' + params.toString();
+            }
+            
+            console.log('🔗 URL:', url);
+            
+            // Mostrar loading
+            mostrarCargando(true);
+            
+            // Cerrar modal
+            const modal = bootstrap.Modal.getInstance(document.getElementById('exportModal'));
+            if (modal) modal.hide();
+            
+            // Realizar petición al backend
+            fetch(url)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`Error ${response.status}: ${response.statusText}`);
+                    }
+                    return response.blob();
+                })
+                .then(blob => {
+                    // Crear archivo para descarga
+                    const fecha = new Date().toISOString().split('T')[0];
+                    const extension = formato === 'excel' ? 'xlsx' : formato;
+                    const nombreArchivo = `pedidos-ecovivashop-${fecha}.${extension}`;
+                    
+                    const url = window.URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = nombreArchivo;
+                    document.body.appendChild(a);
+                    a.click();
+                    window.URL.revokeObjectURL(url);
+                    document.body.removeChild(a);
+                    
+                    mostrarMensaje('success', `✅ Archivo ${formato.toUpperCase()} descargado correctamente`);
+                })
+                .catch(error => {
+                    console.error('❌ Error en exportación:', error);
+                    mostrarMensaje('error', `❌ Error al exportar: ${error.message}`);
+                })
+                .finally(() => {
+                    mostrarCargando(false);
+                });
+        }
+        
+        // =====================================================
+        // FUNCIONES AUXILIARES
+        // =====================================================
+        function mostrarCargando(mostrar) {
+            const loading = document.getElementById('loadingIndicator');
+            if (loading) {
+                loading.style.display = mostrar ? 'block' : 'none';
+            }
+        }
+        
+        function mostrarMensaje(tipo, mensaje) {
+            const alertClass = tipo === 'success' ? 'alert-success' : 'alert-danger';
+            const iconClass = tipo === 'success' ? 'bi-check-circle' : 'bi-exclamation-triangle';
+            
+            const alert = document.createElement('div');
+            alert.className = `alert ${alertClass} alert-dismissible position-fixed fade show`;
+            alert.style.cssText = 'top: 20px; right: 20px; z-index: 10001; min-width: 300px;';
+            alert.innerHTML = `
+                <i class="bi ${iconClass} me-2"></i>${mensaje}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            `;
+            document.body.appendChild(alert);
+            
+            // Auto-remover después de 5 segundos
+            setTimeout(() => {
+                if (alert && alert.parentNode) {
+                    alert.remove();
+                }
+            }, 5000);
+        }
+        
+        function editOrderStatus(pedidoId) {
+            // Implementar edición de estado
+            console.log('Editar estado del pedido:', pedidoId);
+            window.location.href = `/admin/pedidos/editar/${pedidoId}`;
+        }
+        
+        function printOrder(pedidoId) {
+            // Implementar impresión
+            console.log('Imprimir pedido:', pedidoId);
+            window.open(`/admin/pedidos/imprimir/${pedidoId}`, '_blank');
+        }
+
+        // =====================================================
+        // INICIALIZACIÓN
+        // =====================================================
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('🔄 Página de pedidos cargada');
+            
+            // Forzar estilos de tarjetas de métricas
+            const cards = document.querySelectorAll('[class*="stats-card-"]');
+            const backgrounds = [
+                'linear-gradient(135deg, #007bff 0%, #0056b3 100%)',
+                'linear-gradient(135deg, #28a745 0%, #20c997 100%)',
+                'linear-gradient(135deg, #17a2b8 0%, #138496 100%)',
+                'linear-gradient(135deg, #ffc107 0%, #e0a800 100%)'
+            ];
+            const textColors = ['white', 'white', 'white', '#212529'];
+            
+            cards.forEach((card, index) => {
+                if (backgrounds[index]) {
+                    card.style.background = backgrounds[index];
+                    card.style.color = textColors[index];
+                    
+                    const texts = card.querySelectorAll('*');
+                    texts.forEach(text => {
+                        text.style.color = textColors[index];
+                    });
+                    
+                    const icon = card.querySelector('.force-visible-icon');
+                    if (icon) {
+                        icon.style.color = textColors[index];
+                        icon.style.fontSize = '3rem';
+                    }
+                }
+            });
+            
+            // Configurar fechas por defecto en formulario de exportación
+            const today = new Date().toISOString().split('T')[0];
+            const lastMonth = new Date();
+            lastMonth.setMonth(lastMonth.getMonth() - 1);
+            const lastMonthStr = lastMonth.toISOString().split('T')[0];
+            
+            const fechaInicioExport = document.getElementById('fechaInicioExport');
+            const fechaFinExport = document.getElementById('fechaFinExport');
+            if (fechaInicioExport) fechaInicioExport.value = lastMonthStr;
+            if (fechaFinExport) fechaFinExport.value = today;
+        });
+    </script>
+
+    <style>
+        /* ESTILOS PARA LAS TARJETAS DE ESTADÍSTICAS */
+        .stats-card-1 {
+            background: linear-gradient(135deg, #007bff 0%, #0056b3 100%) !important;
+        }
+        .stats-card-2 {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%) !important;
+        }
+        .stats-card-3 {
+            background: linear-gradient(135deg, #17a2b8 0%, #138496 100%) !important;
+        }
+        .stats-card-4 {
+            background: linear-gradient(135deg, #ffc107 0%, #e0a800 100%) !important;
+        }
+        .stats-card-white-text, .stats-card-white-text * {
+            color: white !important;
+        }
+        .stats-card-dark-text, .stats-card-dark-text * {
+            color: #212529 !important;
+        }
+        .force-visible-icon {
+            color: white !important;
+            font-size: 3rem !important;
+            display: inline-block !important;
+            opacity: 1 !important;
+        }
+        
+        /* ESTILOS DE LA PÁGINA */
+        .eco-bg {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            min-height: 100vh;
+        }
+        
+        .table-hover tbody tr:hover {
+            background-color: rgba(40, 167, 69, 0.05);
+        }
+        
+        .btn-group-sm .btn {
+            padding: 0.25rem 0.5rem;
+        }
+        
+        .badge {
+            font-size: 0.75rem;
+            font-weight: 600 !important;
+            min-width: 80px !important;
+            text-align: center !important;
+        }
+        
+        /* MEJORAR TABLA */
+        .table-responsive {
+            overflow-x: auto !important;
+        }
+        
+        .table th, .table td {
+            white-space: nowrap;
+        }
+    </style>
+</body>
+</html>

@@ -1,0 +1,881 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:replace="~{fragments/head :: head('Gestión de Productos | EcoVivaShop Admin')}">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestión de Productos | EcoVivaShop Admin</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
+</head>
+<style>
+        :root {
+            --primary-green: #20c997;
+            --secondary-green: #28a745;
+            --accent-teal: #17a2b8;
+            --warning-yellow: #ffc107;
+            --danger-red: #dc3545;
+            --light-gray: #f8f9fa;
+            --dark-text: #212529;
+            --card-shadow: 0 4px 20px rgba(32, 201, 151, 0.15);
+        }
+        
+        body {
+            background: linear-gradient(135deg, #f0f8f5 0%, #e8f5f0 100%);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: var(--dark-text);
+        }
+        
+        .admin-header {
+            background: linear-gradient(135deg, var(--primary-green) 0%, var(--secondary-green) 100%);
+            color: white;
+            padding: 2.5rem 0;
+            margin-bottom: 2rem;
+            box-shadow: var(--card-shadow);
+        }
+        
+        .stats-container {
+            margin-bottom: 2rem;
+        }
+        
+        .stat-card {
+            background: white;
+            border-radius: 20px;
+            padding: 2rem;
+            text-align: center;
+            box-shadow: var(--card-shadow);
+            border: none;
+            transition: all 0.3s ease;
+            height: 100%;
+            border-left: 5px solid var(--primary-green);
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 8px 30px rgba(32, 201, 151, 0.25);
+        }
+        
+        .stat-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            color: var(--primary-green);
+        }
+        
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin: 0;
+            color: var(--primary-green);
+        }
+        
+        .product-card {
+            background: white;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: var(--card-shadow);
+            transition: all 0.3s ease;
+            height: 100%;
+            border: none;
+            border-left: 4px solid var(--primary-green);
+        }
+        
+        .product-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 40px rgba(32, 201, 151, 0.3);
+        }
+        
+        .product-image {
+            position: relative;
+            height: 200px;
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+        
+        .product-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.3s ease;
+        }
+        
+        .product-card:hover .product-image img {
+            transform: scale(1.05);
+        }
+        
+        .product-icon {
+            font-size: 4rem;
+            color: #6c757d;
+            opacity: 0.5;
+        }
+        
+        .stock-badge {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            padding: 0.3rem 0.6rem;
+            border-radius: 15px;
+            font-size: 0.75rem;
+            font-weight: bold;
+            backdrop-filter: blur(10px);
+        }
+        
+        .stock-high {
+            background: rgba(40, 167, 69, 0.9);
+            color: white;
+        }
+        
+        .stock-medium {
+            background: rgba(255, 193, 7, 0.9);
+            color: #212529;
+        }
+        
+        .stock-low {
+            background: rgba(220, 53, 69, 0.9);
+            color: white;
+        }
+        
+        .category-badge {
+            background: linear-gradient(135deg, var(--accent-teal), #138496);
+            color: white;
+            padding: 0.4rem 1rem;
+            border-radius: 25px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            display: inline-block;
+            margin-bottom: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .price-tag {
+            font-size: 1.4rem;
+            font-weight: bold;
+            color: var(--secondary-green);
+            background: linear-gradient(135deg, #e8f5e8, #f0f8f0);
+            padding: 0.5rem 1rem;
+            border-radius: 15px;
+            display: inline-block;
+        }
+        
+        .eco-score {
+            background: linear-gradient(135deg, var(--primary-green), var(--secondary-green));
+            color: white;
+            padding: 0.4rem 1rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+        
+        .action-buttons .btn {
+            border-radius: 25px;
+            font-weight: 600;
+            padding: 0.6rem 1.5rem;
+            transition: all 0.3s ease;
+            margin: 0.2rem;
+        }
+        
+        .btn-success {
+            background: linear-gradient(135deg, var(--primary-green), var(--secondary-green));
+            border: none;
+            box-shadow: 0 4px 15px rgba(32, 201, 151, 0.3);
+        }
+        
+        .btn-success:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(32, 201, 151, 0.4);
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, var(--accent-teal), #138496);
+            border: none;
+            box-shadow: 0 4px 15px rgba(23, 162, 184, 0.3);
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(23, 162, 184, 0.4);
+        }
+        
+        .btn-warning {
+            background: linear-gradient(135deg, var(--warning-yellow), #e0a800);
+            border: none;
+            color: #000;
+        }
+        
+        .btn-danger {
+            background: linear-gradient(135deg, var(--danger-red), #c82333);
+            border: none;
+        }
+        
+        .filters-card {
+            background: white;
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: var(--card-shadow);
+            margin-bottom: 2rem;
+            border-left: 4px solid var(--primary-green);
+        }
+        
+        .form-control, .form-select {
+            border-radius: 15px;
+            border: 2px solid #e9ecef;
+            padding: 0.75rem 1rem;
+            transition: all 0.3s ease;
+        }
+        
+        .form-control:focus, .form-select:focus {
+            border-color: var(--primary-green);
+            box-shadow: 0 0 0 0.2rem rgba(32, 201, 151, 0.25);
+        }
+        
+        .no-products {
+            text-align: center;
+            padding: 5rem 2rem;
+            color: #6c757d;
+            background: white;
+            border-radius: 20px;
+            box-shadow: var(--card-shadow);
+            margin: 2rem 0;
+        }
+        
+        .no-products i {
+            font-size: 6rem;
+            margin-bottom: 2rem;
+            color: var(--primary-green);
+            opacity: 0.7;
+        }
+        
+        @media (max-width: 768px) {
+            .admin-header {
+                padding: 1rem 0;
+            }
+            
+            .stat-card {
+                margin-bottom: 1rem;
+            }
+            
+            .product-card {
+                margin-bottom: 1.5rem;
+            }
+        }
+        
+        .pagination {
+            margin-top: 2rem;
+        }
+        
+        .pagination .page-link {
+            border-radius: 10px;
+            margin: 0 2px;
+            border: none;
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            color: #28a745;
+        }
+        
+        .pagination .page-item.active .page-link {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            color: white;
+        }
+        
+        .loading-spinner {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 300px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navbar usando fragment -->
+    <div th:replace="~{fragments/admin-navbar :: admin-navbar}"></div>
+
+    <!-- Header -->
+    <div class="admin-header">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-md-6">
+                    <h1 class="mb-1">
+                        <i class="bi bi-box-seam me-2"></i>
+                        Gestión de Productos
+                    </h1>
+                    <p class="mb-0 opacity-75">Administra el catálogo de productos de EcoVivaShop</p>
+                </div>
+                <div class="col-md-6 text-end">
+                    <!-- Dropdown para generar reportes -->
+                    <div class="dropdown d-inline-block me-3">
+                        <button class="btn btn-outline-light btn-lg" 
+                                type="button" 
+                                id="reportesDropdownBtn" 
+                                onclick="toggleReportesDropdown()" 
+                                style="border-radius: 25px; border-width: 2px;"
+                                title="Generar reportes de productos">
+                            <i class="bi bi-file-earmark-bar-graph me-2"></i>Generar Reporte
+                        </button>
+                        <ul class="dropdown-menu" id="reportesDropdownMenu">
+                            <li>
+                                <a class="dropdown-item" href="/admin/productos/exportar/pdf" target="_blank">
+                                    <i class="bi bi-file-earmark-pdf text-danger me-2"></i>
+                                    Exportar PDF
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item" href="/admin/productos/exportar/excel" target="_blank">
+                                    <i class="bi bi-file-earmark-excel text-success me-2"></i>
+                                    Exportar Excel
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                    
+                    <a th:href="@{/admin/productos/agregar}" 
+                       class="btn btn-outline-light btn-lg me-3" 
+                       style="border-radius: 25px; border-width: 2px;"
+                       title="Agregar nuevo producto al catálogo">
+                        <i class="bi bi-plus-circle me-2"></i> Agregar Producto
+                    </a>
+                    <a th:href="@{/admin/productos/bulk-upload}" 
+                       class="btn btn-light btn-lg" 
+                       style="border-radius: 25px; background: white; color: var(--primary-green); font-weight: 600;"
+                       title="Cargar productos de forma masiva desde archivo CSV">
+                        <i class="bi bi-upload me-2"></i> Carga Masiva
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="container">
+        <!-- Estadísticas -->
+        <div class="stats-container">
+            <div class="row g-4">
+                <div class="col-xl-3 col-md-6">
+                    <div class="stat-card">
+                        <div class="stat-icon text-primary">
+                            <i class="bi bi-box-seam"></i>
+                        </div>
+                        <h3 class="stat-number text-primary" th:text="${totalItems ?: '0'}">0</h3>
+                        <p class="text-muted mb-0">Total Productos</p>
+                    </div>
+                </div>
+                <div class="col-xl-3 col-md-6">
+                    <div class="stat-card">
+                        <div class="stat-icon text-success">
+                            <i class="bi bi-tags"></i>
+                        </div>
+                        <h3 class="stat-number text-success" th:text="${#lists.size(categorias ?: {})}">0</h3>
+                        <p class="text-muted mb-0">Categorías</p>
+                    </div>
+                </div>
+                <div class="col-xl-3 col-md-6">
+                    <div class="stat-card">
+                        <div class="stat-icon text-warning">
+                            <i class="bi bi-currency-dollar"></i>
+                        </div>
+                        <h3 class="stat-number text-warning">S/ 1250.50</h3>
+                        <p class="text-muted mb-0">Precio Promedio</p>
+                    </div>
+                </div>
+                <div class="col-xl-3 col-md-6">
+                    <div class="stat-card">
+                        <div class="stat-icon text-info">
+                            <i class="bi bi-star"></i>
+                        </div>
+                        <h3 class="stat-number text-info">8.2</h3>
+                        <p class="text-muted mb-0">Puntuación Eco Promedio</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Filtros y Búsqueda -->
+        <div class="filters-card">
+            <form method="get" th:action="@{/admin/productos}">
+                <div class="row align-items-end g-3">
+                    <div class="col-md-4">
+                        <label for="busqueda" class="form-label fw-bold">Buscar Productos</label>
+                        <input type="text" class="form-control" id="busqueda" name="busqueda" 
+                               th:value="${busqueda}" placeholder="Nombre, descripción, marca...">
+                    </div>
+                    <div class="col-md-3">
+                        <label for="categoria" class="form-label fw-bold">Categoría</label>
+                        <select class="form-select" id="categoria" name="categoria">
+                            <option value="">Todas las categorías</option>
+                            <option th:each="cat : ${categorias}" 
+                                    th:value="${cat}" 
+                                    th:text="${cat}"
+                                    th:selected="${cat == categoria}">Categoría</option>
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <label for="sortBy" class="form-label fw-bold">Ordenar por</label>
+                        <select class="form-select" id="sortBy" name="sortBy">
+                            <option value="nombre" th:selected="${sortBy == 'nombre'}">Nombre</option>
+                            <option value="precio" th:selected="${sortBy == 'precio'}">Precio</option>
+                            <option value="categoria" th:selected="${sortBy == 'categoria'}">Categoría</option>
+                            <option value="fechaCreacion" th:selected="${sortBy == 'fechaCreacion'}">Fecha</option>
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <label for="sortDir" class="form-label fw-bold">Dirección</label>
+                        <select class="form-select" id="sortDir" name="sortDir">
+                            <option value="asc" th:selected="${sortDir == 'asc'}">Ascendente</option>
+                            <option value="desc" th:selected="${sortDir == 'desc'}">Descendente</option>
+                        </select>
+                    </div>
+                    <div class="col-md-1">
+                        <button type="submit" class="btn btn-primary w-100" title="Buscar productos">
+                            <i class="bi bi-search"></i>
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <!-- Mensajes de Éxito/Error -->
+        <div th:if="${success}" class="alert alert-success alert-dismissible fade show" role="alert">
+            <i class="bi bi-check-circle"></i> <span th:text="${success}"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" title="Cerrar mensaje"></button>
+        </div>
+        <div th:if="${error}" class="alert alert-danger alert-dismissible fade show" role="alert">
+            <i class="bi bi-exclamation-triangle"></i> <span th:text="${error}"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" title="Cerrar mensaje"></button>
+        </div>
+
+        <!-- Grid de Productos -->
+        <div class="products-grid" th:if="${productos != null and productos.hasContent()}">
+            <div class="row g-4">
+                <div class="col-xl-3 col-lg-4 col-md-6" th:each="producto : ${productos.content}">
+                    <div class="card product-card">
+                        <div class="product-image">
+                            <!-- Stock Badge -->
+                            <span class="stock-badge"
+                                  th:classappend="${producto.inventario?.stock > 20} ? 'stock-high' : (${producto.inventario?.stock > 5} ? 'stock-medium' : 'stock-low')"
+                                  th:text="${producto.inventario?.stock ?: '0'} + ' unidades'">Stock</span>
+                            
+                            <!-- Imagen o Icono -->
+                            <div th:if="${producto.imagenUrl != null and #strings.length(producto.imagenUrl) > 0}">
+                                <img th:src="${producto.imagenUrl}" th:alt="${producto.nombre}" th:title="${producto.nombre}" alt="Imagen del producto" title="Imagen del producto" class="product-image" />
+                            </div>
+                            <div th:unless="${producto.imagenUrl != null and #strings.length(producto.imagenUrl) > 0}">
+                                <i class="bi bi-box product-icon"></i>
+                            </div>
+                        </div>
+                        
+                        <div class="card-body">
+                            <div class="category-badge" th:text="${producto.categoria}">Categoría</div>
+                            <h5 class="card-title fw-bold" th:text="${producto.nombre}">Nombre del Producto</h5>
+                            <p class="card-text text-muted" th:text="${#strings.abbreviate(producto.descripcion ?: 'Sin descripción', 80)}">
+                                Descripción del producto...
+                            </p>
+                            
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <span class="price-tag">
+                                    S/ <span th:text="${#numbers.formatDecimal(producto.precio ?: 0, 1, 2)}">0.00</span>
+                                </span>
+                                <span class="eco-score" th:if="${producto.puntuacionEco != null}">
+                                    <i class="bi bi-leaf"></i> <span th:text="${producto.puntuacionEco}">0.0</span>
+                                </span>
+                            </div>
+                            
+                            <div class="text-muted small mb-3">
+                                <div th:if="${producto.marca != null}">
+                                    <strong>Marca:</strong> <span th:text="${producto.marca}">-</span>
+                                </div>
+                                <div th:if="${producto.modelo != null}">
+                                    <strong>Modelo:</strong> <span th:text="${producto.modelo}">-</span>
+                                </div>
+                                <div>
+                                    <strong>Stock:</strong> 
+                                    <span th:text="${producto.inventario?.stock ?: '0'}" 
+                                          th:classappend="${producto.inventario?.stock > 5} ? 'text-success' : 'text-danger'">0</span>
+                                    / <span th:text="${producto.inventario?.stockMaximo ?: '0'}">0</span>
+                                </div>
+                            </div>
+                            
+                            <div class="action-buttons d-grid gap-2">
+                                <div class="btn-group" role="group">
+                                    <a th:href="@{/admin/productos/editar/{id}(id=${producto.idProducto})}" 
+                                       class="btn btn-primary btn-sm">
+                                        <i class="bi bi-pencil"></i> Editar
+                                    </a>
+                                    <button type="button" class="btn btn-danger btn-sm btn-eliminar" 
+                                            th:data-id="${producto.idProducto}" 
+                                            th:data-nombre="${producto.nombre}"
+                                            title="Eliminar producto">
+                                        <i class="bi bi-trash"></i> Eliminar
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sin productos -->
+        <div th:if="${productos == null or !productos.hasContent()}" class="no-products">
+            <i class="bi bi-box"></i>
+            <h3>No se encontraron productos</h3>
+            <p>Agrega productos al catálogo o ajusta los filtros de búsqueda.</p>
+            <a href="/admin/productos/agregar" class="btn btn-success">
+                <i class="bi bi-plus-circle"></i> Agregar Primer Producto
+            </a>
+        </div>
+
+        <!-- Paginación -->
+        <div th:if="${productos != null and productos.hasContent() and productos.totalPages > 1}" 
+             class="d-flex justify-content-center mt-4">
+            <nav>
+                <ul class="pagination">
+                    <li class="page-item" th:classappend="${productos.first} ? 'disabled'">
+                        <a class="page-link" th:href="@{/admin/productos(page=${currentPage - 1}, size=12, sortBy=${sortBy}, sortDir=${sortDir}, categoria=${categoria}, busqueda=${busqueda})}">
+                            <i class="bi bi-chevron-left"></i>
+                        </a>
+                    </li>
+                    
+                    <li class="page-item" th:each="i : ${#numbers.sequence(0, productos.totalPages - 1)}"
+                        th:classappend="${i == currentPage} ? 'active'">
+                        <a class="page-link" th:href="@{/admin/productos(page=${i}, size=12, sortBy=${sortBy}, sortDir=${sortDir}, categoria=${categoria}, busqueda=${busqueda})}"
+                           th:text="${i + 1}">1</a>
+                    </li>
+                    
+                    <li class="page-item" th:classappend="${productos.last} ? 'disabled'">
+                        <a class="page-link" th:href="@{/admin/productos(page=${currentPage + 1}, size=12, sortBy=${sortBy}, sortDir=${sortDir}, categoria=${categoria}, busqueda=${busqueda})}">
+                            <i class="bi bi-chevron-right"></i>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    </div>
+
+    <!-- Modal de Confirmación -->
+    <div class="modal fade" id="eliminarModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Confirmar Eliminación</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" title="Cerrar ventana"></button>
+                </div>
+                <div class="modal-body">
+                    <p>¿Estás seguro de que deseas eliminar el producto <strong id="nombreProducto"></strong>?</p>
+                    <p class="text-muted">Esta acción no se puede deshacer.</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <form id="formEliminar" method="post" style="display: inline;">
+                        <button type="submit" class="btn btn-danger">Eliminar</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Carga Masiva -->
+    <div class="modal fade" id="cargaMasivaModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        <i class="bi bi-upload me-2"></i>Carga Masiva de Productos
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" title="Cerrar ventana"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="formCargaMasiva" th:action="@{/admin/productos/bulk-upload}" method="post" enctype="multipart/form-data">
+                        <div class="alert alert-info">
+                            <i class="bi bi-info-circle"></i>
+                            <strong>Instrucciones:</strong> Sube un archivo CSV con los productos. 
+                            <a th:href="@{/admin/productos/plantilla-csv}" class="alert-link">Descargar plantilla</a>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="archivo" class="form-label">Archivo CSV</label>
+                            <input type="file" class="form-control" id="archivo" name="archivo" accept=".csv" required>
+                            <div class="form-text">Solo archivos CSV. Tamaño máximo: 5MB</div>
+                        </div>
+                        
+                        <div class="form-check mb-3">
+                            <input class="form-check-input" type="checkbox" id="actualizarExistentes" name="actualizarExistentes">
+                            <label class="form-check-label" for="actualizarExistentes">
+                                Actualizar productos existentes
+                            </label>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" form="formCargaMasiva" class="btn btn-success">
+                        <i class="bi bi-upload"></i> Cargar Productos
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Inicializar dropdowns al cargar la página
+        document.addEventListener('DOMContentLoaded', function() {
+            // Inicializar todos los dropdowns
+            var dropdownElementList = [].slice.call(document.querySelectorAll('.dropdown-toggle'));
+            var dropdownList = dropdownElementList.map(function (dropdownToggleEl) {
+                return new bootstrap.Dropdown(dropdownToggleEl);
+            });
+            
+            // Handle delete button clicks
+            const deleteButtons = document.querySelectorAll('.btn-eliminar');
+            deleteButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const id = this.getAttribute('data-id');
+                    const nombre = this.getAttribute('data-nombre');
+                    eliminarProducto(id, nombre);
+                });
+            });
+            
+            console.log('Bootstrap dropdowns inicializados:', dropdownList.length);
+        });
+
+        function eliminarProducto(id, nombre) {
+            document.getElementById('nombreProducto').textContent = nombre;
+            document.getElementById('formEliminar').action = '/admin/productos/eliminar/' + id;
+            new bootstrap.Modal(document.getElementById('eliminarModal')).show();
+        }
+
+        // Auto-dismiss alerts after 5 seconds
+        setTimeout(function() {
+            const alerts = document.querySelectorAll('.alert-dismissible');
+            alerts.forEach(function(alert) {
+                if (alert) {
+                    const bsAlert = new bootstrap.Alert(alert);
+                    bsAlert.close();
+                }
+            });
+        }, 5000);
+
+        // LIMPIEZA DE OVERLAYS RESIDUALES - Previene capas semitransparentes que bloquean contenido
+        function limpiarOverlaysResiduales() {
+            console.log('🧹 Limpiando overlays residuales...');
+            
+            // Eliminar loadingOverlay dinámico si existe
+            const loadingOverlay = document.getElementById('loadingOverlay');
+            if (loadingOverlay && loadingOverlay.parentNode) {
+                console.log('❌ Eliminando loadingOverlay residual');
+                loadingOverlay.parentNode.removeChild(loadingOverlay);
+            }
+            
+            // Ocultar loadingIndicator estático si está visible
+            const loadingIndicator = document.getElementById('loadingIndicator');
+            if (loadingIndicator) {
+                loadingIndicator.style.display = 'none';
+                console.log('❌ Ocultando loadingIndicator residual');
+            }
+            
+            // Eliminar cualquier modal-backdrop residual de Bootstrap
+            const modalBackdrops = document.querySelectorAll('.modal-backdrop');
+            modalBackdrops.forEach(backdrop => {
+                if (backdrop && backdrop.parentNode) {
+                    console.log('❌ Eliminando modal-backdrop residual');
+                    backdrop.parentNode.removeChild(backdrop);
+                }
+            });
+            
+            // Eliminar cualquier elemento con position fixed y alto z-index que pueda estar bloqueando
+            const elementosFixed = document.querySelectorAll('[style*="position: fixed"], [style*="position:fixed"]');
+            elementosFixed.forEach(elemento => {
+                const zIndex = window.getComputedStyle(elemento).zIndex;
+                if (zIndex && parseInt(zIndex) > 1000) {
+                    // Solo eliminar si tiene z-index muy alto y parece ser un overlay
+                    const background = window.getComputedStyle(elemento).background;
+                    if (background && (background.includes('rgba') || background.includes('opacity'))) {
+                        console.log('❌ Eliminando elemento fixed con alto z-index y fondo semitransparente');
+                        if (elemento.parentNode) {
+                            elemento.parentNode.removeChild(elemento);
+                        }
+                    }
+                }
+            });
+            
+            // Remover clase 'show' de cualquier modal que pueda estar abierto
+            const modalsAbiertos = document.querySelectorAll('.modal.show');
+            modalsAbiertos.forEach(modal => {
+                console.log('❌ Cerrando modal abierto residual');
+                const bsModal = bootstrap.Modal.getInstance(modal);
+                if (bsModal) {
+                    bsModal.hide();
+                } else {
+                    modal.classList.remove('show');
+                    modal.style.display = 'none';
+                }
+            });
+            
+            console.log('✅ Limpieza de overlays completada');
+        }
+        
+        // Ejecutar limpieza inmediatamente y después de un pequeño delay
+        limpiarOverlaysResiduales();
+        setTimeout(limpiarOverlaysResiduales, 100);
+        setTimeout(limpiarOverlaysResiduales, 500);
+
+        // DEPURACIÓN ESPECÍFICA PARA EL DROPDOWN DE REPORTES
+        setTimeout(() => {
+            const dropdownButton = document.getElementById('reportesDropdownBtn');
+            if (dropdownButton) {
+                console.log('🔍 [DROPDOWN DEBUG] Botón encontrado:', dropdownButton);
+                console.log('🔍 [DROPDOWN DEBUG] Clases:', dropdownButton.className);
+                console.log('🔍 [DROPDOWN DEBUG] pointer-events:', window.getComputedStyle(dropdownButton).pointerEvents);
+                console.log('🔍 [DROPDOWN DEBUG] cursor:', window.getComputedStyle(dropdownButton).cursor);
+                console.log('🔍 [DROPDOWN DEBUG] z-index:', window.getComputedStyle(dropdownButton).zIndex);
+                console.log('🔍 [DROPDOWN DEBUG] position:', window.getComputedStyle(dropdownButton).position);
+
+                // Verificar si hay elementos encima
+                const rect = dropdownButton.getBoundingClientRect();
+                const elementsAtPoint = document.elementsFromPoint(rect.left + rect.width/2, rect.top + rect.height/2);
+                console.log('🔍 [DROPDOWN DEBUG] Elementos en la posición del botón:', elementsAtPoint);
+
+                // Verificar overlays específicamente en el área del botón
+                const allOverlays = document.querySelectorAll('.modal-backdrop, .loading-overlay, [style*="position: fixed"], [style*="position:fixed"]');
+                console.log('🔍 [DROPDOWN DEBUG] Overlays encontrados:', allOverlays.length);
+
+                allOverlays.forEach((overlay, index) => {
+                    const overlayRect = overlay.getBoundingClientRect();
+                    const buttonRect = dropdownButton.getBoundingClientRect();
+
+                    // Verificar si el overlay cubre el botón
+                    const overlaps = !(overlayRect.right < buttonRect.left ||
+                                     overlayRect.left > buttonRect.right ||
+                                     overlayRect.bottom < buttonRect.top ||
+                                     overlayRect.top > buttonRect.bottom);
+
+                    if (overlaps) {
+                        console.warn(`⚠️ [DROPDOWN DEBUG] Overlay ${index} cubre el botón:`, overlay);
+                        console.warn(`⚠️ [DROPDOWN DEBUG] Overlay styles:`, window.getComputedStyle(overlay));
+
+                        // Remover overlay problemático
+                        if (overlay.parentNode) {
+                            overlay.parentNode.removeChild(overlay);
+                            console.log(`❌ [DROPDOWN DEBUG] Overlay ${index} removido`);
+                        }
+                    }
+                });
+
+                // Verificar cada elemento en la posición
+                elementsAtPoint.forEach((element, index) => {
+                    console.log(`🔍 [DROPDOWN DEBUG] Elemento ${index}:`, element.tagName, element.className, element.id);
+                    console.log(`🔍 [DROPDOWN DEBUG] Elemento ${index} pointer-events:`, window.getComputedStyle(element).pointerEvents);
+                    console.log(`🔍 [DROPDOWN DEBUG] Elemento ${index} z-index:`, window.getComputedStyle(element).zIndex);
+                });
+
+                // Forzar estilos si es necesario
+                dropdownButton.style.pointerEvents = 'auto';
+                dropdownButton.style.cursor = 'pointer';
+                dropdownButton.style.position = 'relative';
+                dropdownButton.style.zIndex = '1050';
+
+                // Añadir event listener de prueba
+                dropdownButton.addEventListener('click', function(e) {
+                    console.log('🎯 [DROPDOWN DEBUG] Click detectado en el botón!');
+                    console.log('🎯 [DROPDOWN DEBUG] Event:', e);
+                    e.stopPropagation();
+                    // Llamar a la función manualmente
+                    toggleReportesDropdown();
+                }, true); // Usar capture phase
+
+                // También añadir listener normal
+                dropdownButton.addEventListener('click', function(e) {
+                    console.log('🎯 [DROPDOWN DEBUG] Click normal detectado');
+                });
+
+                // Añadir indicador visual de que el botón está activo
+                dropdownButton.style.border = '2px solid #0d6efd';
+                dropdownButton.style.boxShadow = '0 0 0 0.2rem rgba(13, 110, 253, 0.25)';
+
+                setTimeout(() => {
+                    dropdownButton.style.border = '';
+                    dropdownButton.style.boxShadow = '';
+                }, 2000);
+
+                console.log('✅ [DROPDOWN DEBUG] Estilos forzados aplicados y event listeners añadidos');
+            } else {
+                console.warn('⚠️ [DROPDOWN DEBUG] Botón dropdown no encontrado');
+            }
+        }, 1000);
+
+        // FUNCIÓN PERSONALIZADA PARA EL DROPDOWN DE REPORTES
+        function toggleReportesDropdown() {
+            console.log('🎯 [DROPDOWN] Toggle manual activado');
+
+            const button = document.getElementById('reportesDropdownBtn');
+            const menu = document.getElementById('reportesDropdownMenu');
+
+            if (!button || !menu) {
+                console.error('❌ [DROPDOWN] Elementos del dropdown no encontrados');
+                return;
+            }
+
+            console.log('🔍 [DROPDOWN] Estado actual - Button classes:', button.className);
+            console.log('🔍 [DROPDOWN] Estado actual - Menu classes:', menu.className);
+
+            // Toggle manual del menú
+            const isOpen = menu.classList.contains('show');
+
+            if (isOpen) {
+                // Cerrar el menú
+                menu.classList.remove('show');
+                button.setAttribute('aria-expanded', 'false');
+                console.log('🔒 [DROPDOWN] Menú cerrado manualmente');
+            } else {
+                // Abrir el menú
+                menu.classList.add('show');
+                button.setAttribute('aria-expanded', 'true');
+                console.log('🔓 [DROPDOWN] Menú abierto manualmente');
+
+                // Cerrar el menú cuando se hace click fuera
+                setTimeout(() => {
+                    document.addEventListener('click', function closeDropdown(e) {
+                        if (!button.contains(e.target) && !menu.contains(e.target)) {
+                            menu.classList.remove('show');
+                            button.setAttribute('aria-expanded', 'false');
+                            document.removeEventListener('click', closeDropdown);
+                            console.log('🔒 [DROPDOWN] Menú cerrado por click fuera');
+                        }
+                    });
+                }, 1);
+            }
+        }
+
+        // VERIFICACIÓN FINAL - Asegurar que no hay bloqueos globales
+        setTimeout(() => {
+            console.log('🔍 [GLOBAL CHECK] Verificando estado global...');
+            console.log('🔍 [GLOBAL CHECK] Body overflow:', document.body.style.overflow, document.body.style.overflowY);
+            console.log('🔍 [GLOBAL CHECK] HTML overflow:', document.documentElement.style.overflow, document.documentElement.style.overflowY);
+            console.log('🔍 [GLOBAL CHECK] Body classes:', document.body.className);
+
+            // Forzar restauración si es necesario
+            if (document.body.classList.contains('modal-open')) {
+                document.body.classList.remove('modal-open');
+                console.log('❌ [GLOBAL CHECK] Clase modal-open removida del body');
+            }
+
+            if (document.body.style.overflow === 'hidden' || document.body.style.overflowY === 'hidden') {
+                document.body.style.overflow = '';
+                document.body.style.overflowY = '';
+                console.log('❌ [GLOBAL CHECK] Overflow del body restaurado');
+            }
+
+            if (document.documentElement.style.overflow === 'hidden' || document.documentElement.style.overflowY === 'hidden') {
+                document.documentElement.style.overflow = '';
+                document.documentElement.style.overflowY = '';
+                console.log('❌ [GLOBAL CHECK] Overflow del html restaurado');
+            }
+
+            console.log('✅ [GLOBAL CHECK] Verificación global completada');
+        }, 1500);
+
+        console.log("EcoVivaShop - Gestión de Productos cargado correctamente");
+    </script>
+</body>
+</html>

@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/head :: head('Detalle Pedido | EcoVivaShop Admin')}">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Detalle Pedido | EcoVivaShop Admin</title>
+</head>
+<body class="eco-bg">
+    <!-- Admin Navbar -->
+    <div th:replace="~{fragments/admin-navbar :: admin-navbar}"></div>
+
+    <main class="container-fluid py-4">
+        <!-- Header -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h1 class="h3 mb-0 text-dark fw-bold">
+                            <i class="bi bi-receipt text-success me-2"></i>
+                            Detalle del Pedido
+                        </h1>
+                        <p class="text-muted mb-0">Información detallada del pedido</p>
+                    </div>
+                    <div class="d-flex gap-2">
+                        <button class="btn btn-outline-info" onclick="window.print()">
+                            <i class="bi bi-printer me-2"></i>Imprimir
+                        </button>
+                        <a href="/admin/pedidos" class="btn btn-primary">
+                            <i class="bi bi-arrow-left me-2"></i>Volver a Lista
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Alertas -->
+        <div th:if="${success}" class="alert alert-success alert-dismissible fade show" role="alert">
+            <i class="bi bi-check-circle me-2"></i>
+            <span th:text="${success}">Mensaje de éxito</span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar alerta de éxito"></button>
+        </div>
+        
+        <div th:if="${error}" class="alert alert-danger alert-dismissible fade show" role="alert">
+            <i class="bi bi-exclamation-triangle me-2"></i>
+            <span th:text="${error}">Mensaje de error</span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar alerta de error"></button>
+        </div>
+
+        <div class="row">
+            <!-- Información General -->
+            <div class="col-lg-8">
+                <div class="card border-0 shadow-sm mb-4">
+                    <div class="card-header bg-white border-bottom">
+                        <h5 class="card-title mb-0 text-dark fw-bold">
+                            <i class="bi bi-info-circle me-2"></i>Información General
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h6 class="text-muted mb-2">Número de Pedido</h6>
+                                <p class="fw-bold text-primary mb-3" th:text="'#' + ${pedido.numeroPedido}">#ECO-2024-001</p>
+                                
+                                <h6 class="text-muted mb-2">Fecha del Pedido</h6>
+                                <p class="mb-3" th:text="${#temporals.format(pedido.fechaPedido, 'dd/MM/yyyy HH:mm')}">15/05/2024 14:30</p>
+                                
+                                <h6 class="text-muted mb-2">Estado</h6>
+                                <span th:class="|badge fs-6 ${pedido.estado == 'PENDIENTE' ? 'bg-warning' : 
+                                               pedido.estado == 'CONFIRMADO' ? 'bg-info' :
+                                               pedido.estado == 'PREPARANDO' ? 'bg-primary' :
+                                               pedido.estado == 'ENVIADO' ? 'bg-secondary' :
+                                               pedido.estado == 'ENTREGADO' ? 'bg-success' : 'bg-danger'}|"
+                                      th:text="${pedido.estado}">PENDIENTE</span>
+                            </div>
+                            <div class="col-md-6">
+                                <h6 class="text-muted mb-2">Cliente</h6>
+                                <p class="fw-bold mb-1" th:text="${pedido.usuario.nombre + ' ' + pedido.usuario.apellido}">Cliente</p>
+                                <p class="text-muted mb-3" th:text="${pedido.usuario.email}">email@ejemplo.com</p>
+                                
+                                <h6 class="text-muted mb-2">Método de Pago</h6>
+                                <p class="mb-3">
+                                    <i th:class="|bi ${pedido.metodoPago == 'TARJETA' ? 'bi-credit-card text-primary' : 
+                                                  pedido.metodoPago == 'PAYPAL' ? 'bi-paypal text-info' : 
+                                                  'bi-cash text-success'} me-1|"></i>
+                                    <span th:text="${pedido.metodoPago}">Método</span>
+                                </p>
+                                
+                                <h6 class="text-muted mb-2">Total</h6>
+                                <p class="fw-bold text-success fs-5" th:text="'S/ ' + ${#numbers.formatDecimal(pedido.total, 1, 2)}">S/ 300.50</p>
+                            </div>
+                        </div>
+                        
+                        <!-- Dirección de Envío -->
+                        <div th:if="${pedido.direccionEnvio}" class="mt-4">
+                            <h6 class="text-muted mb-2">Dirección de Envío</h6>
+                            <p class="mb-0" th:text="${pedido.direccionEnvio}">Dirección de envío</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Productos del Pedido -->
+                <div class="card border-0 shadow-sm">
+                    <div class="card-header bg-white border-bottom">
+                        <h5 class="card-title mb-0 text-dark fw-bold">
+                            <i class="bi bi-box-seam me-2"></i>Productos del Pedido
+                        </h5>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table table-hover mb-0">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Producto</th>
+                                        <th>Cantidad</th>
+                                        <th>Precio Unit.</th>
+                                        <th>Subtotal</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr th:each="detalle : ${pedido.detalles}">
+                                        <td>
+                                            <div class="d-flex align-items-center">
+                                                <img th:src="${detalle.producto.imagenUrl ?: '/img/producto-placeholder.jpg'}" 
+                                                     alt="Producto" class="rounded me-3" width="50" height="50">
+                                                <div>
+                                                    <div class="fw-bold" th:text="${detalle.producto.nombre}">Producto</div>
+                                                    <small class="text-muted" th:text="${detalle.producto.categoria}">Categoría</small>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <span class="fw-bold" th:text="${detalle.cantidad}">2</span>
+                                        </td>
+                                        <td>
+                                            <span th:text="'S/ ' + ${#numbers.formatDecimal(detalle.precioUnitario, 1, 2)}">S/ 150.00</span>
+                                        </td>
+                                        <td>
+                                            <span class="fw-bold" th:text="'S/ ' + ${#numbers.formatDecimal(detalle.subtotal, 1, 2)}">S/ 300.00</span>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                                <tfoot class="table-light">
+                                    <tr>
+                                        <th colspan="3" class="text-end">Total:</th>
+                                        <th class="text-success" th:text="'S/ ' + ${#numbers.formatDecimal(pedido.total, 1, 2)}">S/ 300.50</th>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Panel de Acciones -->
+            <div class="col-lg-4">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-header bg-white border-bottom">
+                        <h5 class="card-title mb-0 text-dark fw-bold">
+                            <i class="bi bi-gear me-2"></i>Gestionar Pedido
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <!-- Cambiar Estado -->
+                        <form th:action="@{/admin/pedidos/cambiar-estado/{id}(id=${pedido.idPedido})}" method="post" class="mb-3">
+                            <label class="form-label fw-bold">Cambiar Estado</label>
+                            <div class="input-group">
+                                <select name="nuevoEstado" class="form-select" th:value="${pedido.estado}" title="Seleccionar nuevo estado del pedido">
+                                    <option th:each="estado : ${estados}" 
+                                            th:value="${estado}" 
+                                            th:text="${estado}"
+                                            th:selected="${estado == pedido.estado}">Estado</option>
+                                </select>
+                                <button type="submit" class="btn btn-primary" title="Cambiar estado del pedido">
+                                    <i class="bi bi-check-lg"></i>
+                                    <span class="visually-hidden">Cambiar estado</span>
+                                </button>
+                            </div>
+                        </form>
+
+                        <!-- Botones de Acción -->
+                        <div class="d-grid gap-2">
+                            <button class="btn btn-outline-info" onclick="window.print()">
+                                <i class="bi bi-printer me-2"></i>Imprimir Pedido
+                            </button>
+                            
+                            <button class="btn btn-outline-primary" onclick="sendEmail()">
+                                <i class="bi bi-envelope me-2"></i>Enviar Email
+                            </button>
+                            
+                            <div th:if="${pedido.estado != 'CANCELADO' and pedido.estado != 'ENTREGADO'}">
+                                <button class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#cancelModal">
+                                    <i class="bi bi-x-circle me-2"></i>Cancelar Pedido
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Información de Seguimiento -->
+                        <div class="mt-4">
+                            <h6 class="fw-bold">Seguimiento</h6>
+                            <div class="timeline">
+                                <div class="timeline-item">
+                                    <div class="timeline-marker bg-success"></div>
+                                    <div class="timeline-content">
+                                        <h6 class="mb-1">Pedido Creado</h6>
+                                        <small class="text-muted" th:text="${#temporals.format(pedido.fechaPedido, 'dd/MM/yyyy HH:mm')}">15/05/2024 14:30</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Modal Cancelar Pedido -->
+    <div class="modal fade" id="cancelModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Cancelar Pedido</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar modal"></button>
+                </div>
+                <form th:action="@{/admin/pedidos/cancelar/{id}(id=${pedido.idPedido})}" method="post">
+                    <div class="modal-body">
+                        <p>¿Está seguro de que desea cancelar este pedido?</p>
+                        <div class="mb-3">
+                            <label class="form-label">Motivo de cancelación (opcional)</label>
+                            <textarea name="motivo" class="form-control" rows="3" placeholder="Ingrese el motivo..."></textarea>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                        <button type="submit" class="btn btn-danger">Cancelar Pedido</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div th:replace="~{fragments/footer :: footer}"></div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        function sendEmail() {
+            alert('Funcionalidad de envío de email en desarrollo');
+        }
+    </script>
+
+    <style>
+        .timeline {
+            position: relative;
+            padding-left: 30px;
+        }
+        
+        .timeline-item {
+            position: relative;
+            margin-bottom: 20px;
+        }
+        
+        .timeline-marker {
+            position: absolute;
+            left: -35px;
+            top: 5px;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+        }
+        
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: -31px;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: #dee2e6;
+        }
+        
+        @media print {
+            .btn, .modal { display: none !important; }
+            .card { border: 1px solid #ddd !important; }
+        }
+    </style>
+</body>
+</html>

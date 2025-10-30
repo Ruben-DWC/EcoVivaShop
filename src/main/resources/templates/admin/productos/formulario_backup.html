@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${producto.idProducto != null ? 'Editar Producto' : 'Agregar Producto'} + ' | EcoVivaShop Admin'">Producto | EcoVivaShop Admin</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-green: #20c997;
+            --secondary-green: #28a745;
+            --accent-teal: #17a2b8;
+            --card-shadow: 0 4px 20px rgba(32, 201, 151, 0.15);
+        }
+        
+        body {
+            background: linear-gradient(135deg, #f0f8f5 0%, #e8f5f0 100%);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: #212529;
+        }
+        
+        .form-container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        
+        .form-card {
+            background: white;
+            border-radius: 20px;
+            box-shadow: var(--card-shadow);
+            border: none;
+            border-left: 5px solid var(--primary-green);
+        }
+        
+        .form-header {
+            background: linear-gradient(135deg, var(--primary-green) 0%, var(--secondary-green) 100%);
+            color: white;
+            padding: 2rem;
+            border-radius: 20px 20px 0 0;
+            margin: -1px -1px 0 -6px;
+        }
+        
+        .form-section {
+            border-left: 4px solid var(--primary-green);
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .form-section h5 {
+            color: var(--primary-green);
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+        
+        .form-control, .form-select {
+            border-radius: 15px;
+            border: 2px solid #e9ecef;
+            padding: 0.75rem 1rem;
+            transition: all 0.3s ease;
+        }
+        
+        .form-control:focus, .form-select:focus {
+            border-color: var(--primary-green);
+            box-shadow: 0 0 0 0.2rem rgba(32, 201, 151, 0.25);
+        }
+        
+        .btn {
+            border-radius: 25px;
+            font-weight: 600;
+            padding: 0.75rem 2rem;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-success {
+            background: linear-gradient(135deg, var(--primary-green), var(--secondary-green));
+            border: none;
+            box-shadow: 0 4px 15px rgba(32, 201, 151, 0.3);
+        }
+        
+        .btn-success:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(32, 201, 151, 0.4);
+        }
+        
+        .btn-secondary {
+            background: linear-gradient(135deg, #6c757d, #5a6268);
+            border: none;
+        }
+        
+        .image-preview {
+            border: 3px dashed var(--primary-green);
+            border-radius: 20px;
+            padding: 3rem;
+            text-align: center;
+            background: linear-gradient(135deg, #f8f9fa 0%, #fff 100%);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            min-height: 200px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+        }
+        
+        .image-preview:hover {
+            background: linear-gradient(135deg, #e8f5f0 0%, #f0f8f5 100%);
+            border-color: var(--secondary-green);
+            transform: translateY(-2px);
+        }
+        
+        .image-preview img {
+            max-width: 100%;
+            max-height: 300px;
+            object-fit: cover;
+            border-radius: 15px;
+        }
+        
+        .upload-icon {
+            font-size: 3rem;
+            color: var(--primary-green);
+            margin-bottom: 1rem;
+        }
+        
+        .navbar {
+            background: linear-gradient(135deg, var(--primary-green) 0%, var(--secondary-green) 100%) !important;
+            box-shadow: var(--card-shadow);
+        }
+    </style>
+</head>
+<body>
+        
+        .form-card {
+            background: linear-gradient(135deg, #fff 0%, #f8f9fa 100%);
+            border: none;
+            border-radius: 1rem;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.08);
+        }
+        
+        .form-section {
+            border-left: 4px solid #28a745;
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            border-radius: 0.5rem;
+            padding: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .form-section h5 {
+            color: #28a745;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+        
+        .image-preview {
+            border: 2px dashed #28a745;
+            border-radius: 1rem;
+            padding: 2rem;
+            text-align: center;
+            background: linear-gradient(135deg, #f8f9fa 0%, #fff 100%);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .image-preview:hover {
+            background: linear-gradient(135deg, #e8f5e8 0%, #f0f9f0 100%);
+            border-color: #20c997;
+        }
+        
+        .image-preview img {
+            max-width: 100%;
+            max-height: 200px;
+            border-radius: 0.5rem;
+        }
+        
+        .eco-score-slider {
+            background: linear-gradient(to right, #dc3545 0%, #ffc107 50%, #28a745 100%);
+            height: 8px;
+            border-radius: 4px;
+        }
+        
+        .btn-save {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            border: none;
+            color: white;
+            border-radius: 0.75rem;
+            padding: 0.75rem 2rem;
+            font-weight: 600;
+        }
+        
+        .btn-cancel {
+            background: linear-gradient(135deg, #6c757d 0%, #5a6268 100%);
+            border: none;
+            color: white;
+            border-radius: 0.75rem;
+            padding: 0.75rem 2rem;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark shadow-sm" style="background: linear-gradient(135deg, #28a745 0%, #20c997 100%);">
+        <div class="container-fluid">
+            <a class="navbar-brand fw-bold" href="/admin/portal_administrador">
+                <i class="bi bi-leaf-fill text-success"></i> EcoVivaShop Admin
+            </a>
+            <div class="navbar-nav ms-auto">
+                <div class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                        <i class="bi bi-person-circle"></i> 
+                        <span th:text="${usuario != null ? usuario.nombre : 'Administrador'}">Admin</span>
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li><a class="dropdown-item" href="/admin/perfil"><i class="bi bi-person"></i> Mi Perfil</a></li>
+                        <li><a class="dropdown-item" href="/admin/dashboard"><i class="bi bi-speedometer2"></i> Dashboard</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item" href="/logout"><i class="bi bi-box-arrow-right"></i> Cerrar Sesión</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container py-4">
+        <!-- Header -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h1 class="h2 mb-1">
+                            <i class="bi bi-box"></i> 
+                            <span th:text="${producto.idProducto != null ? 'Editar Producto' : 'Agregar Nuevo Producto'}">Producto</span>
+                        </h1>
+                        <p class="text-muted">Completa la información del producto</p>
+                    </div>
+                    <a href="/admin/productos" class="btn btn-outline-secondary">
+                        <i class="bi bi-arrow-left"></i> Volver a Productos
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mensajes -->
+        <div th:if="${success}" class="alert alert-success alert-dismissible fade show" role="alert">
+            <i class="bi bi-check-circle"></i> <span th:text="${success}"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar alerta"></button>
+        </div>
+        
+        <div th:if="${error}" class="alert alert-danger alert-dismissible fade show" role="alert">
+            <i class="bi bi-exclamation-triangle"></i> <span th:text="${error}"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar alerta"></button>
+        </div>
+
+        <!-- Formulario -->
+        <form th:action="@{/admin/productos/guardar}" method="post" enctype="multipart/form-data" th:object="${producto}">
+            <input type="hidden" th:field="*{idProducto}">
+            <input type="hidden" th:field="*{fechaCreacion}">
+            <input type="hidden" th:field="*{fechaActualizacion}">
+            <input type="hidden" th:field="*{estado}">
+            
+            <div class="row">
+                <!-- Información Básica -->
+                <div class="col-lg-8">
+                    <div class="card form-card">
+                        <div class="card-body">
+                            <!-- Información Principal -->
+                            <div class="form-section">
+                                <h5><i class="bi bi-info-circle"></i> Información Principal</h5>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <label for="nombre" class="form-label">Nombre del Producto <span class="text-danger">*</span></label>
+                                        <input type="text" class="form-control" id="nombre" th:field="*{nombre}" required maxlength="100">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="categoria" class="form-label">Categoría <span class="text-danger">*</span></label>
+                                        <select class="form-select" id="categoria" th:field="*{categoria}" required>
+                                            <option value="">Seleccionar categoría</option>
+                                            <option th:each="cat : ${categorias}" th:value="${cat}" th:text="${cat}">Categoría</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                
+                                <div class="row mt-3">
+                                    <div class="col-12">
+                                        <label for="descripcion" class="form-label">Descripción <span class="text-danger">*</span></label>
+                                        <textarea class="form-control" id="descripcion" th:field="*{descripcion}" rows="4" required maxlength="1000"></textarea>
+                                    </div>
+                                </div>
+                                
+                                <div class="row mt-3">
+                                    <div class="col-md-4">
+                                        <label for="precio" class="form-label">Precio (S/) <span class="text-danger">*</span></label>
+                                        <div class="input-group">
+                                            <span class="input-group-text">S/</span>
+                                            <input type="number" class="form-control" id="precio" th:field="*{precio}" 
+                                                   step="0.01" min="0" required>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label for="marca" class="form-label">Marca</label>
+                                        <input type="text" class="form-control" id="marca" th:field="*{marca}" maxlength="50">
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label for="modelo" class="form-label">Modelo</label>
+                                        <input type="text" class="form-control" id="modelo" th:field="*{modelo}" maxlength="50">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Características Físicas -->
+                            <div class="form-section">
+                                <h5><i class="bi bi-rulers"></i> Características Físicas</h5>
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <label for="color" class="form-label">Color</label>
+                                        <input type="text" class="form-control" id="color" th:field="*{color}" maxlength="30">
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label for="peso" class="form-label">Peso (kg)</label>
+                                        <input type="number" class="form-control" id="peso" th:field="*{peso}" 
+                                               step="0.01" min="0">
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label for="material" class="form-label">Material</label>
+                                        <input type="text" class="form-control" id="material" th:field="*{material}" maxlength="50">
+                                    </div>
+                                </div>
+                                
+                                <div class="row mt-3">
+                                    <div class="col-md-6">
+                                        <label for="dimensiones" class="form-label">Dimensiones</label>
+                                        <input type="text" class="form-control" id="dimensiones" th:field="*{dimensiones}" 
+                                               placeholder="ej: 35x25x2 cm" maxlength="100">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="garantiaMeses" class="form-label">Garantía (meses)</label>
+                                        <input type="number" class="form-control" id="garantiaMeses" th:field="*{garantiaMeses}" 
+                                               min="0" max="120">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Información Ecológica -->
+                            <div class="form-section">
+                                <h5><i class="bi bi-leaf"></i> Información Ecológica</h5>
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <label for="eficienciaEnergetica" class="form-label">Eficiencia Energética</label>
+                                        <select class="form-select" id="eficienciaEnergetica" th:field="*{eficienciaEnergetica}">
+                                            <option value="">No aplica</option>
+                                            <option value="A+++">A+++</option>
+                                            <option value="A++">A++</option>
+                                            <option value="A+">A+</option>
+                                            <option value="A">A</option>
+                                            <option value="B">B</option>
+                                            <option value="C">C</option>
+                                            <option value="D">D</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label for="impactoAmbiental" class="form-label">Impacto Ambiental</label>
+                                        <select class="form-select" id="impactoAmbiental" th:field="*{impactoAmbiental}">
+                                            <option value="">No especificado</option>
+                                            <option value="Bajo">Bajo</option>
+                                            <option value="Medio">Medio</option>
+                                            <option value="Alto">Alto</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label for="puntuacionEco" class="form-label">Puntuación Ecológica (0-10)</label>
+                                        <input type="range" class="form-range" id="puntuacionEco" th:field="*{puntuacionEco}" 
+                                               min="0" max="10" step="0.1" oninput="updateEcoScore(this.value)">
+                                        <div class="d-flex justify-content-between">
+                                            <small>0.0</small>
+                                            <small><strong id="ecoScoreValue" th:text="${producto.puntuacionEco != null ? producto.puntuacionEco : '5.0'}">5.0</strong></small>
+                                            <small>10.0</small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Imagen y Stock -->
+                <div class="col-lg-4">
+                    <!-- Imagen del Producto -->
+                    <div class="card form-card mb-4">
+                        <div class="card-header">
+                            <h5 class="mb-0"><i class="bi bi-image"></i> Imagen del Producto</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="image-preview" onclick="document.getElementById('imagen').click()">
+                                <div id="imagePreview">
+                                    <div th:if="${producto.imagenUrl != null and #strings.length(producto.imagenUrl) > 0}">
+                                        <img th:src="${producto.imagenUrl}" alt="Imagen actual" id="currentImage">
+                                        <p class="mt-2 mb-0 text-muted">Haz clic para cambiar imagen</p>
+                                    </div>
+                                    <div th:unless="${producto.imagenUrl != null and #strings.length(producto.imagenUrl) > 0}">
+                                        <i class="bi bi-cloud-upload" style="font-size: 3rem; color: #28a745;"></i>
+                                        <h6 class="mt-2">Subir Imagen</h6>
+                                        <p class="text-muted mb-0">Formatos: JPG, PNG, GIF<br>Tamaño máximo: 5MB</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <input type="file" id="imagen" name="imagen" accept="image/*" style="display: none;" onchange="previewImage(this)">
+                            
+                            <div class="mt-3">
+                                <label for="imagenUrl" class="form-label">O ingresa URL de imagen</label>
+                                <input type="url" class="form-control" id="imagenUrl" th:field="*{imagenUrl}" 
+                                       placeholder="https://ejemplo.com/imagen.jpg">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Información de Stock -->
+                    <div class="card form-card">
+                        <div class="card-header">
+                            <h5 class="mb-0"><i class="bi bi-boxes"></i> Información de Stock</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="mb-3">
+                                <label for="stockInicial" class="form-label">Stock Inicial</label>
+                                <input type="number" class="form-control" id="stockInicial" name="stockInicial" 
+                                       min="0" value="0">
+                                <small class="text-muted">Stock con el que iniciará el producto</small>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="stockMinimo" class="form-label">Stock Mínimo</label>
+                                <input type="number" class="form-control" id="stockMinimo" name="stockMinimo" 
+                                       min="0" value="5">
+                                <small class="text-muted">Alerta cuando el stock baje de este nivel</small>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="stockMaximo" class="form-label">Stock Máximo</label>
+                                <input type="number" class="form-control" id="stockMaximo" name="stockMaximo" 
+                                       min="1" value="100">
+                                <small class="text-muted">Capacidad máxima de stock</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Botones de acción -->
+            <div class="row mt-4">
+                <div class="col-12 text-center">
+                    <button type="submit" class="btn btn-save me-3">
+                        <i class="bi bi-save"></i> 
+                        <span th:text="${producto.idProducto != null ? 'Actualizar Producto' : 'Guardar Producto'}">Guardar</span>
+                    </button>
+                    <a href="/admin/productos" class="btn btn-cancel">
+                        <i class="bi bi-x-circle"></i> Cancelar
+                    </a>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        function updateEcoScore(value) {
+            document.getElementById('ecoScoreValue').textContent = parseFloat(value).toFixed(1);
+        }
+        
+        function previewImage(input) {
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const imagePreview = document.getElementById('imagePreview');
+                    imagePreview.innerHTML = `
+                        <img src="${e.target.result}" alt="Vista previa" style="max-width: 100%; max-height: 200px; border-radius: 0.5rem;">
+                        <p class="mt-2 mb-0 text-muted">Haz clic para cambiar imagen</p>
+                    `;
+                };
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+        
+        // Inicializar valor del slider si existe
+        document.addEventListener('DOMContentLoaded', function() {
+            const ecoSlider = document.getElementById('puntuacionEco');
+            if (ecoSlider.value) {
+                updateEcoScore(ecoSlider.value);
+            }
+        });
+    </script>
+</body>
+</html>

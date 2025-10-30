@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>¡Bienvenido a EcoVivaShop!</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(135deg, #e8f5e8 0%, #f0f8f0 100%);
+            color: #333;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+        .header {
+            background: linear-gradient(135deg, #43a047 0%, #388e3c 100%);
+            color: white;
+            padding: 40px 30px;
+            text-align: center;
+        }
+        .logo {
+            width: 80px;
+            height: 80px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 20px;
+            font-size: 40px;
+        }
+        .eco-title {
+            margin: 0;
+            font-size: 24px;
+        }
+        .eco-header-title {
+            margin: 0;
+            font-size: 24px;
+        }
+        .eco-header-main {
+            margin: 0;
+            font-size: 24px;
+        }
+        .eco-header-h1 {
+            margin: 0;
+            font-size: 24px;
+        }
+        .content {
+            padding: 40px 30px;
+        }
+        .welcome-message {
+            font-size: 28px;
+            font-weight: bold;
+            color: #2e7d32;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .subtitle {
+            font-size: 18px;
+            color: #666;
+            text-align: center;
+            margin-bottom: 30px;
+            line-height: 1.6;
+        }
+        .features {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 30px;
+            margin: 30px 0;
+        }
+        .feature {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .feature:last-child {
+            margin-bottom: 0;
+        }
+        .feature-icon {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, #43a047 0%, #388e3c 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 20px;
+            margin-right: 20px;
+            flex-shrink: 0;
+        }
+        .feature-text {
+            flex: 1;
+        }
+        .feature-title {
+            font-weight: bold;
+            color: #2e7d32;
+            margin-bottom: 5px;
+        }
+        .feature-desc {
+            color: #666;
+            font-size: 14px;
+        }
+        .cta-button {
+            display: inline-block;
+            background: linear-gradient(135deg, #43a047 0%, #388e3c 100%);
+            color: white;
+            padding: 15px 30px;
+            text-decoration: none;
+            border-radius: 50px;
+            font-weight: bold;
+            font-size: 16px;
+            text-align: center;
+            margin: 20px auto;
+            display: block;
+            width: fit-content;
+            transition: transform 0.3s ease;
+        }
+        .cta-button:hover {
+            transform: translateY(-2px);
+            color: white;
+        }
+        .eco-stats {
+            background: linear-gradient(135deg, #e8f5e8 0%, #f0f8f0 100%);
+            border-radius: 10px;
+            padding: 30px;
+            margin: 30px 0;
+            text-align: center;
+        }
+        .stat {
+            display: inline-block;
+            margin: 0 20px;
+            text-align: center;
+        }
+        .stat-number {
+            font-size: 24px;
+            font-weight: bold;
+            color: #2e7d32;
+        }
+        .stat-label {
+            font-size: 12px;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .footer {
+            background: #2e7d32;
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        .social-links {
+            margin: 20px 0;
+        }
+        .social-link {
+            display: inline-block;
+            width: 40px;
+            height: 40px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 50%;
+            margin: 0 10px;
+            text-decoration: none;
+            color: white;
+            line-height: 40px;
+            transition: background 0.3s ease;
+        }
+        .social-link:hover {
+            background: rgba(255,255,255,0.3);
+            color: white;
+        }
+        .contact-info {
+            margin-top: 20px;
+            font-size: 14px;
+            color: rgba(255,255,255,0.8);
+        }
+        .footer-link {
+            color: rgba(255,255,255,0.8);
+        }
+        .footer-link-alt {
+            color: rgba(255,255,255,0.8);
+        }
+        .divider {
+            height: 3px;
+            background: linear-gradient(90deg, #43a047 0%, #388e3c 50%, #43a047 100%);
+            margin: 20px 0;
+        }
+        @media (max-width: 600px) {
+            .container {
+                margin: 10px;
+                border-radius: 10px;
+            }
+            .header, .content, .footer {
+                padding: 20px;
+            }
+            .stat {
+                display: block;
+                margin: 10px 0;
+            }
+        }
+    </style>
+</head>
+<body>
+            <h1 class="eco-header-h1">EcoVivaShop</h1>
+        <!-- Header -->
+        <div class="header">
+            <div class="logo">🌱</div>
+            <h1 style="margin: 0; font-size: 24px;">EcoVivaShop</h1>
+            <p style="margin: 10px 0 0; opacity: 0.9;">Tu tienda ecológica de confianza</p>
+        </div>
+
+        <!-- Main Content -->
+        <div class="content">
+            <div class="welcome-message">
+                ¡Gracias por crear tu cuenta!
+            </div>
+            
+            <div class="subtitle">
+                Bienvenido/a a la familia EcoVivaShop, <strong th:text="${nombreUsuario}">Usuario</strong>. 
+                Estamos comprometidos en poder hacer crecer tu negocio de manera sostenible.
+                <br><br>
+                <strong>¡Gracias por elegir un futuro más verde!</strong>
+            </div>
+
+            <div class="divider"></div>
+
+            <!-- Features Section -->
+            <div class="features">
+                <h3 style="text-align: center; color: #2e7d32; margin-bottom: 25px;">
+                    En EcoVivaShop nos comprometemos a:
+                </h3>
+                
+                <div class="feature">
+                    <div class="feature-icon">🔧</div>
+                    <div class="feature-text">
+                        <div class="feature-title">Resolver problemas técnicos en los sistemas</div>
+                        <div class="feature-desc">Soporte 24/7 para que tu experiencia sea perfecta</div>
+                    </div>
+                </div>
+                
+                <div class="feature">
+                    <div class="feature-icon">📚</div>
+                    <div class="feature-text">
+                        <div class="feature-title">Brindamos servicios de capacitación</div>
+                        <div class="feature-desc">Te enseñamos a usar nuestros sistemas de forma óptima</div>
+                    </div>
+                </div>
+                
+                <div class="feature">
+                    <div class="feature-icon">💡</div>
+                    <div class="feature-text">
+                        <div class="feature-title">Crear soluciones personalizadas para tu negocio</div>
+                        <div class="feature-desc">Y mucho más para hacer crecer tu impacto ecológico</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Call to Action -->
+            <a href="https://localhost:8080/client/home" class="cta-button">
+                🛒 Explorar Productos Ecológicos
+            </a>
+
+            <!-- Eco Impact Stats -->
+            <div class="eco-stats">
+                <h4 style="color: #2e7d32; margin-bottom: 20px;">
+                    🌍 Nuestro Impacto Ambiental Conjunto
+                </h4>
+                <div class="stat">
+                    <div class="stat-number">1,247</div>
+                    <div class="stat-label">Árboles Salvados</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-number">15,680L</div>
+                    <div class="stat-label">Agua Ahorrada</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-number">892kg</div>
+                    <div class="stat-label">Residuos Reducidos</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-number">2,456</div>
+                    <div class="stat-label">Familias Beneficiadas</div>
+                </div>
+            </div>
+
+            <div style="text-align: center; margin-top: 30px;">
+                <p style="color: #666; font-style: italic;">
+                    "Cada compra que realizas es un voto por el planeta que queremos dejar a las futuras generaciones."
+                </p>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="footer">
+            <h4 style="margin: 0 0 10px; font-size: 18px;">¿Necesitas ayuda? ¡Contáctanos!</h4>
+            <p style="margin: 0 0 20px; opacity: 0.9;">
+                Siempre estaremos aquí para ayudarte en tu viaje hacia la sostenibilidad.
+            </p>
+
+            <!-- Social Links -->
+            <div class="social-links">
+                <a href="#" class="social-link">📘</a>
+                <a href="#" class="social-link">📞</a>
+                <a href="#" class="social-link">📸</a>
+                <a href="#" class="social-link">💬</a>
+            </div>
+
+            <!-- Contact Info -->
+            <div class="contact-info">
+                <p style="margin: 5px 0;">📧 soporte@EcoVivaShop.com</p>
+                <p style="margin: 5px 0;">📱 +1 (555) 123-4567</p>
+                <p style="margin: 5px 0;">🌐 www.EcoVivaShop.com</p>
+            </div>
+
+            <div class="divider" style="background: rgba(255,255,255,0.3);"></div>
+
+                <a href="#" class="footer-link-alt">Cancelar suscripción</a> | 
+                <a href="#" class="footer-link-alt">Actualizar preferencias</a>
+                Este correo fue enviado a <span th:text="${emailUsuario}">tu-email@ejemplo.com</span><br>
+                <a href="#" style="color: rgba(255,255,255,0.8);">Cancelar suscripción</a> | 
+                <a href="#" style="color: rgba(255,255,255,0.8);">Actualizar preferencias</a>
+            </p>
+        </div>
+    </div>
+</body>
+</html>

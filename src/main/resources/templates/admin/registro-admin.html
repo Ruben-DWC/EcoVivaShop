@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/head :: head('Registro de Administrador | EcoVivaShop Admin')}">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Registro de Administrador | EcoVivaShop Admin</title>
+</head>
+<body class="eco-bg">
+    <!-- Admin Navbar -->
+    <div th:replace="~{fragments/admin-navbar :: admin-navbar}"></div>
+    
+    <div style="display: none"><!-- Mantener las clases y estructura para CSS -->
+        <nav class="navbar navbar-expand-lg navbar-dark bg-dark shadow-sm">
+            <div class="container-fluid">
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarAdmin" aria-label="Abrir menú de navegación">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarAdmin">
+                <ul class="navbar-nav me-auto">                    <li class="nav-item">
+                        <a class="nav-link" href="/admin/portal">
+                            <i class="bi bi-speedometer2 me-1"></i>Panel de Control
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/admin/clientes">
+                            <i class="bi bi-people me-1"></i>Clientes
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/admin/productos">
+                            <i class="bi bi-box-seam me-1"></i>Productos
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/admin/pedidos">
+                            <i class="bi bi-cart-check me-1"></i>Pedidos
+                        </a>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle active" href="#" role="button" data-bs-toggle="dropdown">
+                            <i class="bi bi-gear me-1"></i>Gestión
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item active" href="/admin/registro-admin">
+                                <i class="bi bi-person-plus me-2"></i>Nuevo Admin
+                            </a></li>
+                            <li><a class="dropdown-item" href="/admin/reportes">
+                                <i class="bi bi-graph-up me-2"></i>Reportes
+                            </a></li>
+                        </ul>
+                    </li>
+                </ul>
+                <ul class="navbar-nav">
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                            <i class="bi bi-person-circle me-1"></i>Admin
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li><a class="dropdown-item" href="/admin/perfil">Mi Perfil</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="/logout">Cerrar Sesión</a></li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+    </div><!-- Fin de estructura oculta para CSS -->
+
+    <main class="container py-5">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <!-- Header -->
+                <div class="text-center mb-5">
+                    <div class="bg-success text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-3 admin-avatar">
+                        <i class="bi bi-person-plus display-5"></i>
+                    </div>
+                    <h1 class="h3 fw-bold text-dark">Registro de Nuevo Administrador</h1>
+                    <p class="text-muted">Crea una nueva cuenta de administrador para EcoVivaShop</p>
+                </div>
+
+                <!-- Registration Form -->
+                <div class="card border-0 shadow-lg rounded-4">
+                    <div class="card-body p-5">
+                        <form id="adminRegistrationForm" action="/admin/registro-admin" method="post" class="needs-validation" novalidate>
+                            
+                            <!-- Personal Information -->
+                            <div class="mb-4">
+                                <h5 class="fw-bold text-success mb-3">
+                                    <i class="bi bi-person-fill me-2"></i>Información Personal
+                                </h5>
+                                <div class="row g-3">
+                                    <div class="col-md-6">
+                                        <label for="nombre" class="form-label fw-bold">Nombre</label>
+                                        <input type="text" class="form-control form-control-lg" id="nombre" name="nombre" required>
+                                        <div class="invalid-feedback">
+                                            Por favor, ingresa el nombre.
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="apellido" class="form-label fw-bold">Apellido</label>
+                                        <input type="text" class="form-control form-control-lg" id="apellido" name="apellido" required>
+                                        <div class="invalid-feedback">
+                                            Por favor, ingresa el apellido.
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="cedula" class="form-label fw-bold">Cédula de Identidad</label>
+                                        <input type="text" class="form-control form-control-lg" id="cedula" name="cedula" required>
+                                        <div class="invalid-feedback">
+                                            Por favor, ingresa la cédula.
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="telefono" class="form-label fw-bold">Teléfono</label>
+                                        <input type="tel" class="form-control form-control-lg" id="telefono" name="telefono" required>
+                                        <div class="invalid-feedback">
+                                            Por favor, ingresa el teléfono.
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Account Information -->
+                            <div class="mb-4">
+                                <h5 class="fw-bold text-success mb-3">
+                                    <i class="bi bi-shield-lock-fill me-2"></i>Información de Cuenta
+                                </h5>
+                                <div class="row g-3">
+                                    <div class="col-12">
+                                        <label for="email" class="form-label fw-bold">Correo Electrónico</label>
+                                        <div class="input-group input-group-lg">
+                                            <span class="input-group-text bg-light">
+                                                <i class="bi bi-envelope"></i>
+                                            </span>
+                                            <input type="email" class="form-control" id="email" name="email" required>
+                                            <div class="invalid-feedback">
+                                                Por favor, ingresa un correo válido.
+                                            </div>
+                                        </div>
+                                        <div class="form-text">Este será el correo para iniciar sesión</div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="password" class="form-label fw-bold">Contraseña</label>
+                                        <div class="input-group input-group-lg">
+                                            <span class="input-group-text bg-light">
+                                                <i class="bi bi-lock"></i>
+                                            </span>
+                                            <input type="password" class="form-control" id="password" name="password" required minlength="8">
+                                            <button class="btn btn-outline-secondary" type="button" id="togglePassword" aria-label="Mostrar u ocultar contraseña">
+                                                <i class="bi bi-eye"></i>
+                                            </button>
+                                            <div class="invalid-feedback">
+                                                La contraseña debe tener al menos 8 caracteres.
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="confirmPassword" class="form-label fw-bold">Confirmar Contraseña</label>
+                                        <div class="input-group input-group-lg">
+                                            <span class="input-group-text bg-light">
+                                                <i class="bi bi-lock-fill"></i>
+                                            </span>
+                                            <input type="password" class="form-control" id="confirmPassword" name="confirmPassword" required>
+                                            <div class="invalid-feedback">
+                                                Las contraseñas no coinciden.
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Administrative Information -->
+                            <div class="mb-4">
+                                <h5 class="fw-bold text-success mb-3">
+                                    <i class="bi bi-gear-fill me-2"></i>Información Administrativa
+                                </h5>
+                                <div class="row g-3">
+                                    <div class="col-md-6">
+                                        <label for="rol" class="form-label fw-bold">Rol de Administrador</label>
+                                        <select class="form-select form-select-lg" id="rol" name="rol" required>
+                                            <option value="">Selecciona un rol</option>
+                                            <option value="super_admin">Super Administrador</option>
+                                            <option value="admin_productos">Admin de Productos</option>
+                                            <option value="admin_clientes">Admin de Clientes</option>
+                                            <option value="admin_reportes">Admin de Reportes</option>
+                                        </select>
+                                        <div class="invalid-feedback">
+                                            Por favor, selecciona un rol.
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="departamento" class="form-label fw-bold">Departamento</label>
+                                        <select class="form-select form-select-lg" id="departamento" name="departamento">
+                                            <option value="">Selecciona departamento</option>
+                                            <option value="administracion">Administración</option>
+                                            <option value="ventas">Ventas</option>
+                                            <option value="marketing">Marketing</option>
+                                            <option value="soporte">Soporte al Cliente</option>
+                                            <option value="logistica">Logística</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-12">
+                                        <label for="observaciones" class="form-label fw-bold">Observaciones</label>
+                                        <textarea class="form-control" id="observaciones" name="observaciones" rows="3" placeholder="Notas adicionales sobre el administrador..."></textarea>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Permissions -->
+                            <div class="mb-4">
+                                <h5 class="fw-bold text-success mb-3">
+                                    <i class="bi bi-check2-square me-2"></i>Permisos
+                                </h5>
+                                <div class="row g-3">
+                                    <div class="col-md-6">
+                                        <div class="card bg-light">
+                                            <div class="card-body">
+                                                <h6 class="card-title">Gestión de Usuarios</h6>
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="checkbox" id="perm_view_users" name="permisos" value="view_users">
+                                                    <label class="form-check-label" for="perm_view_users">
+                                                        Ver usuarios
+                                                    </label>
+                                                </div>
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="checkbox" id="perm_edit_users" name="permisos" value="edit_users">
+                                                    <label class="form-check-label" for="perm_edit_users">
+                                                        Editar usuarios
+                                                    </label>
+                                                </div>
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="checkbox" id="perm_delete_users" name="permisos" value="delete_users">
+                                                    <label class="form-check-label" for="perm_delete_users">
+                                                        Eliminar usuarios
+                                                    </label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="card bg-light">
+                                            <div class="card-body">
+                                                <h6 class="card-title">Gestión de Productos</h6>
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="checkbox" id="perm_view_products" name="permisos" value="view_products">
+                                                    <label class="form-check-label" for="perm_view_products">
+                                                        Ver productos
+                                                    </label>
+                                                </div>
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="checkbox" id="perm_edit_products" name="permisos" value="edit_products">
+                                                    <label class="form-check-label" for="perm_edit_products">
+                                                        Editar productos
+                                                    </label>
+                                                </div>
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="checkbox" id="perm_delete_products" name="permisos" value="delete_products">
+                                                    <label class="form-check-label" for="perm_delete_products">
+                                                        Eliminar productos
+                                                    </label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Submit Buttons -->
+                            <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                                <a href="/admin/portal" class="btn btn-outline-secondary btn-lg me-md-2">
+                                    <i class="bi bi-arrow-left me-2"></i>Cancelar
+                                </a>
+                                <button type="submit" class="btn btn-success btn-lg">
+                                    <i class="bi bi-person-plus me-2"></i>Crear Administrador
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Success Alert (Hidden by default) -->
+                <div id="successAlert" class="alert alert-success alert-dismissible fade mt-4 d-none" role="alert">
+                    <i class="bi bi-check-circle-fill me-2"></i>
+                    <strong>¡Administrador creado exitosamente!</strong>
+                    <p class="mb-0 mt-2">Se ha enviado un correo de bienvenida con las credenciales de acceso.</p>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <div th:replace="~{fragments/footer :: footer}"></div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <style>
+        .form-control:focus, .form-select:focus {
+            border-color: #28a745;
+            box-shadow: 0 0 0 0.2rem rgba(40, 167, 69, 0.25);
+        }
+        
+        .card {
+            border-radius: 1rem;
+        }
+        
+        .btn-success {
+            background: linear-gradient(135deg, #43a047 0%, #388e3c 100%);
+            border: none;
+        }
+        
+        .btn-success:hover {
+            background: linear-gradient(135deg, #388e3c 0%, #2e7d32 100%);
+        }
+        
+        .input-group-text {
+            background: #f8f9fa;
+        }
+        
+        .navbar-dark .navbar-nav .nav-link:hover {
+            background: rgba(255,255,255,0.1);
+            border-radius: 0.5rem;
+        }
+        
+        .form-check-input:checked {
+            background-color: #28a745;
+            border-color: #28a745;
+        }
+
+        .admin-avatar {
+            width: 80px;
+            height: 80px;
+        }
+
+        /* Hide success alert by default */
+        #successAlert {
+            display: none;
+        }
+        /* Utility class for hiding elements */
+        .d-none {
+            display: none !important;
+        }
+    </style>
+
+    <script>
+        // Form validation
+        (function() {
+            'use strict';
+            window.addEventListener('load', function() {
+                const form = document.getElementById('adminRegistrationForm');
+                const passwordField = document.getElementById('password');
+                const confirmPasswordField = document.getElementById('confirmPassword');
+                
+                // Custom validation for password confirmation
+                function validatePasswordMatch() {
+                    if (passwordField.value !== confirmPasswordField.value) {
+                        confirmPasswordField.setCustomValidity('Las contraseñas no coinciden');
+                    } else {
+                        confirmPasswordField.setCustomValidity('');
+                    }
+                }
+                
+                passwordField.addEventListener('change', validatePasswordMatch);
+                confirmPasswordField.addEventListener('keyup', validatePasswordMatch);
+                
+                form.addEventListener('submit', function(event) {
+                    validatePasswordMatch();
+                    
+                    if (form.checkValidity() === false) {
+                        event.preventDefault();
+                        event.stopPropagation();
+                    } else {
+                        event.preventDefault();
+                        // Simulate successful registration
+                        showSuccessAlert();
+                    }
+                    
+                    form.classList.add('was-validated');
+                });
+            });
+        })();
+
+        // Toggle password visibility
+        document.getElementById('togglePassword').addEventListener('click', function() {
+            const passwordField = document.getElementById('password');
+            const icon = this.querySelector('i');
+            if (passwordField.type === 'password') {
+                passwordField.type = 'text';
+                icon.classList.remove('bi-eye');
+                icon.classList.add('bi-eye-slash');
+            } else {
+                passwordField.type = 'password';
+                icon.classList.remove('bi-eye-slash');
+                icon.classList.add('bi-eye');
+            }
+        });
+
+        // Show success alert
+        function showSuccessAlert() {
+            const successAlert = document.getElementById('successAlert');
+            successAlert.classList.remove('d-none');
+            successAlert.classList.add('show');
+            
+            // Scroll to alert
+            successAlert.scrollIntoView({ behavior: 'smooth' });
+            
+            // Reset form after success
+            setTimeout(() => {
+                document.getElementById('adminRegistrationForm').reset();
+                document.getElementById('adminRegistrationForm').classList.remove('was-validated');
+            }, 1000);
+        }
+
+        // Auto-select permissions based on role
+        document.getElementById('rol').addEventListener('change', function() {
+            const role = this.value;
+            const checkboxes = document.querySelectorAll('input[name="permisos"]');
+            
+            // Clear all checkboxes first
+            checkboxes.forEach(cb => cb.checked = false);
+            
+            // Set permissions based on role
+            switch(role) {
+                case 'super_admin':
+                    checkboxes.forEach(cb => cb.checked = true);
+                    break;
+                case 'admin_productos':
+                    document.getElementById('perm_view_products').checked = true;
+                    document.getElementById('perm_edit_products').checked = true;
+                    document.getElementById('perm_delete_products').checked = true;
+                    break;
+                case 'admin_clientes':
+                    document.getElementById('perm_view_users').checked = true;
+                    document.getElementById('perm_edit_users').checked = true;
+                    break;
+                case 'admin_reportes':
+                    document.getElementById('perm_view_users').checked = true;
+                    document.getElementById('perm_view_products').checked = true;
+                    break;
+            }
+        });
+    </script>
+</body>
+</html>

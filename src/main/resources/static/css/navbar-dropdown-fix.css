@@ -1,0 +1,184 @@
+/* 
+ * Correcciones adicionales para el dropdown del navbar
+ * Específicamente para modo escritorio - VERSIÓN MEJORADA
+ */
+
+/* CORRECCIÓN PRINCIPAL: Asegurar que el contenedor padre tenga position relative */
+.navbar .nav-item.dropdown {
+    position: relative !important;
+}
+
+/* Asegurar que el dropdown funcione en escritorio */
+@media (min-width: 768px) {
+    .navbar .dropdown:hover .dropdown-menu {
+        display: block;
+    }
+    
+    .navbar .dropdown-menu {
+        position: absolute !important;
+        top: 100% !important;
+        right: 0 !important;
+        left: auto !important;
+        z-index: 9999 !important;
+        animation: slideDown 0.2s ease-in-out;
+        margin-top: 0.125rem !important;
+        min-width: 200px !important;
+        white-space: nowrap !important;
+    }
+}
+
+/* Para todos los tamaños - Z-INDEX MÁXIMO */
+.navbar .dropdown-menu {
+    z-index: 99999 !important;
+    position: absolute !important;
+}
+
+.navbar .dropdown-menu.show {
+    display: block !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+    z-index: 99999 !important;
+    position: absolute !important;
+}
+
+.navbar .dropdown-toggle::after {
+    margin-left: 0.5rem !important;
+}
+
+.navbar .dropdown-item {
+    padding: 0.75rem 1rem !important;
+    transition: all 0.2s ease-in-out !important;
+    cursor: pointer !important;
+    display: flex !important;
+    align-items: center !important;
+    pointer-events: all !important;
+    position: relative !important;
+    z-index: inherit !important;
+}
+
+.navbar .dropdown-item:hover {
+    background-color: rgba(0, 123, 255, 0.1) !important;
+    border-radius: 8px !important;
+    transform: translateX(2px);
+}
+
+.navbar .dropdown-item:focus {
+    background-color: rgba(0, 123, 255, 0.1) !important;
+    border-radius: 8px !important;
+    outline: none !important;
+}
+
+.navbar .dropdown-item:active {
+    background-color: rgba(0, 123, 255, 0.2) !important;
+    border-radius: 8px !important;
+}
+
+/* Animaciones suaves */
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* CORRECCIÓN CRÍTICA: Asegurar que todos los elementos sean clickeables SOLO EN EL NAVBAR */
+.navbar .dropdown-item * {
+    pointer-events: none !important;
+}
+
+.navbar .dropdown-item {
+    pointer-events: all !important;
+    position: relative !important;
+    z-index: inherit !important;
+}
+
+/* Mejorar el aspecto visual con z-index asegurado */
+.dropdown-menu {
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15) !important;
+    border: 1px solid rgba(0, 0, 0, 0.08) !important;
+    backdrop-filter: blur(10px);
+    z-index: 99999 !important;
+    position: absolute !important;
+}
+
+/* Fix específico para el dropdown toggle en escritorio */
+@media (min-width: 992px) {
+    .navbar .nav-link.dropdown-toggle {
+        cursor: pointer !important;
+        position: relative !important;
+    }
+    
+    .navbar .nav-link.dropdown-toggle:hover {
+        background-color: rgba(255, 255, 255, 0.1) !important;
+        border-radius: 8px !important;
+    }
+}
+
+/* CORRECCIÓN ADICIONAL: Asegurar que contenedores cercanos no interfieran */
+.navbar {
+    z-index: 1030 !important;
+    position: relative !important;
+}
+
+.navbar-collapse {
+    position: static !important;
+}
+
+/* Corregir posibles interferencias de otros elementos */
+.container,
+.container-fluid,
+.row,
+.col,
+.col-* {
+    position: relative !important;
+}
+
+/* Asegurar que elementos amarillos (welcome blocks) no interfieran */
+.welcome-block,
+.alert,
+.card,
+.bg-warning,
+.bg-info,
+.bg-light {
+    z-index: 1 !important;
+    position: relative !important;
+}
+
+/* Forzar dropdown por encima de todo */
+.navbar .dropdown-menu {
+    z-index: 99999 !important;
+    position: absolute !important;
+    will-change: transform, opacity !important;
+}
+
+.navbar .dropdown-menu.show {
+    z-index: 99999 !important;
+    position: absolute !important;
+    will-change: transform, opacity !important;
+}
+
+/* REGLAS PARA DROPDOWNS FUERA DEL NAVBAR - Página de productos y otras */
+.dropdown:not(.navbar .dropdown) .dropdown-item {
+    pointer-events: all !important;
+    position: relative !important;
+    z-index: inherit !important;
+    cursor: pointer !important;
+}
+
+.dropdown:not(.navbar .dropdown) .dropdown-item * {
+    pointer-events: all !important;
+}
+
+.dropdown:not(.navbar .dropdown) .dropdown-toggle {
+    pointer-events: all !important;
+    cursor: pointer !important;
+}
+
+.dropdown:not(.navbar .dropdown) .dropdown-menu {
+    z-index: 1050 !important;
+    position: absolute !important;
+}

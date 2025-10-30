@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/head :: head('Cerrando Sesión | EcoVivaShop')}">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cerrando Sesión | EcoVivaShop</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
+</head>
+<style>
+    :root {
+        --primary-green: #20c997;
+        --secondary-green: #28a745;
+        --accent-teal: #17a2b8;
+        --warm-orange: #ff6b6b;
+        --soft-purple: #6f42c1;
+    }
+
+    body {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+    }
+
+    .logout-container {
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(20px);
+        border-radius: 30px;
+        box-shadow: 0 25px 50px rgba(0, 0, 0, 0.3);
+        padding: 3rem;
+        text-align: center;
+        max-width: 500px;
+        width: 90%;
+        position: relative;
+        overflow: hidden;
+        border: 1px solid rgba(255, 255, 255, 0.3);
+    }
+
+    .logout-container::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        left: -50%;
+        width: 200%;
+        height: 200%;
+        background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+        transform: rotate(45deg);
+        animation: shimmer 3s infinite;
+    }
+
+    @keyframes shimmer {
+        0% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
+        100% { transform: translateX(100%) translateY(100%) rotate(45deg); }
+    }
+
+    .logout-icon {
+        font-size: 4rem;
+        color: var(--primary-green);
+        margin-bottom: 1.5rem;
+        animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+        0% { transform: scale(1); }
+        50% { transform: scale(1.1); }
+        100% { transform: scale(1); }
+    }
+
+    .goodbye-animation {
+        width: 120px;
+        height: 120px;
+        margin: 0 auto 1.5rem;
+        border-radius: 50%;
+        background: linear-gradient(135deg, var(--primary-green), var(--secondary-green));
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        animation: rotateAndFade 3s ease-in-out infinite;
+        box-shadow: 0 10px 30px rgba(32, 201, 151, 0.4);
+    }
+
+    @keyframes rotateAndFade {
+        0% { transform: rotate(0deg) scale(1); opacity: 1; }
+        50% { transform: rotate(180deg) scale(1.1); opacity: 0.8; }
+        100% { transform: rotate(360deg) scale(1); opacity: 1; }
+    }
+
+    .goodbye-animation i {
+        font-size: 3rem;
+        color: white;
+    }
+
+    .logout-title {
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: #2c3e50;
+        margin-bottom: 1rem;
+        background: linear-gradient(135deg, var(--primary-green), var(--secondary-green));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+
+    .logout-message {
+        font-size: 1.2rem;
+        color: #6c757d;
+        margin-bottom: 2rem;
+        line-height: 1.6;
+    }
+
+    .user-info {
+        background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+        border-radius: 20px;
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+        border-left: 5px solid var(--primary-green);
+    }
+
+    .user-role-badge {
+        display: inline-block;
+        padding: 0.5rem 1.5rem;
+        border-radius: 25px;
+        font-weight: 600;
+        margin-bottom: 1rem;
+        text-transform: uppercase;
+        font-size: 0.9rem;
+        letter-spacing: 1px;
+    }
+
+    .role-admin {
+        background: linear-gradient(135deg, #ff6b6b, #ee5a52);
+        color: white;
+    }
+
+    .role-cliente {
+        background: linear-gradient(135deg, var(--primary-green), var(--secondary-green));
+        color: white;
+    }
+
+    .countdown-container {
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        color: white;
+        border-radius: 20px;
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .countdown-container::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        height: 100%;
+        background: linear-gradient(135deg, var(--primary-green), var(--secondary-green));
+        transition: width 1s ease-in-out;
+        z-index: 0;
+    }
+
+    .countdown-content {
+        position: relative;
+        z-index: 1;
+    }
+
+    .countdown-number {
+        font-size: 3rem;
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+        animation: countdown-bounce 1s ease-in-out infinite;
+    }
+
+    @keyframes countdown-bounce {
+        0%, 100% { transform: scale(1); }
+        50% { transform: scale(1.2); }
+    }
+
+    .countdown-text {
+        font-size: 1.1rem;
+        margin-bottom: 0;
+    }
+
+    .floating-elements {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        pointer-events: none;
+        z-index: -1;
+    }
+
+    .floating-element {
+        position: absolute;
+        color: rgba(32, 201, 151, 0.3);
+        animation: float 6s ease-in-out infinite;
+    }
+
+    .floating-element:nth-child(1) { top: 10%; left: 10%; animation-delay: 0s; }
+    .floating-element:nth-child(2) { top: 20%; right: 10%; animation-delay: 1s; }
+    .floating-element:nth-child(3) { bottom: 20%; left: 15%; animation-delay: 2s; }
+    .floating-element:nth-child(4) { bottom: 10%; right: 15%; animation-delay: 3s; }
+
+    @keyframes float {
+        0%, 100% { transform: translateY(0) rotate(0deg); }
+        33% { transform: translateY(-20px) rotate(120deg); }
+        66% { transform: translateY(-10px) rotate(240deg); }
+    }
+
+    .thank-you-section {
+        margin-top: 2rem;
+        padding-top: 2rem;
+        border-top: 2px dashed #dee2e6;
+    }
+
+    .thank-you-text {
+        font-size: 1.1rem;
+        color: #495057;
+        font-style: italic;
+        margin-bottom: 1rem;
+    }
+
+    .eco-logo {
+        font-size: 1.5rem;
+        color: var(--primary-green);
+        margin: 0 0.5rem;
+    }
+
+    .progress-bar-container {
+        background: rgba(255, 255, 255, 0.3);
+        border-radius: 10px;
+        height: 8px;
+        margin-top: 1rem;
+        overflow: hidden;
+    }
+
+    .progress-bar {
+        height: 100%;
+        background: linear-gradient(135deg, var(--primary-green), var(--secondary-green));
+        border-radius: 10px;
+        transition: width 1s ease-in-out;
+        box-shadow: 0 2px 10px rgba(32, 201, 151, 0.5);
+    }
+
+    @media (max-width: 768px) {
+        .logout-container {
+            margin: 1rem;
+            padding: 2rem 1.5rem;
+        }
+        
+        .logout-title {
+            font-size: 2rem;
+        }
+        
+        .countdown-number {
+            font-size: 2.5rem;
+        }
+    }
+</style>
+<body class="eco-bg">
+    <div class="floating-elements">
+        <i class="bi bi-leaf floating-element"></i>
+        <i class="bi bi-heart floating-element"></i>
+        <i class="bi bi-star floating-element"></i>
+        <i class="bi bi-check-circle floating-element"></i>
+    </div>
+
+    <div class="logout-container">
+        <div class="goodbye-animation">
+            <i class="bi bi-hand-thumbs-up"></i>
+        </div>
+
+        <h1 class="logout-title">¡Hasta pronto!</h1>
+        
+        <div class="user-info">
+            <div class="user-role-badge" th:classappend="${userRole == 'ADMIN'} ? 'role-admin' : 'role-cliente'">
+                <i class="bi" th:classappend="${userRole == 'ADMIN'} ? 'bi-shield-check' : 'bi-person-circle'"></i>
+                <span th:text="${userRole == 'ADMIN'} ? 'Administrador' : 'Cliente'">Usuario</span>
+            </div>
+            <p class="logout-message">
+                <strong th:text="${userName}">Usuario</strong>, tu sesión se ha cerrado correctamente.
+                <br>Gracias por usar EcoVivaShop.
+            </p>
+        </div>
+
+        <div class="countdown-container">
+            <div class="countdown-content">
+                <div class="countdown-number" id="countdown">5</div>
+                <p class="countdown-text">Redirigiendo al inicio de sesión...</p>
+            </div>
+            <div class="progress-bar-container">
+                <div class="progress-bar" id="progressBar"></div>
+            </div>
+        </div>
+
+        <div class="thank-you-section">
+            <p class="thank-you-text">
+                <i class="bi bi-leaf-fill eco-logo"></i>
+                Tu compromiso con el medio ambiente marca la diferencia
+                <i class="bi bi-heart-fill eco-logo"></i>
+            </p>
+            <p class="text-muted">
+                <small>
+                    <i class="bi bi-shield-check text-success me-2"></i>
+                    Sesión cerrada de forma segura
+                </small>
+            </p>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            let countdown = 5;
+            const countdownElement = document.getElementById('countdown');
+            const progressBar = document.getElementById('progressBar');
+            const totalTime = 5;
+            
+            // Configurar la barra de progreso inicial
+            progressBar.style.width = '100%';
+            
+            const timer = setInterval(function() {
+                countdown--;
+                countdownElement.textContent = countdown;
+                
+                // Actualizar barra de progreso
+                const progressPercentage = (countdown / totalTime) * 100;
+                progressBar.style.width = progressPercentage + '%';
+                
+                // Añadir efecto de rebote al número
+                countdownElement.style.transform = 'scale(1.3)';
+                setTimeout(() => {
+                    countdownElement.style.transform = 'scale(1)';
+                }, 200);
+                
+                if (countdown <= 0) {
+                    clearInterval(timer);
+                    countdownElement.textContent = '¡Adiós!';
+                    progressBar.style.width = '0%';
+                    
+                    // Añadir efecto de fade out
+                    document.querySelector('.logout-container').style.opacity = '0.8';
+                    document.querySelector('.logout-container').style.transform = 'scale(0.95)';
+                    
+                    // Redirigir después de un breve delay
+                    setTimeout(() => {
+                        window.location.href = '/auth/login?logout=success';
+                    }, 1000);
+                }
+            }, 1000);
+            
+            // Efecto de partículas flotantes adicionales
+            createFloatingParticles();
+            
+            function createFloatingParticles() {
+                const container = document.querySelector('.floating-elements');
+                const icons = ['bi-star-fill', 'bi-heart-fill', 'bi-leaf-fill', 'bi-check-circle-fill'];
+                
+                setInterval(() => {
+                    if (countdown > 0) {
+                        const particle = document.createElement('i');
+                        particle.className = `bi ${icons[Math.floor(Math.random() * icons.length)]} floating-element`;
+                        particle.style.left = Math.random() * 100 + '%';
+                        particle.style.top = Math.random() * 100 + '%';
+                        particle.style.fontSize = (Math.random() * 1 + 0.5) + 'rem';
+                        particle.style.animationDuration = (Math.random() * 3 + 3) + 's';
+                        
+                        container.appendChild(particle);
+                        
+                        // Remover partícula después de la animación
+                        setTimeout(() => {
+                            if (particle.parentNode) {
+                                particle.parentNode.removeChild(particle);
+                            }
+                        }, 6000);
+                    }
+                }, 2000);
+            }
+            
+            console.log('🌱 EcoVivaShop - Logout page loaded successfully');
+            console.log('👋 Goodbye animation started');
+        });
+        
+        // Prevenir navegación hacia atrás
+        window.history.pushState(null, null, window.location.href);
+        window.onpopstate = function() {
+            window.history.go(1);
+        };
+    </script>
+</body>
+</html>

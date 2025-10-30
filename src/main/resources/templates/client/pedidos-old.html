@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/head :: head('Mis Pedidos | EcoVivaShop')}">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Mis Pedidos | EcoVivaShop</title>
+</head>
+<body class="eco-bg">
+    <div th:replace="~{fragments/client-navbar :: client-navbar}"></div>
+    
+    <main class="container my-5">
+        <!-- CONTENEDOR PRINCIPAL MODERNO -->
+        <div class="client-profile-container">
+            <!-- ENCABEZADO DE PEDIDOS -->
+            <div class="client-profile-header">
+                <div class="client-profile-avatar">
+                    <i class="bi bi-bag-check-fill" style="font-size: 3rem;"></i>
+                </div>
+                <h2 class="client-profile-name">📦 Mis Pedidos</h2>
+                <p class="client-profile-email">Gestiona y revisa el estado de todos tus pedidos</p>
+            </div>
+
+            <!-- FILTROS Y BÚSQUEDA -->
+            <div class="client-info-section">
+                <h3 class="client-section-title">
+                    <i class="bi bi-search"></i>
+                    Buscar y Filtrar
+                </h3>
+                <div class="row g-4">
+                    <div class="col-md-6">
+                        <label for="searchOrder" class="client-form-label">
+                            <i class="bi bi-search me-1"></i>Buscar Pedido
+                        </label>
+                        <input type="text" class="client-form-control" id="searchOrder" placeholder="Número de pedido o producto">
+                    </div>
+                    <div class="col-md-3">
+                        <label for="statusFilter" class="client-form-label">
+                            <i class="bi bi-funnel me-1"></i>Estado
+                        </label>
+                        <select class="client-form-control" id="statusFilter">
+                            <option value="">Todos los estados</option>
+                            <option value="procesando">Procesando</option>
+                                    <option value="enviado">Enviado</option>
+                                    <option value="entregado">Entregado</option>
+                                    <option value="cancelado">Cancelado</option>
+                                </select>
+                            </div>
+                            <div class="col-md-3">
+                                <label for="dateFilter" class="form-label fw-bold">Periodo</label>
+                                <select class="form-select" id="dateFilter">
+                            <option value="confirmado">Confirmado</option>
+                            <option value="enviado">Enviado</option>
+                            <option value="entregado">Entregado</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <label for="dateFilter" class="client-form-label">
+                            <i class="bi bi-calendar me-1"></i>Período
+                        </label>
+                        <select class="client-form-control" id="dateFilter">
+                            <option value="">Todo el tiempo</option>
+                            <option value="30">Últimos 30 días</option>
+                            <option value="90">Últimos 3 meses</option>
+                            <option value="365">Último año</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="d-flex justify-content-center mt-4">
+                    <button class="client-btn-primary" onclick="filterOrders()">
+                        <i class="bi bi-search"></i>
+                        Aplicar Filtros
+                    </button>
+                </div>
+            </div>
+
+            <!-- LISTA DE PEDIDOS -->
+            <div class="client-info-section">
+                <h3 class="client-section-title">
+                    <i class="bi bi-list-ul"></i>
+                    Historial de Pedidos <span class="badge bg-success ms-2" th:text="${totalPedidos}">0</span>
+                </h3>
+                
+                <!-- Mensaje cuando no hay pedidos -->
+                <div th:if="${#lists.isEmpty(pedidos)}" class="text-center py-5">
+                    <i class="bi bi-inbox" style="font-size: 4rem; color: #9CA3AF;"></i>
+                    <h4 class="mt-3 text-muted">No tienes pedidos aún</h4>
+                    <p class="text-muted">Cuando realices tu primera compra, aparecerá aquí.</p>
+                    <a th:href="@{/client/catalogo}" class="client-btn-primary mt-3">
+                        <i class="bi bi-cart-plus"></i>
+                        Explorar Productos
+                    </a>
+                </div>
+                
+                <!-- Lista de pedidos reales -->
+                <div th:each="pedido : ${pedidos}" class="client-order-card">
+                    <div class="client-order-header">
+                        <div>
+                            <h4 class="client-order-id" th:text="'Pedido #' + ${pedido.numeroPedido}">Pedido #ECO-2024-001234</h4>
+                            <p style="color: #64748b; margin: 0; font-weight: 600;">
+                                <i class="bi bi-calendar me-1"></i>
+                                <span>Realizado el </span>
+                                <span th:text="${#temporals.format(pedido.fechaPedido, 'dd \'de\' MMMM, yyyy')}">8 de junio, 2024</span>
+                            </p>
+                        </div>
+                        <span th:class="'client-order-status ' + ${pedido.estado == 'PENDIENTE' ? 'status-pending' : 
+                                        (pedido.estado == 'CONFIRMADO' ? 'status-confirmed' : 
+                                        (pedido.estado == 'EN_PREPARACION' ? 'status-processing' : 
+                                        (pedido.estado == 'ENVIADO' ? 'status-shipped' : 
+                                        (pedido.estado == 'ENTREGADO' ? 'status-delivered' : 'status-cancelled'))))}"
+                              th:text="${pedido.estado == 'PENDIENTE' ? 'Pendiente' : 
+                                       (pedido.estado == 'CONFIRMADO' ? 'Confirmado' : 
+                                       (pedido.estado == 'EN_PREPARACION' ? 'Procesando' : 
+                                       (pedido.estado == 'ENVIADO' ? 'Enviado' : 
+                                       (pedido.estado == 'ENTREGADO' ? 'Entregado' : 'Cancelado'))))}">Procesando</span>
+                    </div>
+                    <div class="mb-3">
+                        <p style="color: #0891b2; font-weight: 600; margin-bottom: 8px;">
+                            <strong th:text="${#lists.size(pedido.detalles)} + ' productos:'">3 productos:</strong>
+                            <span th:text="${#strings.listJoin(#lists.toList(pedido.detalles.![producto.nombre]), ', ')}">Eco Kit Hogar, Shampoo Natural</span>
+                        </p>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div class="fw-bold" style="color: #16a34a; font-size: 1.4rem;" th:text="'S/ ' + ${#numbers.formatDecimal(pedido.total, 0, 2)}">S/ 232.00</div>
+                            <div class="d-flex gap-2">
+                                <button class="client-btn-secondary" th:onclick="'viewOrder(\'' + ${pedido.numeroPedido} + '\')'">
+                                    <i class="bi bi-eye"></i>
+                                    Ver Detalles
+                                </button>
+                                <button th:if="${pedido.estado == 'ENVIADO'}" class="client-btn-secondary" th:onclick="'trackOrder(\'' + ${pedido.numeroPedido} + '\')'">
+                                    <i class="bi bi-geo-alt"></i>
+                                    Rastrear
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                                <button class="client-btn-primary" onclick="viewOrder('ECO-2024-001234')">
+                                    <i class="bi bi-eye"></i>
+                                    Ver Detalles
+                                </button>
+                                <button class="client-btn-secondary" onclick="trackOrder('ECO-2024-001234')">
+                                    <i class="bi bi-geo-alt"></i>
+                                    Rastrear
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Pedido 2 - Entregado -->
+                <div class="client-order-card">
+                    <div class="client-order-header">
+                        <div>
+                            <h4 class="client-order-id">Pedido #ECO-2024-001233</h4>
+                            <p style="color: #64748b; margin: 0; font-weight: 600;">
+                                <i class="bi bi-calendar me-1"></i>Realizado el 1 de junio, 2024
+                                <span class="ms-3"><i class="bi bi-truck me-1"></i>Entregado el 5 de junio, 2024</span>
+                            </p>
+                        </div>
+                        <span class="client-order-status status-delivered">Entregado</span>
+                    </div>
+                    <div class="mb-3">
+                        <p style="color: #0891b2; font-weight: 600; margin-bottom: 8px;">
+                            <strong>2 productos:</strong> Cepillo de Bambú, Bolsa Ecológica
+                        </p>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div class="fw-bold" style="color: #16a34a; font-size: 1.4rem;">S/ 41.75</div>
+                            <div class="d-flex gap-2">
+                                <button class="client-btn-primary" onclick="viewOrder('ECO-2024-001233')">
+                                    <i class="bi bi-eye"></i>
+                                    Ver Detalles
+                                </button>
+                                <button class="client-btn-secondary" onclick="reorderItems('ECO-2024-001233')">
+                                    <i class="bi bi-arrow-repeat"></i>
+                                    Reordenar
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Pedido 3 - Entregado -->
+                <div class="client-order-card">
+                    <div class="client-order-header">
+                        <div>
+                            <h4 class="client-order-id">Pedido #ECO-2024-001232</h4>
+                            <p style="color: #64748b; margin: 0; font-weight: 600;">
+                                <i class="bi bi-calendar me-1"></i>Realizado el 25 de mayo, 2024
+                                <span class="ms-3"><i class="bi bi-truck me-1"></i>Entregado el 28 de mayo, 2024</span>
+                            </p>
+                        </div>
+                        <span class="client-order-status status-delivered">Entregado</span>
+                    </div>
+                    <div class="mb-3">
+                        <p style="color: #0891b2; font-weight: 600; margin-bottom: 8px;">
+                            <strong>4 productos:</strong> Kit Limpieza Verde, Jabón Artesanal, Pañuelos Reutilizables, Vela Aromática
+                        </p>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div class="fw-bold" style="color: #16a34a; font-size: 1.4rem;">S/ 168.90</div>
+                            <div class="d-flex gap-2">
+                                <button class="client-btn-primary" onclick="viewOrder('ECO-2024-001232')">
+                                    <i class="bi bi-eye"></i>
+                                    Ver Detalles
+                                </button>
+                                <button class="client-btn-secondary" onclick="reorderItems('ECO-2024-001232')">
+                                    <i class="bi bi-arrow-repeat"></i>
+                                    Reordenar
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                                    <div class="product-summary">
+                                        <span class="text-muted">1 producto: </span>
+                                        <span>Kit Premium Eco-Hogar</span>
+                                    </div>
+                                </div>
+                                <div class="col-md-2 text-center">
+                                    <div class="fw-bold text-success fs-5">S/ 250.50</div>
+                                </div>
+                                <div class="col-md-2 text-end">
+                                    <div class="btn-group-vertical gap-1">
+                                        <button class="btn btn-outline-success btn-sm" onclick="viewOrder('ECO-2024-001232')">
+                                            <i class="bi bi-eye me-1"></i>Ver Detalles
+                                        </button>
+                                        <button class="btn btn-outline-warning btn-sm" onclick="reorderItems('ECO-2024-001232')">
+                                            <i class="bi bi-arrow-repeat me-1"></i>Reordenar
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Pedido 4 - Enviado -->
+                        <div class="order-item p-4">
+                            <div class="row align-items-center">
+                                <div class="col-md-8">
+                                    <div class="d-flex align-items-center mb-2">
+                                        <h6 class="fw-bold me-3 mb-0">Pedido #ECO-2024-001231</h6>
+                                        <span class="badge bg-info">Enviado</span>
+                                    </div>
+                                    <p class="text-muted small mb-2">
+                                        <i class="bi bi-calendar me-1"></i>Realizado el 20 de mayo, 2024
+                                        <span class="ms-3"><i class="bi bi-truck me-1"></i>Enviado el 22 de mayo, 2024</span>
+                                    </p>
+                                    <div class="product-summary">
+                                        <span class="text-muted">4 productos: </span>
+                                        <span>Copa Menstrual, Shampoo Natural, Detergente Eco, Esponja Natural</span>
+                                    </div>
+                                </div>
+                                <div class="col-md-2 text-center">
+                                    <div class="fw-bold text-success fs-5">S/ 150.50</div>
+                                </div>
+                                <div class="col-md-2 text-end">
+                                    <div class="btn-group-vertical gap-1">
+                                        <button class="btn btn-outline-success btn-sm" onclick="viewOrder('ECO-2024-001231')">
+                                            <i class="bi bi-eye me-1"></i>Ver Detalles
+                                        </button>
+                                        <button class="btn btn-outline-primary btn-sm" onclick="trackOrder('ECO-2024-001231')">
+                                            <i class="bi bi-geo-alt me-1"></i>Rastrear
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Paginación -->
+                <nav aria-label="Navegación de pedidos" class="mt-4">
+                    <ul class="pagination justify-content-center">
+                        <li class="page-item disabled">
+                            <span class="page-link">Anterior</span>
+                        </li>
+                        <li class="page-item active">
+                            <span class="page-link">1</span>
+                        </li>
+                        <li class="page-item">
+                            <a class="page-link" href="#">2</a>
+                        </li>
+                        <li class="page-item">
+                            <a class="page-link" href="#">3</a>
+                        </li>
+                        <li class="page-item">
+                            <a class="page-link" href="#">Siguiente</a>
+                        </li>
+                    </ul>
+                </nav>
+
+                <!-- Resumen de estadísticas -->
+                <div class="row mt-4">
+                    <div class="col-md-3">
+                        <div class="card text-center border-0 bg-light">
+                            <div class="card-body">
+                                <i class="bi bi-bag-check-fill text-success fs-2"></i>
+                                <h4 class="fw-bold text-success mt-2">12</h4>
+                                <p class="text-muted small mb-0">Total Pedidos</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card text-center border-0 bg-light">
+                            <div class="card-body">
+                                <i class="bi bi-currency-dollar text-success fs-2"></i>
+                                <h4 class="fw-bold text-success mt-2">S/ 1,418.35</h4>
+                                <p class="text-muted small mb-0">Total Gastado</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card text-center border-0 bg-light">
+                            <div class="card-body">
+                                <i class="bi bi-star-fill text-success fs-2"></i>
+                                <h4 class="fw-bold text-success mt-2">150</h4>
+                                <p class="text-muted small mb-0">Puntos Eco</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card text-center border-0 bg-light">
+                            <div class="card-body">
+                                <i class="bi bi-leaf text-success fs-2"></i>
+                                <h4 class="fw-bold text-success mt-2">2.4kg</h4>
+                                <p class="text-muted small mb-0">CO₂ Ahorrado</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Modal de detalles del pedido -->
+    <div class="modal fade" id="orderDetailsModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header bg-success text-white">
+                    <h5 class="modal-title">
+                        <i class="bi bi-receipt me-2"></i>Detalles del Pedido <span id="modalOrderNumber"></span>
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" 
+                            title="Cerrar ventana" aria-label="Cerrar ventana de detalles"></button>
+                </div>
+                <div class="modal-body" id="orderDetailsContent">
+                    <!-- El contenido se cargará dinámicamente -->
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cerrar</button>
+                    <button type="button" class="btn btn-success" onclick="downloadInvoice()">
+                        <i class="bi bi-download me-1"></i>Descargar Factura
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div th:replace="~{fragments/footer :: footer}"></div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Función para ver detalles del pedido
+        function viewOrder(orderNumber) {
+            document.getElementById('modalOrderNumber').textContent = orderNumber;
+            
+            // Simular carga de detalles del pedido
+            const orderDetails = getOrderDetails(orderNumber);
+            document.getElementById('orderDetailsContent').innerHTML = orderDetails;
+            
+            const modal = new bootstrap.Modal(document.getElementById('orderDetailsModal'));
+            modal.show();
+        }
+
+        // Función para obtener detalles del pedido (simulada)
+        function getOrderDetails(orderNumber) {
+            const orders = {
+                'ECO-2024-001234': {
+                    status: 'Procesando',
+                    date: '8 de junio, 2024',
+                    total: 'S/ 231.83',
+                    products: [
+                        { name: 'Eco Kit Hogar', quantity: 2, price: 'S/ 117.00' },
+                        { name: 'Shampoo Natural', quantity: 1, price: 'S/ 40.00' },
+                        { name: 'Botella Reutilizable', quantity: 1, price: 'S/ 50.00' }
+                    ],
+                    shipping: 'Av. Principal 123, San Isidro, Lima',
+                    payment: 'Tarjeta de Crédito •••• 3456'
+                },
+                'ECO-2024-001233': {
+                    status: 'Entregado',
+                    date: '1 de junio, 2024',
+                    total: 'S/ 41.67',
+                    products: [
+                        { name: 'Cepillo de Bambú', quantity: 1, price: 'S/ 13.34' },
+                        { name: 'Bolsa Ecológica', quantity: 1, price: 'S/ 28.33' }
+                    ],
+                    shipping: 'Av. Principal 123, San Isidro, Lima',
+                    payment: 'PayPal'
+                }
+            };
+
+            const order = orders[orderNumber] || orders['ECO-2024-001234'];
+            
+            return `
+                <div class="row g-4">
+                    <div class="col-md-6">
+                        <h6 class="fw-bold text-success">Estado del Pedido</h6>
+                        <span class="badge bg-${order.status === 'Entregado' ? 'success' : 'warning'}">${order.status}</span>
+                        <p class="text-muted mt-2">Fecha: ${order.date}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <h6 class="fw-bold text-success">Total</h6>
+                        <p class="fs-5 fw-bold text-success">${order.total}</p>
+                    </div>
+                    <div class="col-12">
+                        <h6 class="fw-bold text-success">Productos</h6>
+                        <div class="table-responsive">
+                            <table class="table table-sm">
+                                <thead>
+                                    <tr>
+                                        <th>Producto</th>
+                                        <th>Cantidad</th>
+                                        <th>Precio</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    ${order.products.map(product => `
+                                        <tr>
+                                            <td>${product.name}</td>
+                                            <td>${product.quantity}</td>
+                                            <td>${product.price}</td>
+                                        </tr>
+                                    `).join('')}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <h6 class="fw-bold text-success">Dirección de Envío</h6>
+                        <p>${order.shipping}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <h6 class="fw-bold text-success">Método de Pago</h6>
+                        <p>${order.payment}</p>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Función para rastrear pedido
+        function trackOrder(orderNumber) {
+            showSuccessMessage('Abriendo seguimiento para el pedido ' + orderNumber);
+        }
+
+        // Función para reordenar items
+        function reorderItems(orderNumber) {
+            showSuccessMessage('¡Productos agregados al carrito exitosamente!');
+        }
+
+        // Función para filtrar pedidos
+        function filterOrders() {
+            const searchTerm = document.getElementById('searchOrder').value.toLowerCase();
+            const statusFilter = document.getElementById('statusFilter').value;
+            const dateFilter = document.getElementById('dateFilter').value;
+            
+            showSuccessMessage('Filtros aplicados exitosamente');
+        }
+
+        // Función para descargar factura
+        function downloadInvoice() {
+            showSuccessMessage('Generando factura... Se descargará automáticamente.');
+        }
+
+        // Función para mostrar mensajes de éxito
+        function showSuccessMessage(message) {
+            const alert = document.createElement('div');
+            alert.className = 'alert alert-success alert-dismissible fade show position-fixed';
+            alert.style.cssText = 'top: 20px; right: 20px; z-index: 9999; min-width: 300px;';
+            alert.innerHTML = `
+                <i class="bi bi-check-circle me-2"></i>${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" 
+                        title="Cerrar mensaje" aria-label="Cerrar mensaje de éxito"></button>
+            `;
+            
+            document.body.appendChild(alert);
+            
+            setTimeout(() => {
+                if (alert.parentNode) {
+                    alert.parentNode.removeChild(alert);
+                }
+            }, 5000);
+        }
+    </script>
+
+    <div th:replace="~{fragments/footer :: footer}"></div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
