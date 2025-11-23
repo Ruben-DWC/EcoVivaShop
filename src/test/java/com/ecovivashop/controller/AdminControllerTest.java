@@ -26,6 +26,7 @@ import com.ecovivashop.entity.Usuario;
 import com.ecovivashop.repository.RolRepository;
 import com.ecovivashop.repository.UsuarioRepository;
 import com.ecovivashop.service.ImagenService;
+import com.ecovivashop.service.PedidoService;
 import com.ecovivashop.service.UsuarioService;
 
 @WebMvcTest(AdminController.class)
@@ -41,6 +42,10 @@ class AdminControllerTest {
     @MockBean
     @SuppressWarnings({"removal", "unused"})
     private ImagenService imagenService;
+
+    @MockBean
+    @SuppressWarnings({"removal", "unused"})
+    private PedidoService pedidoService;
 
     @Test
     @WithMockUser(username = "admin@example.com", roles = {"ADMIN"})

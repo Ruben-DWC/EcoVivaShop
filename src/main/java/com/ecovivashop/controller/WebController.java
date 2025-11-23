@@ -15,12 +15,6 @@ public class WebController extends BaseAdminController {
         return "admin/registro-admin";
     }
 
-    @GetMapping("/inventario")
-    public String inventario(Model model) {
-        model.addAttribute("pageTitle", "Gestión de Inventario");
-        return "admin/inventario";
-    }
-
     @GetMapping("/configuracion")
     public String configuracion(Model model) {
         model.addAttribute("pageTitle", "Configuración del Sistema");

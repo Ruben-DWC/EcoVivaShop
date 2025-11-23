@@ -1,7 +1,12 @@
 package com.ecovivashop.controller;
 
+import java.math.BigDecimal;
 import java.security.Principal;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -9,7 +14,6 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -17,11 +21,22 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import com.ecovivashop.entity.TransaccionPago;
 import com.ecovivashop.entity.Usuario;
+import com.ecovivashop.repository.TransaccionPagoRepository;
+import com.ecovivashop.service.PedidoService;
+
+import jakarta.servlet.http.HttpServletRequest;
 
 @Controller
 @RequestMapping("/admin")
 public class ClienteAdminController extends BaseAdminController {
+    
+    @Autowired
+    private TransaccionPagoRepository transaccionPagoRepository;
+    
+    @Autowired
+    private PedidoService pedidoService;
     
     public ClienteAdminController() {
         // Constructor sin parámetros - usa el usuarioService heredado
@@ -62,6 +77,18 @@ public class ClienteAdminController extends BaseAdminController {
             clientes = usuarioService.obtenerClientesPaginados(pageable);
         }
         
+        // Calcular conteo de pedidos por cliente
+        Map<Integer, Long> conteoPedidosPorCliente = new HashMap<>();
+        for (Usuario cliente : clientes.getContent()) {
+            try {
+                long conteoPedidos = pedidoService.contarPedidosPorUsuario(cliente.getIdUsuario());
+                conteoPedidosPorCliente.put(cliente.getIdUsuario(), conteoPedidos);
+            } catch (RuntimeException e) {
+                // Si hay error al contar pedidos, usar 0
+                conteoPedidosPorCliente.put(cliente.getIdUsuario(), 0L);
+            }
+        }
+        
         // Estadísticas
         long totalClientes = usuarioService.contarClientes();
         long clientesActivos = usuarioService.contarClientesActivos();
@@ -69,6 +96,7 @@ public class ClienteAdminController extends BaseAdminController {
         
         // Agregar al modelo
         model.addAttribute("clientes", clientes);
+        model.addAttribute("conteoPedidosPorCliente", conteoPedidosPorCliente);
         model.addAttribute("currentPage", page);
         model.addAttribute("totalPages", clientes.getTotalPages());
         model.addAttribute("totalItems", clientes.getTotalElements());
@@ -125,21 +153,75 @@ public class ClienteAdminController extends BaseAdminController {
      * Guardar cliente (nuevo o editado)
      */
     @PostMapping("/clientes/guardar")
-    public String guardarCliente(@ModelAttribute Usuario cliente,
+    @SuppressWarnings("CallToPrintStackTrace")
+    public String guardarCliente(HttpServletRequest request,
                                 RedirectAttributes redirectAttributes) {
         try {
+            System.out.println("🔍 === INICIO GUARDAR CLIENTE ===");
+            
+            // Obtener parámetros del request
+            String idClienteStr = request.getParameter("idUsuario");
+            Integer idCliente = idClienteStr != null && !idClienteStr.trim().isEmpty() ? Integer.valueOf(idClienteStr.trim()) : null;
+            
+            String nombre = request.getParameter("nombre");
+            String apellido = request.getParameter("apellido");
+            String email = request.getParameter("email");
+            String telefono = request.getParameter("telefono");
+            String direccion = request.getParameter("direccion");
+            String dni = request.getParameter("dni");
+            String fechaNacimientoStr = request.getParameter("fechaNacimiento");
+            String password = request.getParameter("password");
+            String estadoStr = request.getParameter("estado");
+            
+            System.out.println("🔍 ID del cliente recibido: " + idCliente);
+            System.out.println("🔍 Email: " + email);
+            System.out.println("🔍 Nombre: " + nombre);
+            System.out.println("🔍 Apellido: " + apellido);
+            System.out.println("🔍 Estado: " + estadoStr);
+            
+            // Crear objeto Usuario con los datos del formulario
+            Usuario cliente = new Usuario();
+            cliente.setIdUsuario(idCliente);
+            cliente.setNombre(nombre);
+            cliente.setApellido(apellido);
+            cliente.setEmail(email);
+            cliente.setTelefono(telefono);
+            cliente.setDireccion(direccion);
+            cliente.setDni(dni);
+            
+            if (fechaNacimientoStr != null && !fechaNacimientoStr.trim().isEmpty()) {
+                try {
+                    cliente.setFechaNacimiento(java.sql.Date.valueOf(fechaNacimientoStr.trim()).toLocalDate());
+                } catch (IllegalArgumentException e) {
+                    System.err.println("❌ Error parseando fecha de nacimiento: " + e.getMessage());
+                }
+            }
+            
+            if (password != null && !password.trim().isEmpty()) {
+                cliente.setPassword(password.trim());
+            }
+            
+            if (estadoStr != null && !estadoStr.trim().isEmpty()) {
+                cliente.setEstado("on".equals(estadoStr.trim()) || Boolean.parseBoolean(estadoStr.trim()));
+            }
+            
             // Si es nuevo cliente, asignar rol de cliente
             if (cliente.getIdUsuario() == null) {
+                System.out.println("🔍 Creando nuevo cliente...");
                 usuarioService.registrarCliente(cliente);
                 redirectAttributes.addFlashAttribute("success", 
                     "Cliente registrado exitosamente");
             } else {
+                System.out.println("🔍 Actualizando cliente existente con ID: " + cliente.getIdUsuario());
                 usuarioService.actualizarCliente(cliente);
                 redirectAttributes.addFlashAttribute("success", 
                     "Cliente actualizado exitosamente");
             }
                 
-        } catch (Exception e) {
+        } catch (RuntimeException e) {
+            System.err.println("❌ === ERROR AL GUARDAR CLIENTE ===");
+            System.err.println("❌ Error: " + e.getMessage());
+            e.printStackTrace();
             redirectAttributes.addFlashAttribute("error", 
                 "Error al guardar cliente: " + e.getMessage());
         }
@@ -157,7 +239,7 @@ public class ClienteAdminController extends BaseAdminController {
             usuarioService.cambiarEstadoCliente(id);
             redirectAttributes.addFlashAttribute("success", 
                 "Estado del cliente actualizado exitosamente");
-        } catch (Exception e) {
+        } catch (RuntimeException e) {
             redirectAttributes.addFlashAttribute("error", 
                 "Error al cambiar estado del cliente: " + e.getMessage());
         }
@@ -178,10 +260,26 @@ public class ClienteAdminController extends BaseAdminController {
         Usuario cliente = usuarioService.findById(id)
             .orElseThrow(() -> new IllegalArgumentException("Cliente no encontrado"));
         
-        // Obtener estadísticas del cliente
-        // Implementar contadores de pedidos, compras, etc.
+        // Calcular estadísticas del cliente
+        long totalPedidos = pedidoService.contarPedidosPorUsuario(id);
+        BigDecimal totalGastado = pedidoService.calcularTotalGastadoPorUsuario(id);
+        BigDecimal promedioPedido = pedidoService.calcularPromedioPedidoPorUsuario(id);
+        java.time.LocalDateTime fechaUltimoPedido = pedidoService.obtenerFechaUltimoPedido(id);
         
+        // Obtener historial de pedidos (últimos 10 pedidos)
+        List<com.ecovivashop.entity.Pedido> historialPedidos = pedidoService.obtenerPedidosPorUsuario(id);
+        // Limitar a los últimos 10 pedidos más recientes
+        if (historialPedidos.size() > 10) {
+            historialPedidos = historialPedidos.subList(0, 10);
+        }
+        
+        // Agregar datos al modelo
         model.addAttribute("cliente", cliente);
+        model.addAttribute("totalPedidos", totalPedidos);
+        model.addAttribute("totalGastado", totalGastado);
+        model.addAttribute("promedioPedido", promedioPedido);
+        model.addAttribute("fechaUltimoPedido", fechaUltimoPedido);
+        model.addAttribute("historialPedidos", historialPedidos);
         
         return "admin/cliente-detalle";
     }
@@ -190,19 +288,56 @@ public class ClienteAdminController extends BaseAdminController {
      * Eliminar cliente (cambiar estado a inactivo)
      */
     @PostMapping("/clientes/eliminar/{id}")
+    @SuppressWarnings("CallToPrintStackTrace")
     public String eliminarCliente(@PathVariable Integer id, 
-                                 RedirectAttributes redirectAttributes) {
+                                 RedirectAttributes redirectAttributes,
+                                 HttpServletRequest request) {
         try {
+            // Log detallado de la solicitud
+            System.out.println("🔍 === INICIO DESACTIVACIÓN CLIENTE ===");
+            System.out.println("🔍 ID recibido: " + id);
+            System.out.println("🔍 Método HTTP: " + request.getMethod());
+            System.out.println("🔍 URL: " + request.getRequestURL());
+            System.out.println("🔍 Headers importantes:");
+            System.out.println("🔍   Content-Type: " + request.getContentType());
+            System.out.println("🔍   Content-Length: " + request.getContentLength());
+            System.out.println("🔍   User-Agent: " + request.getHeader("User-Agent"));
+            System.out.println("🔍   Referer: " + request.getHeader("Referer"));
+            
             // Verificar que el cliente existe antes de desactivar
-            usuarioService.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Cliente no encontrado"));
+            Usuario cliente = usuarioService.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Cliente no encontrado con ID: " + id));
+            
+            // Log del cliente encontrado
+            System.out.println("🔍 Cliente encontrado:");
+            System.out.println("🔍   ID: " + cliente.getIdUsuario());
+            System.out.println("🔍   Email: " + cliente.getEmail());
+            System.out.println("🔍   Estado actual: " + cliente.getEstado());
+            System.out.println("🔍   Es Gmail: " + cliente.getEmail().toLowerCase().contains("@gmail.com"));
             
             // En lugar de eliminar físicamente, desactivamos el cliente
+            System.out.println("🔍 Llamando a usuarioService.desactivarUsuario(" + id + ")");
             usuarioService.desactivarUsuario(id);
             
+            // Verificar que se desactivó correctamente
+            Usuario clienteDesactivado = usuarioService.findById(id).orElse(null);
+            if (clienteDesactivado != null) {
+                System.out.println("✅ Cliente desactivado exitosamente:");
+                System.out.println("✅   Nuevo estado: " + clienteDesactivado.getEstado());
+                System.out.println("✅   Confirmación: " + (clienteDesactivado.getEstado() == false));
+            } else {
+                System.out.println("❌ ERROR: No se pudo verificar el cliente después de desactivar");
+            }
+            
+            System.out.println("🔍 === FIN DESACTIVACIÓN CLIENTE ===");
             redirectAttributes.addFlashAttribute("success", 
                 "Cliente desactivado exitosamente");
-        } catch (Exception e) {
+        } catch (RuntimeException e) {
+            System.err.println("❌ === ERROR EN DESACTIVACIÓN CLIENTE ===");
+            System.err.println("❌ ID: " + id);
+            System.err.println("❌ Error: " + e.getMessage());
+            e.printStackTrace();
+            System.err.println("❌ === FIN ERROR DESACTIVACIÓN ===");
             redirectAttributes.addFlashAttribute("error", 
                 "Error al desactivar cliente: " + e.getMessage());
         }
@@ -214,13 +349,29 @@ public class ClienteAdminController extends BaseAdminController {
      * Activar cliente
      */
     @PostMapping("/clientes/activar/{id}")
+    @SuppressWarnings("CallToPrintStackTrace")
     public String activarCliente(@PathVariable Integer id, 
                                 RedirectAttributes redirectAttributes) {
         try {
+            Usuario cliente = usuarioService.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Cliente no encontrado con ID: " + id));
+            
+            // Log para debugging
+            System.out.println("🔍 Intentando activar cliente ID: " + id + ", Email: " + cliente.getEmail() + ", Estado actual: " + cliente.getEstado());
+            
             usuarioService.activarUsuario(id);
+            
+            // Verificar que se activó correctamente
+            Usuario clienteActivado = usuarioService.findById(id).orElse(null);
+            if (clienteActivado != null) {
+                System.out.println("✅ Cliente activado exitosamente. Nuevo estado: " + clienteActivado.getEstado());
+            }
+            
             redirectAttributes.addFlashAttribute("success", 
                 "Cliente activado exitosamente");
-        } catch (Exception e) {
+        } catch (RuntimeException e) {
+            System.err.println("❌ Error al activar cliente ID: " + id + " - " + e.getMessage());
+            e.printStackTrace();
             redirectAttributes.addFlashAttribute("error", 
                 "Error al activar cliente: " + e.getMessage());
         }
@@ -229,25 +380,62 @@ public class ClienteAdminController extends BaseAdminController {
     }
     
     /**
-     * Eliminar cliente completamente (solo si no tiene pedidos)
+     * Eliminar cliente completamente (solo si no tiene pedidos ni transacciones de pago)
      */
     @PostMapping("/clientes/eliminar-completo/{id}")
+    @SuppressWarnings("CallToPrintStackTrace")
     public String eliminarClienteCompleto(@PathVariable Integer id, 
                                          RedirectAttributes redirectAttributes) {
         try {
+            System.out.println("🔍 === INICIO ELIMINACIÓN COMPLETA CLIENTE ===");
+            System.out.println("🔍 ID recibido: " + id);
+            
             // Verificar si se puede eliminar
-            if (!usuarioService.puedeEliminarUsuario(id)) {
+            System.out.println("🔍 Verificando si se puede eliminar usuario ID: " + id);
+            boolean puedeEliminar = usuarioService.puedeEliminarUsuario(id);
+            System.out.println("🔍 ¿Puede eliminar? " + puedeEliminar);
+            
+            if (!puedeEliminar) {
+                System.out.println("❌ No se puede eliminar - tiene pedidos o transacciones asociadas");
                 redirectAttributes.addFlashAttribute("error", 
-                    "No se puede eliminar el cliente porque tiene pedidos asociados");
+                    "No se puede eliminar el cliente porque tiene pedidos o transacciones de pago asociados");
                 return "redirect:/admin/clientes";
             }
             
-            // Eliminar completamente
-            usuarioService.deleteById(id);
+            // Obtener el usuario antes de eliminar
+            Usuario usuario = usuarioService.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Cliente no encontrado"));
             
+            System.out.println("🔍 Usuario encontrado:");
+            System.out.println("🔍   ID: " + usuario.getIdUsuario());
+            System.out.println("🔍   Email: " + usuario.getEmail());
+            System.out.println("🔍   Es Gmail: " + usuario.getEmail().toLowerCase().contains("@gmail.com"));
+            
+            // Eliminar transacciones de pago asociadas
+            System.out.println("🔍 Buscando transacciones de pago...");
+            List<TransaccionPago> transacciones = transaccionPagoRepository.findByUsuarioOrderByFechaCreacionDesc(usuario);
+            System.out.println("🔍 Transacciones encontradas: " + (transacciones != null ? transacciones.size() : 0));
+            
+            if (transacciones != null && !transacciones.isEmpty()) {
+                System.out.println("🔍 Eliminando " + transacciones.size() + " transacciones...");
+                transaccionPagoRepository.deleteAll(transacciones);
+                System.out.println("✅ Transacciones eliminadas");
+            }
+            
+            // Finalmente eliminar el usuario
+            System.out.println("🔍 Eliminando usuario de la base de datos...");
+            usuarioService.deleteById(id);
+            System.out.println("✅ Usuario eliminado completamente");
+            
+            System.out.println("🔍 === FIN ELIMINACIÓN COMPLETA CLIENTE ===");
             redirectAttributes.addFlashAttribute("success", 
                 "Cliente eliminado completamente del sistema");
-        } catch (Exception e) {
+        } catch (RuntimeException e) {
+            System.err.println("❌ === ERROR EN ELIMINACIÓN COMPLETA CLIENTE ===");
+            System.err.println("❌ ID: " + id);
+            System.err.println("❌ Error: " + e.getMessage());
+            e.printStackTrace();
+            System.err.println("❌ === FIN ERROR ELIMINACIÓN COMPLETA ===");
             redirectAttributes.addFlashAttribute("error", 
                 "Error al eliminar cliente: " + e.getMessage());
         }

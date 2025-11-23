@@ -4,6 +4,8 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -88,4 +90,32 @@ public interface InventarioRepository extends JpaRepository<Inventario, Integer>
     @Query("SELECT CASE WHEN i.stock >= :cantidad THEN true ELSE false END " +
            "FROM Inventario i WHERE i.producto.idProducto = :idProducto")
     Boolean verificarDisponibilidad(@Param("idProducto") Integer idProducto, @Param("cantidad") Integer cantidad);
+    
+    // ========== MÉTODOS CON PAGINACIÓN ==========
+    
+    // Inventarios activos con paginación
+    @Query("SELECT i FROM Inventario i WHERE i.estado = true")
+    Page<Inventario> findByEstadoTrue(Pageable pageable);
+    
+    // Productos con stock disponible con paginación
+    @Query("SELECT i FROM Inventario i WHERE i.stock > 0 AND i.estado = true")
+    Page<Inventario> findConStock(Pageable pageable);
+    
+    // Productos agotados con paginación
+    @Query("SELECT i FROM Inventario i WHERE i.stock = 0 AND i.estado = true")
+    Page<Inventario> findAgotados(Pageable pageable);
+    
+    // Productos con stock bajo con paginación
+    @Query("SELECT i FROM Inventario i WHERE i.stock <= i.stockMinimo AND i.stock > 0 AND i.estado = true")
+    Page<Inventario> findConStockBajo(Pageable pageable);
+    
+    // Productos en estado crítico con paginación
+    @Query("SELECT i FROM Inventario i WHERE i.stock <= (i.stockMinimo / 2) AND i.stock > 0 AND i.estado = true")
+    Page<Inventario> findEnEstadoCritico(Pageable pageable);
+    
+    // Alertas de inventario con paginación
+    @Query("SELECT i FROM Inventario i JOIN i.producto p WHERE " +
+           "i.stock <= i.stockMinimo AND i.estado = true AND p.estado = true " +
+           "ORDER BY CAST(i.stock AS double) / CAST(i.stockMinimo AS double) ASC")
+    Page<Inventario> obtenerAlertasInventario(Pageable pageable);
 }

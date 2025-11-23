@@ -26,7 +26,7 @@
 .dropdown:not(.navbar .dropdown) .dropdown-menu {
     z-index: 1050 !important;
     position: absolute !important;
-    display: none !important;
+    /* Remover display: none forzado para permitir que Bootstrap controle la visibilidad */
 }
 
 .dropdown:not(.navbar .dropdown) .dropdown-menu.show {

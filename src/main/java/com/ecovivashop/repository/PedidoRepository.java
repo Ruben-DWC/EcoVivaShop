@@ -146,4 +146,7 @@ public interface PedidoRepository extends JpaRepository<Pedido, Integer> {
     
     // Contar pedidos por estado
     long countByEstado(String estado);
+    
+    // Contar pedidos por usuario
+    long countByUsuario(Usuario usuario);
 }

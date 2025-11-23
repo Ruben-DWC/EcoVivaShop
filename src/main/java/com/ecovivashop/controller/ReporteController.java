@@ -9,6 +9,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.ContentDisposition;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -62,8 +63,8 @@ public class ReporteController {
             
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
-            headers.setContentDispositionFormData("attachment", "pedidos_" + 
-                LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss")) + ".csv");
+            headers.setContentDisposition(ContentDisposition.builder("attachment").filename("pedidos_" + 
+                LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss")) + ".csv").build());
             
             return ResponseEntity.ok()
                     .headers(headers)
@@ -148,8 +149,8 @@ public class ReporteController {
             
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.TEXT_HTML);
-            headers.setContentDispositionFormData("attachment", "reporte_pedidos_" + 
-                LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss")) + ".html");
+            headers.setContentDisposition(ContentDisposition.builder("attachment").filename("reporte_pedidos_" + 
+                LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss")) + ".html").build());
             
             return ResponseEntity.ok()
                     .headers(headers)
@@ -202,8 +203,8 @@ public class ReporteController {
             
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.TEXT_PLAIN);
-            headers.setContentDispositionFormData("attachment", "pedidos_" + 
-                LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss")) + ".txt");
+            headers.setContentDisposition(ContentDisposition.builder("attachment").filename("pedidos_" + 
+                LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss")) + ".txt").build());
             
             return ResponseEntity.ok()
                     .headers(headers)
@@ -252,7 +253,7 @@ public class ReporteController {
             
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.TEXT_PLAIN);
-            headers.setContentDispositionFormData("attachment", "pedidos_simple.csv");
+            headers.setContentDisposition(ContentDisposition.builder("attachment").filename("pedidos_simple.csv").build());
             
             return ResponseEntity.ok()
                     .headers(headers)

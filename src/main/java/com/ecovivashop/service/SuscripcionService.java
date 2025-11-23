@@ -311,6 +311,26 @@ public class SuscripcionService {
         return new EstadisticasSuscripcion(totalActivas, totalBasic, totalPremium, totalVip);
     }
     
+    // Métodos básicos para compatibilidad con controller
+    public Suscripcion save(Suscripcion suscripcion) {
+        return suscripcionRepository.save(suscripcion);
+    }
+
+    public Optional<Suscripcion> findById(Integer id) {
+        return suscripcionRepository.findById(id);
+    }
+
+    public List<Suscripcion> findByUsuario(Usuario usuario) {
+        return suscripcionRepository.findByUsuario(usuario);
+    }
+
+    public List<Suscripcion> findSuscripcionesActivasByUsuario(Usuario usuario) {
+        return suscripcionRepository.findSuscripcionesActivas(java.time.LocalDateTime.now())
+                                   .stream()
+                                   .filter(s -> s.getUsuario().equals(usuario))
+                                   .toList();
+    }
+    
     // Clases auxiliares
     public static class ResultadoSuscripcion {
         private final boolean exitoso;

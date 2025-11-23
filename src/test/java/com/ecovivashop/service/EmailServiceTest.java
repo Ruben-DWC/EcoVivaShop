@@ -156,12 +156,16 @@ class EmailServiceTest {
         String destinatario = "usuario@test.com";
         String nombreUsuario = "Pedro Sánchez";
         String tokenReset = "reset-token-123";
+        when(templateEngine.process(eq("email/restablecer-password"), any(Context.class)))
+            .thenReturn("<html>Reset password</html>");
+        when(mailSender.createMimeMessage()).thenReturn(mock(jakarta.mail.internet.MimeMessage.class));
 
         // When
         emailService.enviarCorreoRestablecimientoPassword(destinatario, nombreUsuario, tokenReset);
 
         // Then
-        verify(mailSender).send(any(SimpleMailMessage.class));
+        verify(templateEngine).process(eq("email/restablecer-password"), any(Context.class));
+        verify(mailSender).send(any(MimeMessage.class));
     }
 
     @Test

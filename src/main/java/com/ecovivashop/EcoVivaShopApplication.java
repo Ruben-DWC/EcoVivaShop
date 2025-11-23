@@ -135,7 +135,13 @@ public class EcoVivaShopApplication {
 				usuario.setPassword(passwordEncoder.encode("123456"));
 				usuario.setTelefono("123456789");
 				usuario.setEstado(true);
-				usuario.setRol(rolRepository.findByNombre("ROLE_CLIENTE").orElse(null));
+				// Por defecto se crea como ROLE_CLIENTE. Para desarrollo local, permitir forzar admin con System Property DEV_PROMOTE_TEST_ADMIN=true
+				boolean promoteAdmin = "true".equalsIgnoreCase(System.getProperty("DEV_PROMOTE_TEST_ADMIN", "false"));
+				if (promoteAdmin) {
+					usuario.setRol(rolRepository.findByNombre("ROLE_ADMIN").orElse(null));
+				} else {
+					usuario.setRol(rolRepository.findByNombre("ROLE_CLIENTE").orElse(null));
+				}
 				usuario.setFechaRegistro(java.time.LocalDateTime.now());
 				usuarioRepository.save(usuario);
 				System.out.println("Usuario de prueba creado: test@test.com / 123456");

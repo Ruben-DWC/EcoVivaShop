@@ -252,6 +252,7 @@ public class ClientController {
 
     @PostMapping("/procesar-pago")
     @ResponseBody
+    @SuppressWarnings("UseSpecificCatch")
     public Map<String, Object> procesarPago(@RequestParam("firstName") String firstName,
                               @RequestParam("lastName") String lastName,
                               @RequestParam("email") String email,
@@ -340,7 +341,7 @@ public class ClientController {
             String numeroPedido = "ECO-" + System.currentTimeMillis();
 
             // Crear pedido usando PedidoService
-            com.ecovivashop.entity.Pedido pedido = this.pedidoService.crearPedidoDesdeCarro(
+            Pedido pedido = this.pedidoService.crearPedidoDesdeCarro(
                 usuario, carrito, numeroPedido, paymentMethod, direccionEnvio,
                 subtotal, envio, descuento, igv, total
             );
@@ -372,9 +373,15 @@ public class ClientController {
             response.put("message", "Pago procesado correctamente");
             response.put("redirectUrl", "/client/confirmacion");
 
-        } catch (Exception e) {
+        } catch (IllegalArgumentException | NullPointerException e) {
             response.put("success", false);
-            response.put("message", "Error al procesar el pago: " + e.getMessage());
+            response.put("message", "Datos inválidos en el procesamiento del pago: " + e.getMessage());
+        } catch (RuntimeException e) {
+            response.put("success", false);
+            response.put("message", "Error en el procesamiento del pago: " + e.getMessage());
+        } catch (Exception e) { // Catch genérico intencional para errores inesperados en procesamiento complejo
+            response.put("success", false);
+            response.put("message", "Error interno al procesar el pago: " + e.getMessage());
         }
 
         return response;
@@ -400,7 +407,7 @@ public class ClientController {
         String ultimoNumeroPedido = (String) session.getAttribute("ultimoNumeroPedido");
         if (ultimoNumeroPedido != null) {
             // Recargar el pedido con detalles desde la base de datos
-            com.ecovivashop.entity.Pedido ultimoPedido = this.pedidoService.findByNumeroPedidoWithDetalles(ultimoNumeroPedido).orElse(null);
+            Pedido ultimoPedido = this.pedidoService.findByNumeroPedidoWithDetalles(ultimoNumeroPedido).orElse(null);
             if (ultimoPedido != null) {
                 // Pasar datos individuales que el template espera
                 model.addAttribute("numeroPedido", ultimoPedido.getNumeroPedido());
@@ -517,7 +524,7 @@ public class ClientController {
 
         try {
             // Cargar el pedido con detalles
-            com.ecovivashop.entity.Pedido pedido = this.pedidoService.findByNumeroPedidoWithDetalles(numeroPedido).orElse(null);
+            Pedido pedido = this.pedidoService.findByNumeroPedidoWithDetalles(numeroPedido).orElse(null);
             if (pedido == null) {
                 response.put("success", false);
                 response.put("message", "Pedido no encontrado");
@@ -936,14 +943,8 @@ public class ClientController {
         Object carritoObj = session.getAttribute("carrito");
         
         if (carritoObj instanceof List<?> carritoList) {
-            try {
-                List<Map<String, Object>> carrito = (List<Map<String, Object>>) carritoList;
-                return carrito;
-            } catch (ClassCastException e) {
-                List<Map<String, Object>> newCarrito = new ArrayList<>();
-                session.setAttribute("carrito", newCarrito);
-                return newCarrito;
-            }
+            // Pattern matching instanceof ensures type safety, no need for try-catch
+            return (List<Map<String, Object>>) carritoList;
         }
         List<Map<String, Object>> newCarrito = new ArrayList<>();
         session.setAttribute("carrito", newCarrito);

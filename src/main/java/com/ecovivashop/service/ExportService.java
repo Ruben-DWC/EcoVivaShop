@@ -20,6 +20,7 @@ import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.stereotype.Service;
 
+import com.ecovivashop.entity.Inventario;
 import com.ecovivashop.entity.Pedido;
 import com.ecovivashop.entity.PedidoDetalle;
 import com.ecovivashop.entity.Producto;
@@ -653,7 +654,7 @@ public class ExportService {
             
             // Crear cabeceras
             Row headerRow = productosSheet.createRow(0);
-            String[] headers = {"ID", "Nombre", "Descripción", "Categoría", "Precio", "Stock", "Estado", "Eco Score", "Fecha Creación"};
+            String[] headers = {"ID", "Nombre", "Descripción", "Categoría", "Precio", "Stock Actual", "Stock Mínimo", "Stock Máximo", "Estado Stock", "Ubicación", "Estado", "Última Actualización", "Usuario Actualización"};
             
             for (int i = 0; i < headers.length; i++) {
                 Cell cell = headerRow.createCell(i);
@@ -691,17 +692,37 @@ public class ExportService {
                 cell5.setCellStyle(dataStyle);
                 
                 Cell cell6 = row.createCell(6);
-                cell6.setCellValue(Boolean.TRUE.equals(producto.getEstado()) ? "ACTIVO" : "INACTIVO");
+                cell6.setCellValue(producto.getInventario() != null && producto.getInventario().getStockMinimo() != null ? 
+                    producto.getInventario().getStockMinimo().toString() : "0");
                 cell6.setCellStyle(dataStyle);
                 
                 Cell cell7 = row.createCell(7);
-                cell7.setCellValue(producto.getPuntuacionEco() != null ? producto.getPuntuacionEco().toString() : "N/A");
+                cell7.setCellValue(producto.getInventario() != null && producto.getInventario().getStockMaximo() != null ? 
+                    producto.getInventario().getStockMaximo().toString() : "N/A");
                 cell7.setCellStyle(dataStyle);
                 
                 Cell cell8 = row.createCell(8);
-                cell8.setCellValue(producto.getFechaCreacion() != null ? 
-                    producto.getFechaCreacion().format(DATE_ONLY_FORMATTER) : "");
+                cell8.setCellValue(producto.getEstado());
                 cell8.setCellStyle(dataStyle);
+                
+                Cell cell9 = row.createCell(9);
+                cell9.setCellValue(producto.getInventario() != null && producto.getInventario().getUbicacion() != null ? 
+                    producto.getInventario().getUbicacion() : "N/A");
+                cell9.setCellStyle(dataStyle);
+                
+                Cell cell10 = row.createCell(10);
+                cell10.setCellValue(Boolean.TRUE.equals(producto.getEstado()) ? "ACTIVO" : "INACTIVO");
+                cell10.setCellStyle(dataStyle);
+                
+                Cell cell11 = row.createCell(11);
+                cell11.setCellValue(producto.getFechaCreacion() != null ? 
+                    producto.getFechaCreacion().format(DATE_ONLY_FORMATTER) : "");
+                cell11.setCellStyle(dataStyle);
+                
+                Cell cell12 = row.createCell(12);
+                cell12.setCellValue(producto.getInventario() != null && producto.getInventario().getUsuarioActualizacion() != null ? 
+                    producto.getInventario().getUsuarioActualizacion() : "Sistema");
+                cell12.setCellStyle(dataStyle);
             }
             
             // Ajustar ancho de columnas
@@ -833,13 +854,12 @@ public class ExportService {
             int cantidad = (Integer) producto.get("cantidad");
             String nombre = (String) producto.get("nombre");
             double precio = ((Number) producto.get("precio")).doubleValue();
-            double importe = precio * cantidad;
             
             productosTable.addCell(new PdfPCell(new Phrase(String.valueOf(cantidad), dataFont)));
             productosTable.addCell(new PdfPCell(new Phrase(nombre, dataFont)));
             productosTable.addCell(new PdfPCell(new Phrase("S/ " + String.format("%.2f", precio), dataFont)));
             productosTable.addCell(new PdfPCell(new Phrase("S/ 0.00", dataFont)));
-            productosTable.addCell(new PdfPCell(new Phrase("S/ " + String.format("%.2f", importe), dataFont)));
+            productosTable.addCell(new PdfPCell(new Phrase("S/ " + String.format("%.2f", precio * cantidad), dataFont)));
         }
         
         document.add(productosTable);
@@ -1059,5 +1079,297 @@ public class ExportService {
         
         document.close();
         return baos.toByteArray();
+    }
+    
+    /**
+     * Exportar inventario a PDF
+     */
+    public byte[] exportarInventarioPDF(List<Inventario> inventarios) throws DocumentException, IOException {
+        Document document = new Document(PageSize.A4.rotate()); // Horizontal para más columnas
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        PdfWriter.getInstance(document, baos);
+        
+        document.open();
+        
+        // Título del reporte
+        com.itextpdf.text.Font titleFont = FontFactory.getFont(FontFactory.HELVETICA_BOLD, 20, BaseColor.BLACK);
+        Paragraph title = new Paragraph("Reporte de Inventario - EcoVivaShop", titleFont);
+        title.setAlignment(Element.ALIGN_CENTER);
+        title.setSpacingAfter(20);
+        document.add(title);
+        
+        // Información del reporte
+        com.itextpdf.text.Font infoFont = FontFactory.getFont(FontFactory.HELVETICA, 12, BaseColor.GRAY);
+        Paragraph info = new Paragraph();
+        info.add(new Chunk("Generado el: " + java.time.LocalDateTime.now().format(DATE_FORMATTER) + "\n", infoFont));
+        info.add(new Chunk("Total de productos en inventario: " + inventarios.size() + "\n", infoFont));
+        info.setSpacingAfter(20);
+        document.add(info);
+        
+        // Estadísticas generales
+        com.itextpdf.text.Font sectionFont = FontFactory.getFont(FontFactory.HELVETICA_BOLD, 14, BaseColor.BLACK);
+        Paragraph statsTitle = new Paragraph("Estadísticas del Inventario", sectionFont);
+        statsTitle.setSpacingAfter(10);
+        document.add(statsTitle);
+        
+        // Calcular estadísticas
+        long totalProductos = inventarios.size();
+        long productosConStock = inventarios.stream().mapToLong(i -> i.getStock() > 0 ? 1 : 0).sum();
+        long productosAgotados = inventarios.stream().mapToLong(i -> i.agotado() ? 1 : 0).sum();
+        long productosStockBajo = inventarios.stream().mapToLong(i -> i.necesitaReposicion() && !i.agotado() ? 1 : 0).sum();
+        long productosCriticos = inventarios.stream().mapToLong(i -> i.stockCritico() ? 1 : 0).sum();
+        long stockTotal = inventarios.stream().mapToLong(i -> i.getStock() != null ? i.getStock().longValue() : 0L).sum();
+        
+        com.itextpdf.text.Font dataFont = FontFactory.getFont(FontFactory.HELVETICA, 11, BaseColor.BLACK);
+        Paragraph stats = new Paragraph();
+        stats.add(new Chunk("• Total de productos: " + totalProductos + "\n", dataFont));
+        stats.add(new Chunk("• Productos con stock: " + productosConStock + "\n", dataFont));
+        stats.add(new Chunk("• Productos agotados: " + productosAgotados + "\n", dataFont));
+        stats.add(new Chunk("• Productos con stock bajo: " + productosStockBajo + "\n", dataFont));
+        stats.add(new Chunk("• Productos en estado crítico: " + productosCriticos + "\n", dataFont));
+        stats.add(new Chunk("• Stock total acumulado: " + stockTotal + " unidades\n", dataFont));
+        stats.setSpacingAfter(20);
+        document.add(stats);
+        
+        // Tabla de inventario
+        Paragraph tableTitle = new Paragraph("Detalle del Inventario", sectionFont);
+        tableTitle.setSpacingAfter(10);
+        document.add(tableTitle);
+        
+        PdfPTable table = new PdfPTable(9);
+        table.setWidthPercentage(100);
+        table.setWidths(new float[]{8, 20, 12, 8, 8, 8, 10, 12, 14});
+        
+        // Cabeceras
+        com.itextpdf.text.Font headerFont = FontFactory.getFont(FontFactory.HELVETICA_BOLD, 8, BaseColor.WHITE);
+        String[] headers = {"ID", "Producto", "Categoría", "Stock", "Mínimo", "Estado", "Ubicación", "Última Actualización", "Usuario"};
+        
+        for (String header : headers) {
+            PdfPCell cell = new PdfPCell(new Phrase(header, headerFont));
+            cell.setBackgroundColor(new BaseColor(76, 175, 80));
+            cell.setHorizontalAlignment(Element.ALIGN_CENTER);
+            cell.setPadding(5);
+            table.addCell(cell);
+        }
+        
+        // Datos
+        com.itextpdf.text.Font tableDataFont = FontFactory.getFont(FontFactory.HELVETICA, 7, BaseColor.BLACK);
+        for (Inventario inventario : inventarios) {
+            Producto producto = inventario.getProducto();
+            
+            table.addCell(new PdfPCell(new Phrase(producto.getIdProducto().toString(), tableDataFont)));
+            table.addCell(new PdfPCell(new Phrase(producto.getNombre(), tableDataFont)));
+            table.addCell(new PdfPCell(new Phrase(producto.getCategoria(), tableDataFont)));
+            table.addCell(new PdfPCell(new Phrase(inventario.getStock().toString(), tableDataFont)));
+            table.addCell(new PdfPCell(new Phrase(inventario.getStockMinimo().toString(), tableDataFont)));
+            table.addCell(new PdfPCell(new Phrase(inventario.getEstadoStock(), tableDataFont)));
+            table.addCell(new PdfPCell(new Phrase(inventario.getUbicacion() != null ? inventario.getUbicacion() : "N/A", tableDataFont)));
+            table.addCell(new PdfPCell(new Phrase(inventario.getFechaActualizacion().format(DATE_FORMATTER), tableDataFont)));
+            table.addCell(new PdfPCell(new Phrase(inventario.getUsuarioActualizacion() != null ? inventario.getUsuarioActualizacion() : "Sistema", tableDataFont)));
+        }
+        
+        document.add(table);
+        document.close();
+        
+        return baos.toByteArray();
+    }
+    
+    /**
+     * Exportar inventario a Excel
+     */
+    public byte[] exportarInventarioExcel(List<Inventario> inventarios) throws IOException {
+        try (Workbook workbook = new XSSFWorkbook();
+             ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
+            
+            // Hoja de estadísticas
+            Sheet statsSheet = workbook.createSheet("Estadísticas del Inventario");
+        
+        // Estilo para títulos
+        CellStyle titleStyle = workbook.createCellStyle();
+        Font titleFont = workbook.createFont();
+        titleFont.setBold(true);
+        titleFont.setFontHeightInPoints((short) 14);
+        titleStyle.setFont(titleFont);
+        
+        // Estilo para datos
+        CellStyle dataStyle = workbook.createCellStyle();
+        dataStyle.setBorderBottom(BorderStyle.THIN);
+        dataStyle.setBorderTop(BorderStyle.THIN);
+        dataStyle.setBorderRight(BorderStyle.THIN);
+        dataStyle.setBorderLeft(BorderStyle.THIN);
+        
+        // Título de la hoja
+        Row titleRow = statsSheet.createRow(0);
+        Cell titleCell = titleRow.createCell(0);
+        titleCell.setCellValue("Reporte de Inventario - EcoVivaShop");
+        titleCell.setCellStyle(titleStyle);
+        
+        // Estadísticas
+        long totalProductos = inventarios.size();
+        long productosConStock = inventarios.stream().mapToLong(i -> i.getStock() > 0 ? 1 : 0).sum();
+        long productosAgotados = inventarios.stream().mapToLong(i -> i.agotado() ? 1 : 0).sum();
+        long productosStockBajo = inventarios.stream().mapToLong(i -> i.necesitaReposicion() && !i.agotado() ? 1 : 0).sum();
+        long productosCriticos = inventarios.stream().mapToLong(i -> i.stockCritico() ? 1 : 0).sum();
+        long stockTotal = inventarios.stream().mapToLong(i -> i.getStock() != null ? i.getStock().longValue() : 0L).sum();
+        
+        statsSheet.createRow(2).createCell(0).setCellValue("Total de productos:");
+        statsSheet.getRow(2).createCell(1).setCellValue(totalProductos);
+        
+        statsSheet.createRow(3).createCell(0).setCellValue("Productos con stock:");
+        statsSheet.getRow(3).createCell(1).setCellValue(productosConStock);
+        
+        statsSheet.createRow(4).createCell(0).setCellValue("Productos agotados:");
+        statsSheet.getRow(4).createCell(1).setCellValue(productosAgotados);
+        
+        statsSheet.createRow(5).createCell(0).setCellValue("Productos con stock bajo:");
+        statsSheet.getRow(5).createCell(1).setCellValue(productosStockBajo);
+        
+        statsSheet.createRow(6).createCell(0).setCellValue("Productos en estado crítico:");
+        statsSheet.getRow(6).createCell(1).setCellValue(productosCriticos);
+        
+        statsSheet.createRow(7).createCell(0).setCellValue("Stock total acumulado:");
+        statsSheet.getRow(7).createCell(1).setCellValue(stockTotal + " unidades");
+        
+        // Hoja de inventario
+        Sheet inventarioSheet = workbook.createSheet("Detalle del Inventario");
+        
+        // Estilo para cabeceras
+        CellStyle headerStyle = workbook.createCellStyle();
+        headerStyle.setFillForegroundColor(IndexedColors.GREEN.getIndex());
+        headerStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+        headerStyle.setBorderBottom(BorderStyle.THIN);
+        headerStyle.setBorderTop(BorderStyle.THIN);
+        headerStyle.setBorderRight(BorderStyle.THIN);
+        headerStyle.setBorderLeft(BorderStyle.THIN);
+        headerStyle.setAlignment(HorizontalAlignment.CENTER);
+        
+        Font headerFont = workbook.createFont();
+        headerFont.setBold(true);
+        headerFont.setColor(IndexedColors.WHITE.getIndex());
+        headerStyle.setFont(headerFont);
+        
+        // Crear cabeceras
+        Row headerRow = inventarioSheet.createRow(0);
+        String[] headers = {"ID Producto", "Nombre", "Descripción", "Categoría", "Precio", "Stock Actual", "Stock Mínimo", "Stock Máximo", "Estado Stock", "Ubicación", "Estado", "Última Actualización", "Usuario Actualización"};
+        
+        for (int i = 0; i < headers.length; i++) {
+            Cell cell = headerRow.createCell(i);
+            cell.setCellValue(headers[i]);
+            cell.setCellStyle(headerStyle);
+        }
+        
+        // Llenar datos
+        int rowNum = 1;
+        for (Inventario inventario : inventarios) {
+            Row row = inventarioSheet.createRow(rowNum++);
+            Producto producto = inventario.getProducto();
+            
+            Cell cell0 = row.createCell(0);
+            cell0.setCellValue(producto.getIdProducto().toString());
+            cell0.setCellStyle(dataStyle);
+            
+            Cell cell1 = row.createCell(1);
+            cell1.setCellValue(producto.getNombre());
+            cell1.setCellStyle(dataStyle);
+            
+            Cell cell2 = row.createCell(2);
+            cell2.setCellValue(producto.getDescripcion() != null ? producto.getDescripcion() : "");
+            cell2.setCellStyle(dataStyle);
+            
+            Cell cell3 = row.createCell(3);
+            cell3.setCellValue(producto.getCategoria());
+            cell3.setCellStyle(dataStyle);
+            
+            Cell cell4 = row.createCell(4);
+            cell4.setCellValue("S/ " + producto.getPrecio().toString());
+            cell4.setCellStyle(dataStyle);
+            
+            Cell cell5 = row.createCell(5);
+            cell5.setCellValue(inventario.getStock().toString());
+            cell5.setCellStyle(dataStyle);
+            
+            Cell cell6 = row.createCell(6);
+            cell6.setCellValue(inventario.getStockMinimo().toString());
+            cell6.setCellStyle(dataStyle);
+            
+            Cell cell7 = row.createCell(7);
+            cell7.setCellValue(inventario.getStockMaximo() != null ? inventario.getStockMaximo().toString() : "N/A");
+            cell7.setCellStyle(dataStyle);
+            
+            Cell cell8 = row.createCell(8);
+            cell8.setCellValue(inventario.getEstadoStock());
+            cell8.setCellStyle(dataStyle);
+            
+            Cell cell9 = row.createCell(9);
+            cell9.setCellValue(inventario.getUbicacion() != null ? inventario.getUbicacion() : "N/A");
+            cell9.setCellStyle(dataStyle);
+            
+            Cell cell10 = row.createCell(10);
+            cell10.setCellValue(Boolean.TRUE.equals(inventario.getEstado()) ? "ACTIVO" : "INACTIVO");
+            cell10.setCellStyle(dataStyle);
+            
+            Cell cell11 = row.createCell(11);
+            cell11.setCellValue(inventario.getFechaActualizacion().format(DATE_FORMATTER));
+            cell11.setCellStyle(dataStyle);
+            
+            Cell cell12 = row.createCell(12);
+            cell12.setCellValue(inventario.getUsuarioActualizacion() != null ? inventario.getUsuarioActualizacion() : "Sistema");
+            cell12.setCellStyle(dataStyle);
+        }
+        
+        // Ajustar ancho de columnas
+        for (int i = 0; i < headers.length; i++) {
+            inventarioSheet.autoSizeColumn(i);
+            if (inventarioSheet.getColumnWidth(i) > 15000) {
+                inventarioSheet.setColumnWidth(i, 15000);
+            }
+        }
+        
+        // Ajustar columnas de estadísticas
+        statsSheet.autoSizeColumn(0);
+        statsSheet.autoSizeColumn(1);
+        
+        workbook.write(baos);
+        return baos.toByteArray();
+        } // Cierre del try-with-resources
+    }
+    
+    /**
+     * Exportar inventario a CSV
+     */
+    public byte[] exportarInventarioCSV(List<Inventario> inventarios) throws IOException {
+        try (ByteArrayOutputStream baos = new ByteArrayOutputStream();
+             OutputStreamWriter osw = new OutputStreamWriter(baos, "UTF-8");
+             CSVWriter writer = new CSVWriter(osw)) {
+            
+            // Cabeceras
+            String[] headers = {"ID Producto", "Nombre", "Descripción", "Categoría", "Precio", "Stock Actual", "Stock Mínimo", "Stock Máximo", "Estado Stock", "Ubicación", "Estado", "Última Actualización", "Usuario Actualización"};
+            writer.writeNext(headers);
+            
+            // Datos
+            for (Inventario inventario : inventarios) {
+                Producto producto = inventario.getProducto();
+                
+                String[] data = {
+                    producto.getIdProducto().toString(),
+                    producto.getNombre(),
+                    producto.getDescripcion() != null ? producto.getDescripcion() : "",
+                    producto.getCategoria(),
+                    "S/ " + producto.getPrecio().toString(),
+                    inventario.getStock().toString(),
+                    inventario.getStockMinimo().toString(),
+                    inventario.getStockMaximo() != null ? inventario.getStockMaximo().toString() : "N/A",
+                    inventario.getEstadoStock(),
+                    inventario.getUbicacion() != null ? inventario.getUbicacion() : "N/A",
+                    Boolean.TRUE.equals(inventario.getEstado()) ? "ACTIVO" : "INACTIVO",
+                    inventario.getFechaActualizacion().format(DATE_FORMATTER),
+                    inventario.getUsuarioActualizacion() != null ? inventario.getUsuarioActualizacion() : "Sistema"
+                };
+                writer.writeNext(data);
+            }
+            
+            writer.flush();
+            return baos.toByteArray();
+        }
     }
 }

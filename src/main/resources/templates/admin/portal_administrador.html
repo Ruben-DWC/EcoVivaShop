@@ -376,7 +376,7 @@
                         <i class="bi bi-people-fill text-white"></i>
                     </div>
                     <div class="text-center">
-                        <div class="stats-counter" id="total-clientes">10</div>
+                        <div class="stats-counter" id="total-clientes" th:text="${totalClientes != null ? totalClientes : '10'}">10</div>
                         <h6 class="fw-bold text-dark mb-2">Total Clientes</h6>
                         <div class="d-flex align-items-center justify-content-center text-success">
                             <i class="bi bi-arrow-up me-1"></i>
@@ -400,7 +400,7 @@
                         <i class="bi bi-cart-check-fill text-white"></i>
                     </div>
                     <div class="text-center">
-                        <div class="stats-counter" id="pedidos-pendientes">4</div>
+                        <div class="stats-counter" id="pedidos-pendientes" th:text="${pedidosPendientes != null ? pedidosPendientes : '4'}">4</div>
                         <h6 class="fw-bold text-dark mb-2">Pedidos Pendientes</h6>
                         <div class="d-flex align-items-center justify-content-center text-primary">
                             <i class="bi bi-clock me-1"></i>
@@ -424,7 +424,7 @@
                         <i class="bi bi-cash-stack text-white"></i>
                     </div>
                     <div class="text-center">
-                        <div class="stats-counter text-warning" id="ventas-mes">S/ 348.19</div>
+                        <div class="stats-counter text-warning" id="ventas-mes">S/ <span th:text="${ventasMes != null ? #numbers.formatDecimal(ventasMes, 1, 2) : '0.00'}">0.00</span></div>
                         <h6 class="fw-bold text-dark mb-2">Ventas del Mes</h6>
                         <div class="d-flex align-items-center justify-content-center text-warning">
                             <i class="bi bi-arrow-up me-1"></i>
@@ -448,7 +448,7 @@
                         <i class="bi bi-box-seam-fill text-white"></i>
                     </div>
                     <div class="text-center">
-                        <div class="stats-counter text-info" id="total-productos">136</div>
+                        <div class="stats-counter text-info" id="total-productos" th:text="${totalProductos != null ? totalProductos : '136'}">136</div>
                         <h6 class="fw-bold text-dark mb-2">Productos Activos</h6>
                         <div class="d-flex align-items-center justify-content-center text-info">
                             <i class="bi bi-check-circle me-1"></i>
@@ -490,7 +490,7 @@
                         <p class="text-muted mb-3">Ver y administrar todos los usuarios registrados en la plataforma</p>
                         <div class="d-flex align-items-center justify-content-between">
                             <span class="badge bg-success bg-opacity-10 text-white px-3 py-2">
-                                <span id="quick-total-clientes">10</span> activos
+                                <span id="quick-total-clientes" th:text="${totalClientes != null ? totalClientes : '10'}">10</span> activos
                             </span>
                             <i class="bi bi-arrow-right-circle fs-5"></i>
                         </div>
@@ -532,7 +532,7 @@
                         <p class="text-muted mb-3">Ver todos los pedidos y gestionar estados de entrega</p>
                         <div class="d-flex align-items-center justify-content-between">
                             <span class="badge bg-info bg-opacity-10 text-white px-3 py-2">
-                                <span id="quick-pedidos-pendientes">4</span> pendientes
+                                <span id="quick-pedidos-pendientes" th:text="${pedidosPendientes != null ? pedidosPendientes : '4'}">4</span> pendientes
                             </span>
                             <i class="bi bi-arrow-right-circle fs-5"></i>
                         </div>
@@ -932,11 +932,11 @@
                             <small class="text-white-50">Productos</small>
                         </div>
                         <div class="text-center">
-                            <div class="fw-bold text-white h5" id="footer-clientes">10</div>
+                            <div class="fw-bold text-white h5" id="footer-clientes" th:text="${totalClientes != null ? totalClientes : '10'}">10</div>
                             <small class="text-white-50">Clientes</small>
                         </div>
                         <div class="text-center">
-                            <div class="fw-bold text-white h5" id="footer-ventas">S/ 348.19</div>
+                            <div class="fw-bold text-white h5" id="footer-ventas">S/ <span th:text="${ventasMes != null ? #numbers.formatDecimal(ventasMes, 1, 2) : '0.00'}">348.19</span></div>
                             <small class="text-white-50">Ventas</small>
                         </div>
                     </div>

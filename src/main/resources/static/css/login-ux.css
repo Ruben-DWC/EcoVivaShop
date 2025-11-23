@@ -1,0 +1,51 @@
+/* login-ux.css — small UI/UX additions for login page */
+/* Gradient background */
+.eco-bg {
+  background: linear-gradient(135deg, #f8fff8 0%, #e8f8ee 100%);
+  background-attachment: fixed;
+}
+@media (prefers-reduced-motion: reduce) {
+  .eco-bg { background-attachment: scroll; }
+}
+
+/* Floating label-like effect within input-group */
+.floating-label { position: relative; }
+.floating-label label {
+  position: absolute;
+  left: 42px; /* account for group icon */
+  top: 12px;
+  color: #6c757d;
+  font-size: 0.9rem;
+  transition: transform .18s, font-size .18s, top .18s;
+  pointer-events: none;
+}
+.floating-label input:not(:placeholder-shown) + label,
+.floating-label input:focus + label {
+  transform: translateY(-14px);
+  font-size: 0.78rem;
+  color: #198754;
+}
+
+/* Toggle password button overlay */
+#togglePass { position: absolute; right: 6px; top: 6px; z-index: 2; }
+
+/* Submit spinner */
+.btn .btn-spinner { display: inline-block; width: 16px; height: 16px; margin-right: 8px; border-radius: 50%; border: 2px solid rgba(255,255,255,0.7); border-top-color: rgba(255,255,255,0.15); animation: spin 0.8s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* Hide the spinner by default */
+.btn .btn-spinner.hidden { display: none; }
+
+/* Shake animation for error */
+@keyframes shake { 10%, 90% { transform: translateX(-1px); } 20%, 80% { transform: translateX(2px); } 50% { transform: translateX(-2px); } }
+.shake { animation: shake 0.5s linear; }
+
+/* Focus outline for inputs for accessibility */
+.form-control:focus { outline: 3px auto rgba(40,167,69,0.15); }
+
+/* Nice hover on hero card (already present) */
+.eco-login-card { transition: box-shadow 0.28s ease, transform 0.28s ease; }
+
+/* Make toggle button smaller and transparent */
+#togglePass { background: transparent; border: none; }
+#togglePass:focus { outline: 2px solid rgba(40,167,69,0.15); border-radius: 4px; }

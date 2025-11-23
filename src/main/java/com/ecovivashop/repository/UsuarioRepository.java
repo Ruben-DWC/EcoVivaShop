@@ -84,10 +84,12 @@ public interface UsuarioRepository extends JpaRepository<Usuario, Integer> {
     
     // ========== MÉTODOS PARA ADMINISTRACIÓN DE CLIENTES ==========
     
-    // Buscar usuarios por rol con paginación
+    // Buscar usuarios por rol con paginación (con pedidos cargados)
+    @Query("SELECT u FROM Usuario u LEFT JOIN FETCH u.pedidos WHERE u.rol = :rol")
     Page<Usuario> findByRol(Rol rol, Pageable pageable);
     
-    // Buscar usuarios por rol y estado
+    // Buscar usuarios por rol y estado (con pedidos cargados)
+    @Query("SELECT u FROM Usuario u LEFT JOIN FETCH u.pedidos WHERE u.rol = :rol AND u.estado = :estado")
     Page<Usuario> findByRolAndEstado(Rol rol, boolean estado, Pageable pageable);
     
     // Buscar usuarios por rol y texto (nombre o email)
@@ -95,7 +97,7 @@ public interface UsuarioRepository extends JpaRepository<Usuario, Integer> {
         Rol rol1, String nombre, Rol rol2, String email, Pageable pageable);
     
     // Búsqueda completa por rol y múltiples campos (ID, nombre, email, teléfono, DNI)
-    @Query("SELECT u FROM Usuario u WHERE u.rol = :rol AND (" +
+    @Query("SELECT u FROM Usuario u LEFT JOIN FETCH u.pedidos WHERE u.rol = :rol AND (" +
            "LOWER(u.nombre) LIKE LOWER(CONCAT('%', :busqueda, '%')) OR " +
            "LOWER(u.apellido) LIKE LOWER(CONCAT('%', :busqueda, '%')) OR " +
            "LOWER(u.email) LIKE LOWER(CONCAT('%', :busqueda, '%')) OR " +
@@ -119,4 +121,15 @@ public interface UsuarioRepository extends JpaRepository<Usuario, Integer> {
     // Buscar clientes por rango de fechas
     @Query("SELECT u FROM Usuario u WHERE u.rol.nombre = 'ROLE_CLIENTE' AND u.fechaRegistro BETWEEN :fechaInicio AND :fechaFin ORDER BY u.fechaRegistro DESC")
     List<Usuario> findClientesPorFecha(@Param("fechaInicio") LocalDateTime fechaInicio, @Param("fechaFin") LocalDateTime fechaFin);
+
+    // ========== MÉTODOS PARA RESET DE CONTRASEÑA ==========
+
+    // Buscar usuario por reset token válido
+    @Query("SELECT u FROM Usuario u WHERE u.resetToken = :token AND u.resetTokenExpiry > :ahora")
+    Optional<Usuario> findByResetTokenAndValid(@Param("token") String token, @Param("ahora") LocalDateTime ahora);
+
+    // Buscar usuario por reset token (sin validar expiración)
+    Optional<Usuario> findByResetToken(String resetToken);
 }
+
+

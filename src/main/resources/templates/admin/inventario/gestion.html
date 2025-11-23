@@ -1,0 +1,1139 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/head :: head('Gestión de Inventario | EcoVivaShop')}">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Gestión de Inventario | EcoVivaShop</title>
+</head>
+<style>
+    .stock-normal { color: #198754; font-weight: bold; }
+    .stock-bajo { color: #0dcaf0; font-weight: bold; }
+    .stock-critico { color: #fd7e14; font-weight: bold; }
+    .stock-agotado { color: #dc3545; font-weight: bold; }
+
+    .table-danger { background-color: #f8d7da !important; }
+    .table-warning { background-color: #fff3cd !important; }
+    .table-info { background-color: #d1ecf1 !important; }
+
+    .btn-group-sm .btn {
+        padding: 0.25rem 0.5rem;
+        font-size: 0.875rem;
+    }
+
+    .img-thumbnail {
+        border: 1px solid #dee2e6;
+        border-radius: 0.25rem;
+    }
+
+    /* Optimizaciones para evitar tambaleo durante actualizaciones */
+    .inventory-row {
+        transition: none !important; /* Desactivar transiciones por defecto para evitar conflictos */
+        will-change: background-color, transform; /* Optimizar para animaciones */
+    }
+
+    .loading-placeholder {
+        display: none;
+    }
+
+    .lazy-image {
+        transition: opacity 0.3s ease;
+    }
+
+    .lazy-image.loading {
+        opacity: 0.5;
+    }
+
+    @keyframes highlightUpdate {
+        0% {
+            background-color: rgba(25, 135, 84, 0.1);
+            transform: scale(1);
+            box-shadow: 0 0 0 rgba(25, 135, 84, 0.3);
+        }
+        30% {
+            background-color: rgba(25, 135, 84, 0.2);
+            transform: scale(1.01);
+            box-shadow: 0 2px 8px rgba(25, 135, 84, 0.3);
+        }
+        70% {
+            background-color: rgba(25, 135, 84, 0.1);
+            transform: scale(1.005);
+            box-shadow: 0 1px 4px rgba(25, 135, 84, 0.2);
+        }
+        100% {
+            background-color: transparent;
+            transform: scale(1);
+            box-shadow: none;
+        }
+    }
+
+    /* Transiciones suaves para elementos individuales */
+    .stock-value, .status-badge, .update-info {
+        transition: color 0.3s ease, background-color 0.3s ease, opacity 0.3s ease;
+    }
+
+    /* Estilos específicos para el dropdown personalizado */
+    .dropdown-menu-custom {
+        background: white !important;
+        border: 1px solid #dee2e6 !important;
+        border-radius: 0.375rem !important;
+        box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
+        z-index: 9999 !important;
+    }
+
+    .dropdown-item-custom {
+        display: block !important;
+        padding: 0.375rem 1rem !important;
+        color: #212529 !important;
+        text-decoration: none !important;
+        border: none !important;
+        background: none !important;
+        width: 100% !important;
+        text-align: left !important;
+        cursor: pointer !important;
+        transition: background-color 0.15s ease-in-out !important;
+    }
+
+    .dropdown-item-custom:hover {
+        background-color: #f8f9fa !important;
+        color: #212529 !important;
+        text-decoration: none !important;
+    }
+
+    /* Asegurar que el contenedor del dropdown tenga posición relativa */
+    #exportDropdownContainer {
+        position: relative !important;
+        display: inline-block !important;
+    }
+</style>
+<body class="eco-bg">
+    <!-- Admin Navbar Fragment -->
+    <div th:replace="~{fragments/admin-navbar :: admin-navbar}"></div>
+    
+    <main class="container-fluid py-4">
+        <!-- Header -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h1 class="h3 mb-1 fw-bold text-dark">
+                            <i class="bi bi-boxes text-primary me-2"></i>
+                            Gestión de Inventario
+                        </h1>
+                        <p class="text-muted mb-0">Control y monitoreo de stock de productos eco-sustentables</p>
+                    </div>
+                    <div class="d-flex gap-2">
+                        <button class="btn btn-info" type="button" onclick="verificarEstadoAutenticacion()">
+                            <i class="bi bi-shield-check me-1"></i>Verificar Auth
+                        </button>
+                        <div class="dropdown" id="exportDropdownContainer" style="position: relative;">
+                            <button class="btn btn-success" type="button" id="exportDropdownBtn" onclick="toggleExportDropdown()">
+                                <i class="bi bi-download me-1"></i>Exportar
+                            </button>
+                            <div class="dropdown-menu-custom" id="exportMenu" style="display: none; position: absolute; top: 100%; left: 0; z-index: 9999; background: white; border: 1px solid #dee2e6; border-radius: 0.375rem; box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15); min-width: 180px; padding: 0.5rem 0;">
+                                <a class="dropdown-item-custom" href="#" onclick="exportarInventario('excel'); return false;">
+                                    <i class="bi bi-file-earmark-excel text-success me-2"></i>Exportar a Excel
+                                </a>
+                                <a class="dropdown-item-custom" href="#" onclick="exportarInventario('csv'); return false;">
+                                    <i class="bi bi-filetype-csv text-primary me-2"></i>Exportar a CSV
+                                </a>
+                                <a class="dropdown-item-custom" href="#" onclick="exportarInventario('pdf'); return false;">
+                                    <i class="bi bi-file-earmark-pdf text-danger me-2"></i>Exportar a PDF
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+                <!-- Statistics Cards -->
+                <div class="row g-4 mb-4">
+                    <div class="col-lg-3 col-md-6">
+                        <div class="card border-0 shadow-sm bg-success">
+                            <div class="card-body text-dark">
+                                <div class="d-flex align-items-center">
+                                    <div class="flex-shrink-0">
+                                        <i class="bi bi-check-circle display-6 text-success"></i>
+                                    </div>
+                                    <div class="flex-grow-1 ms-3">
+                                        <div class="small fw-bold text-dark">Con Stock</div>
+                                        <div class="h4 mb-0 text-success" th:text="${totalProductos}">0</div>
+                                        <div class="small text-muted">Productos disponibles</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-3 col-md-6">
+                        <div class="card border-0 shadow-sm bg-primary">
+                            <div class="card-body text-dark">
+                                <div class="d-flex align-items-center">
+                                    <div class="flex-shrink-0">
+                                        <i class="bi bi-bar-chart-fill display-6 text-primary"></i>
+                                    </div>
+                                    <div class="flex-grow-1 ms-3">
+                                        <div class="small fw-bold text-dark">Stock Total</div>
+                                        <div class="h4 mb-0 text-primary" th:text="${stockTotal}">0</div>
+                                        <div class="small text-muted">Unidades en inventario</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-3 col-md-6">
+                        <div class="card border-0 shadow-sm bg-warning">
+                            <div class="card-body text-dark">
+                                <div class="d-flex align-items-center">
+                                    <div class="flex-shrink-0">
+                                        <i class="bi bi-exclamation-triangle display-6 text-dark"></i>
+                                    </div>
+                                    <div class="flex-grow-1 ms-3">
+                                        <div class="small fw-bold text-dark">Stock Bajo</div>
+                                        <div class="h4 mb-0 text-dark" th:text="${productosStockBajo}">0</div>
+                                        <div class="small text-muted">Requieren atención</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-3 col-md-6">
+                        <div class="card border-0 shadow-sm bg-danger">
+                            <div class="card-body text-dark">
+                                <div class="d-flex align-items-center">
+                                    <div class="flex-shrink-0">
+                                        <i class="bi bi-x-circle display-6 text-danger"></i>
+                                    </div>
+                                    <div class="flex-grow-1 ms-3">
+                                        <div class="small fw-bold text-dark">Agotados</div>
+                                        <div class="h4 mb-0 text-danger" th:text="${productosAgotados}">0</div>
+                                        <div class="small text-muted">Sin stock disponible</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Filters and Search -->
+                <div class="row mb-4">
+                    <div class="col-12">
+                        <div class="card border-0 shadow-sm">
+                            <div class="card-body bg-white">
+                                <div class="row g-3 align-items-end">
+                                    <div class="col-md-4">
+                                        <label for="buscarProducto" class="form-label text-dark fw-medium">Buscar Producto</label>
+                                        <div class="input-group">
+                                            <span class="input-group-text bg-light">
+                                                <i class="bi bi-search text-dark"></i>
+                                            </span>
+                                            <input type="text" class="form-control" id="buscarProducto" placeholder="Nombre o código...">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <label for="filtroCategoria" class="form-label text-dark fw-medium">Categoría</label>
+                                        <select class="form-select" id="filtroCategoria">
+                                            <option value="">Todas las categorías</option>
+                                            <option value="hogar">Hogar Eco</option>
+                                            <option value="personal">Cuidado Personal</option>
+                                            <option value="alimentacion">Alimentación</option>
+                                            <option value="textil">Textil Sostenible</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <label for="filtroEstado" class="form-label text-dark fw-medium">Estado de Stock</label>
+                                        <select class="form-select" id="filtroEstado">
+                                            <option value="">Todos los estados</option>
+                                            <option value="disponible">Disponible</option>
+                                            <option value="stock-bajo">Stock Bajo</option>
+                                            <option value="agotado">Agotado</option>
+                                            <option value="critico">Crítico</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <button class="btn btn-primary w-100" onclick="aplicarFiltros()">
+                                            <i class="bi bi-funnel me-1"></i>Filtrar
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card shadow-sm">
+                    <div class="card-header bg-white">
+                        <h5 class="mb-0">
+                            <i class="bi bi-table me-2"></i>
+                            Inventario de Productos
+                            <span class="badge bg-secondary ms-2" th:text="${totalItems}">0</span>
+                        </h5>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table table-hover mb-0">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Imagen</th>
+                                        <th>Producto</th>
+                                        <th>Categoría</th>
+                                        <th>Stock Actual</th>
+                                        <th>Mínimo</th>
+                                        <th>Máximo</th>
+                                        <th>Estado</th>
+                                        <th>Controles</th>
+                                        <th>Última Actualización</th>
+                                        <th>Usuario</th>
+                                        <th>Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr th:each="inv : ${inventarios.content}"
+                                        class="inventory-row"
+                                        th:classappend="${inv.agotado() ? 'table-danger' : (inv.stockCritico() ? 'table-warning' : (inv.necesitaReposicion() ? 'table-info' : ''))}">
+                                        <td th:text="${inv.idInventario}"></td>
+                                        <td class="text-center">
+                                            <div th:if="${inv.producto.imagenUrl != null and !inv.producto.imagenUrl.isEmpty()}">
+                                                <img th:src="${inv.producto.imagenUrl}"
+                                                     alt="Imagen del producto"
+                                                     class="img-thumbnail lazy-image"
+                                                     style="width: 50px; height: 50px; object-fit: cover;"
+                                                     loading="lazy"
+                                                     onerror="handleImageError(this);">
+                                                <i class="bi bi-image text-muted loading-placeholder"
+                                                   style="font-size: 2rem; display: none;"></i>
+                                            </div>
+                                            <i th:if="${inv.producto.imagenUrl == null or inv.producto.imagenUrl.isEmpty()}"
+                                               class="bi bi-image text-muted"
+                                               style="font-size: 2rem;"></i>
+                                        </td>
+                                        <td>
+                                            <strong th:text="${inv.producto.nombre}"></strong>
+                                            <br>
+                                            <small class="text-muted" th:text="${inv.producto.marca} + ' - ' + ${inv.producto.modelo}"></small>
+                                        </td>
+                                        <td th:text="${inv.producto.categoria}"></td>
+                                        <td>
+                                            <span th:class="${inv.agotado() ? 'stock-agotado stock-value' : (inv.stockCritico() ? 'stock-critico stock-value' : (inv.necesitaReposicion() ? 'stock-bajo stock-value' : 'stock-normal stock-value'))}"
+                                                  th:text="${inv.stock}"
+                                                  th:id="'stock-' + ${inv.producto.idProducto}"></span>
+                                        </td>
+                                        <td th:text="${inv.stockMinimo}"></td>
+                                        <td th:text="${inv.stockMaximo != null ? inv.stockMaximo : 'N/A'}"></td>
+                                        <td>
+                                            <span th:class="${inv.agotado() ? 'badge bg-danger status-badge' : (inv.stockCritico() ? 'badge bg-warning status-badge' : (inv.necesitaReposicion() ? 'badge bg-info status-badge' : 'badge bg-success status-badge'))}"
+                                                  th:text="${inv.estadoStock}"
+                                                  th:id="'estado-' + ${inv.producto.idProducto}"></span>
+                                        </td>
+                                        <td>
+                                            <div class="btn-group btn-group-sm" role="group">
+                                                <button type="button"
+                                                        class="btn btn-outline-danger btn-sm"
+                                                        onclick="ajustarStockRapido(this, -1)"
+                                                        th:data-id="${inv.producto.idProducto}"
+                                                        th:data-nombre="${inv.producto.nombre}"
+                                                        title="Disminuir 1 unidad">
+                                                    <i class="bi bi-dash"></i>
+                                                </button>
+                                                <button type="button"
+                                                        class="btn btn-outline-success btn-sm"
+                                                        onclick="ajustarStockRapido(this, 1)"
+                                                        th:data-id="${inv.producto.idProducto}"
+                                                        th:data-nombre="${inv.producto.nombre}"
+                                                        title="Aumentar 1 unidad">
+                                                    <i class="bi bi-plus"></i>
+                                                </button>
+                                                <button type="button"
+                                                        class="btn btn-outline-primary btn-sm"
+                                                        onclick="ajustarStockRapido(this, 10)"
+                                                        th:data-id="${inv.producto.idProducto}"
+                                                        th:data-nombre="${inv.producto.nombre}"
+                                                        title="Aumentar 10 unidades">
+                                                    <i class="bi bi-plus-circle"></i> 10
+                                                </button>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <small th:text="${#temporals.format(inv.fechaActualizacion, 'dd/MM/yyyy HH:mm')}"
+                                                   th:id="'fecha-' + ${inv.producto.idProducto}"
+                                                   class="update-info"></small>
+                                        </td>
+                                        <td>
+                                            <small th:text="${inv.usuarioActualizacion != null ? inv.usuarioActualizacion : 'Sistema'}"
+                                                   th:id="'usuario-' + ${inv.producto.idProducto}"
+                                                   class="update-info"></small>
+                                        </td>
+                                        <td>
+                                            <div class="btn-group btn-group-sm">
+                                                <a th:href="@{/admin/inventario/editar/{id}(id=${inv.idInventario})}"
+                                                   class="btn btn-outline-primary btn-sm"
+                                                   title="Editar">
+                                                    <i class="bi bi-pencil"></i>
+                                                </a>
+                                                <button class="btn btn-outline-success btn-sm"
+                                                        onclick="ajustarStock(this)"
+                                                        th:data-id="${inv.producto.idProducto}"
+                                                        th:data-nombre="${inv.producto.nombre}"
+                                                        title="Ajuste personalizado">
+                                                    <i class="bi bi-gear"></i>
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr th:if="${inventarios.empty}">
+                                        <td colspan="12" class="text-center py-4">
+                                            <i class="bi bi-info-circle fs-1 text-muted"></i>
+                                            <p class="text-muted mb-0 mt-2">No hay productos en inventario</p>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Pagination -->
+                <nav th:if="${totalPages > 1}" class="mt-3">
+                    <ul class="pagination justify-content-center">
+                        <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled'">
+                            <a class="page-link"
+                               th:href="@{/admin/inventario(page=${currentPage - 1}, filtro=${filtro})}">
+                                Anterior
+                            </a>
+                        </li>
+                        <li th:each="i : ${#numbers.sequence(0, totalPages - 1)}"
+                            class="page-item"
+                            th:classappend="${i == currentPage} ? 'active'">
+                            <a class="page-link"
+                               th:href="@{/admin/inventario(page=${i}, filtro=${filtro})}"
+                               th:text="${i + 1}"></a>
+                        </li>
+                        <li class="page-item" th:classappend="${currentPage + 1 == totalPages} ? 'disabled'">
+                            <a class="page-link"
+                               th:href="@{/admin/inventario(page=${currentPage + 1}, filtro=${filtro})}">
+                                Siguiente
+                            </a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </main>
+
+    <!-- Modal para ajustar stock -->
+    <div class="modal fade" id="ajusteStockModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Ajustar Stock</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <form th:action="@{/admin/inventario/ajustar-stock}" method="post">
+                    <div class="modal-body">
+                        <input type="hidden" name="idProducto" id="ajusteIdProducto">
+                        <div class="mb-3">
+                            <label class="form-label">Producto</label>
+                            <input type="text" class="form-control" id="ajusteProductoNombre" readonly>
+                        </div>
+                        <div class="mb-3">
+                            <label for="cantidadAjuste" class="form-label">Cantidad a Ajustar</label>
+                            <input type="number" class="form-control" id="cantidadAjuste" name="cantidadAjuste" required>
+                            <div class="form-text">Use valores positivos para aumentar, negativos para reducir</div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="motivo" class="form-label">Motivo del Ajuste</label>
+                            <input type="text" class="form-control" id="motivo" name="motivo"
+                                   placeholder="Ej: Recepción de mercancía, Devolución, etc." required>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="submit" class="btn btn-primary">Aplicar Ajuste</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    </main>
+
+    <div th:replace="~{fragments/footer :: footer}"></div>
+
+    <!-- Bootstrap JS Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        // Variable para controlar operaciones en curso por producto
+        const operacionesEnCurso = new Map();
+
+        // Función para ajustes rápidos de stock
+        async function ajustarStockRapido(button, cantidad) {
+            const idProducto = button.getAttribute('data-id');
+            const nombreProducto = button.getAttribute('data-nombre');
+
+            console.log('🔄 [STOCK] Iniciando ajuste rápido:', { idProducto, nombreProducto, cantidad });
+
+            // Verificar si ya hay una operación en curso para este producto
+            if (operacionesEnCurso.has(idProducto)) {
+                console.log(`⚠️ [STOCK] Operación ya en curso para producto ${idProducto}`);
+                return;
+            }
+
+            // Marcar operación como en curso
+            operacionesEnCurso.set(idProducto, true);
+            console.log('✅ [STOCK] Operación marcada como en curso');
+
+            // Deshabilitar todos los botones de este producto y agregar indicador visual
+            const row = button.closest('tr');
+            const buttons = row.querySelectorAll('button[data-id="' + idProducto + '"]');
+            buttons.forEach(btn => {
+                btn.disabled = true;
+                btn.setAttribute('data-original-html', btn.innerHTML);
+                btn.innerHTML = '<i class="bi bi-hourglass-split"></i>';
+            });
+
+            // Agregar clase de carga a la fila
+            row.classList.add('loading');
+            console.log('🎨 [STOCK] UI actualizada - botones deshabilitados, clase loading agregada');
+
+            try {
+                let endpoint, motivo;
+                if (cantidad > 0) {
+                    endpoint = '/admin/inventario/api/aumentar-stock';
+                    motivo = `Aumento rápido: +${cantidad} unidades`;
+                } else {
+                    endpoint = '/admin/inventario/api/disminuir-stock';
+                    motivo = `Disminución rápida: ${Math.abs(cantidad)} unidades`;
+                    cantidad = Math.abs(cantidad); // Convertir a positivo para la API
+                }
+
+                console.log('📡 [STOCK] Enviando request a:', endpoint, 'con cantidad:', cantidad);
+
+                // Preparar headers
+                const headers = {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                };
+
+                // Debug: Mostrar todas las cookies disponibles
+                console.log('🍪 [STOCK] Todas las cookies disponibles:', document.cookie);
+
+                // Obtener cookie JSESSIONID manualmente
+                const jsessionId = document.cookie.split(';').find(cookie => cookie.trim().startsWith('JSESSIONID='));
+                if (jsessionId) {
+                    const sessionValue = jsessionId.split('=')[1];
+                    headers['Cookie'] = `JSESSIONID=${sessionValue}`;
+                    console.log('🍪 [STOCK] Cookie JSESSIONID encontrada y agregada al header:', sessionValue);
+                } else {
+                    console.warn('⚠️ [STOCK] Cookie JSESSIONID no encontrada. Cookies disponibles:', document.cookie);
+                }
+
+                // Nota: No agregar token CSRF ya que estas rutas están excluidas del CSRF
+
+                const response = await fetch(endpoint, {
+                    method: 'POST',
+                    headers: headers,
+                    credentials: 'same-origin', // Cambiar a same-origin para probar
+                    body: new URLSearchParams({
+                        idProducto: idProducto,
+                        cantidad: cantidad,
+                        motivo: motivo
+                    })
+                });
+
+                console.log('📡 [STOCK] Response status:', response.status);
+                console.log('📡 [STOCK] Response headers:', Object.fromEntries(response.headers.entries()));
+
+                const result = await response.text();
+                console.log('📡 [STOCK] Response text:', result);
+
+                if (!response.ok) {
+                    console.error('❌ [STOCK] HTTP Error:', response.status, response.statusText);
+                    throw new Error(`HTTP ${response.status}: ${response.statusText} - ${result}`);
+                }
+
+                if (result === 'OK') {
+                    console.log('✅ [STOCK] Request exitoso, actualizando fila...');
+                    // Actualizar la fila con nueva información
+                    await actualizarFilaInventario(idProducto);
+
+                    // Mostrar notificación de éxito
+                    mostrarNotificacion(`Stock de "${nombreProducto}" actualizado correctamente`, 'success');
+                } else {
+                    console.error('❌ [STOCK] Respuesta inesperada del servidor:', result);
+                    throw new Error(`Respuesta del servidor: ${result}`);
+                }
+
+            } catch (error) {
+                console.error('❌ [STOCK] Error al ajustar stock:', error);
+                mostrarNotificacion(`Error al actualizar stock: ${error.message}`, 'error');
+            } finally {
+                // Limpiar operación en curso
+                operacionesEnCurso.delete(idProducto);
+                console.log('🧹 [STOCK] Operación limpiada');
+
+                // Remover clase de carga de la fila
+                row.classList.remove('loading');
+
+                // Restaurar botones con delay mínimo para evitar flickering
+                setTimeout(() => {
+                    buttons.forEach(btn => {
+                        btn.disabled = false;
+                        const originalHtml = btn.getAttribute('data-original-html');
+                        if (originalHtml) {
+                            btn.innerHTML = originalHtml;
+                            btn.removeAttribute('data-original-html');
+                        }
+                    });
+                    console.log('🎨 [STOCK] UI restaurada - botones habilitados');
+                }, 100);
+            }
+        }
+
+        // Función para actualizar la información de una fila de inventario (optimizada para evitar tambaleo)
+        async function actualizarFilaInventario(idProducto) {
+            console.log('🔄 [UPDATE] Iniciando actualización de fila para producto:', idProducto);
+
+            try {
+                // Obtener información actualizada del servidor usando el endpoint correcto
+                console.log('📡 [UPDATE] Solicitando datos actualizados del servidor...');
+
+                // Preparar headers con cookie de sesión
+                const headers = {};
+                const jsessionId = document.cookie.split(';').find(cookie => cookie.trim().startsWith('JSESSIONID='));
+                if (jsessionId) {
+                    const sessionValue = jsessionId.split('=')[1];
+                    headers['Cookie'] = `JSESSIONID=${sessionValue}`;
+                    console.log('🍪 [UPDATE] Cookie JSESSIONID agregada al header');
+                }
+
+                const response = await fetch(`/admin/inventario/api/inventario/producto/${idProducto}`, {
+                    headers: headers,
+                    credentials: 'same-origin' // Incluir cookies de sesión
+                });
+                console.log('📡 [UPDATE] Response status:', response.status);
+
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+
+                const data = await response.json();
+                console.log('📡 [UPDATE] Datos recibidos:', data);
+
+                if (data.error) {
+                    console.error('❌ [UPDATE] Error en respuesta del servidor:', data.error);
+                    throw new Error(data.error);
+                }
+
+                // Buscar la fila correspondiente al producto
+                const filas = Array.from(document.querySelectorAll('tr.inventory-row')).filter(row => {
+                    const button = row.querySelector(`button[data-id="${idProducto}"]`);
+                    return button !== null;
+                });
+
+                console.log('🔍 [UPDATE] Filas encontradas:', filas.length);
+
+                if (filas.length === 0) {
+                    console.warn('⚠️ [UPDATE] No se encontró fila para el producto:', idProducto);
+                    return;
+                }
+
+                const row = filas[0];
+                console.log('✅ [UPDATE] Fila encontrada, actualizando...');
+
+                // Preparar todas las actualizaciones antes de aplicarlas
+                const updates = {
+                    stock: {
+                        element: document.getElementById(`stock-${idProducto}`),
+                        value: data.stock,
+                        classes: ['stock-value']
+                    },
+                    estado: {
+                        element: document.getElementById(`estado-${idProducto}`),
+                        value: data.estadoStock,
+                        classes: ['badge', `bg-${data.agotado ? 'danger' : (data.stockCritico ? 'warning' : (data.necesitaReposicion ? 'info' : 'success'))}`, 'status-badge']
+                    },
+                    fecha: {
+                        element: document.getElementById(`fecha-${idProducto}`),
+                        value: data.fechaActualizacion,
+                        classes: ['update-info']
+                    },
+                    usuario: {
+                        element: document.getElementById(`usuario-${idProducto}`),
+                        value: data.usuarioActualizacion || 'Sistema',
+                        classes: ['update-info']
+                    }
+                };
+
+                // Determinar clases de stock adicionales
+                if (data.agotado) {
+                    updates.stock.classes.push('stock-agotado');
+                } else if (data.stockCritico) {
+                    updates.stock.classes.push('stock-critico');
+                } else if (data.necesitaReposicion) {
+                    updates.stock.classes.push('stock-bajo');
+                } else {
+                    updates.stock.classes.push('stock-normal');
+                }
+
+                console.log('🎨 [UPDATE] Aplicando actualizaciones...');
+
+                // Usar requestAnimationFrame para actualizar todo de una vez y evitar tambaleo
+                requestAnimationFrame(() => {
+                    // Aplicar todas las actualizaciones de manera atómica
+                    Object.values(updates).forEach(update => {
+                        if (update.element) {
+                            console.log(`📝 [UPDATE] Actualizando ${update.element.id}: "${update.element.textContent}" → "${update.value}"`);
+                            // Limpiar clases existentes y aplicar nuevas
+                            update.element.className = update.classes.join(' ');
+                            // Actualizar contenido
+                            update.element.textContent = update.value;
+                        } else {
+                            console.warn(`⚠️ [UPDATE] Elemento no encontrado:`, Object.keys(updates).find(key => updates[key].element === null));
+                        }
+                    });
+
+                    // Actualizar clases de la fila de manera optimizada
+                    const rowClasses = ['inventory-row'];
+                    if (data.agotado) {
+                        rowClasses.push('table-danger');
+                    } else if (data.stockCritico) {
+                        rowClasses.push('table-warning');
+                    } else if (data.necesitaReposicion) {
+                        rowClasses.push('table-info');
+                    }
+
+                    console.log('🎨 [UPDATE] Actualizando clases de fila:', rowClasses.join(' '));
+                    // Aplicar clases de fila
+                    row.className = rowClasses.join(' ');
+
+                    // Agregar clase de animación para resaltar la actualización
+                    row.classList.add('updating');
+
+                    // Remover la clase de animación después de que termine
+                    setTimeout(() => {
+                        row.classList.remove('updating');
+                        console.log('✅ [UPDATE] Actualización completada');
+                    }, 800); // Duración de la animación CSS
+                });
+
+            } catch (error) {
+                console.error('❌ [UPDATE] Error al actualizar fila:', error);
+            }
+        }
+
+        // Función para verificar estado de autenticación
+        function verificarEstadoAutenticacion() {
+            console.log('🔐 [AUTH] Verificando estado de autenticación...');
+
+            // Verificar cookies disponibles
+            const cookies = document.cookie;
+            console.log('🍪 [AUTH] Cookies disponibles:', cookies);
+
+            // Verificar cookie JSESSIONID específicamente
+            const jsessionId = cookies.split(';').find(cookie => cookie.trim().startsWith('JSESSIONID='));
+            if (jsessionId) {
+                const sessionValue = jsessionId.split('=')[1];
+                console.log('✅ [AUTH] JSESSIONID encontrada:', sessionValue);
+            } else {
+                console.error('❌ [AUTH] JSESSIONID no encontrada');
+            }
+
+            // Verificar si hay usuario logueado en el modelo
+            const usuarioElement = document.querySelector('[data-usuario]');
+            if (usuarioElement) {
+                console.log('✅ [AUTH] Usuario encontrado en DOM:', usuarioElement.getAttribute('data-usuario'));
+            } else {
+                console.warn('⚠️ [AUTH] No se encontró información de usuario en DOM');
+            }
+
+            // Verificar token CSRF
+            const csrfMeta = document.querySelector('meta[name="_csrf"]');
+            if (csrfMeta) {
+                console.log('✅ [AUTH] Token CSRF encontrado');
+            } else {
+                console.log('ℹ️ [AUTH] Token CSRF no encontrado (esperado para rutas excluidas)');
+            }
+
+            return jsessionId !== undefined;
+        }
+
+        function ajustarStock(button) {
+            const idProducto = button.getAttribute('data-id');
+            const nombreProducto = button.getAttribute('data-nombre');
+
+            document.getElementById('ajusteIdProducto').value = idProducto;
+            document.getElementById('ajusteProductoNombre').value = nombreProducto;
+
+            const modal = new bootstrap.Modal(document.getElementById('ajusteStockModal'));
+            modal.show();
+        }
+
+        function aplicarFiltros() {
+            // Obtener valores de los filtros
+            const busqueda = document.getElementById('buscarProducto').value;
+            const categoria = document.getElementById('filtroCategoria').value;
+            const estado = document.getElementById('filtroEstado').value;
+
+            // Construir URL con parámetros
+            let url = '/admin/inventario?';
+            const params = [];
+
+            if (busqueda.trim()) params.push(`filtro=${encodeURIComponent(busqueda.trim())}`);
+            if (categoria) params.push(`categoria=${encodeURIComponent(categoria)}`);
+            if (estado) params.push(`estado=${encodeURIComponent(estado)}`);
+
+            url += params.join('&');
+
+            // Redirigir a la URL filtrada
+            window.location.href = url;
+        }
+
+        function exportarInventario(formato) {
+            // Obtener el filtro actual aplicado
+            const urlParams = new URLSearchParams(window.location.search);
+            const filtroActual = urlParams.get('filtro') || '';
+
+            // Construir URL del endpoint correspondiente
+            let endpoint;
+            switch (formato.toLowerCase()) {
+                case 'excel':
+                    endpoint = '/admin/inventario/export/excel';
+                    break;
+                case 'csv':
+                    endpoint = '/admin/inventario/export/csv';
+                    break;
+                case 'pdf':
+                    endpoint = '/admin/inventario/export/pdf';
+                    break;
+                default:
+                    mostrarNotificacion('Formato de exportación no válido', 'error');
+                    return;
+            }
+
+            // Agregar parámetro de filtro si existe
+            const url = filtroActual ? `${endpoint}?filtro=${encodeURIComponent(filtroActual)}` : endpoint;
+
+            // Crear un enlace temporal y hacer clic para descargar
+            const link = document.createElement('a');
+            link.href = url;
+            link.style.display = 'none';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+
+            // Mostrar notificación de éxito
+            mostrarNotificacion(`Exportación a ${formato.toUpperCase()} iniciada. La descarga comenzará automáticamente.`, 'success');
+        }
+
+        // Funciones para controlar el dropdown personalizado
+        function toggleExportDropdown() {
+            console.log('🔄 Toggle dropdown called');
+            const menu = document.getElementById('exportMenu');
+            if (!menu) {
+                console.error('❌ Menu not found');
+                return;
+            }
+
+            const isVisible = menu.style.display === 'block';
+            console.log('📊 Menu currently visible:', isVisible);
+
+            if (isVisible) {
+                hideExportDropdown();
+            } else {
+                showExportDropdown();
+            }
+        }
+
+        function showExportDropdown() {
+            console.log('📂 Showing dropdown menu');
+            const menu = document.getElementById('exportMenu');
+            if (menu) {
+                menu.style.display = 'block';
+                // Agregar event listener para cerrar al hacer click fuera
+                setTimeout(() => {
+                    document.addEventListener('click', hideExportDropdownOnClickOutside);
+                }, 10);
+            }
+        }
+
+        function hideExportDropdown() {
+            console.log('📁 Hiding dropdown menu');
+            const menu = document.getElementById('exportMenu');
+            if (menu) {
+                menu.style.display = 'none';
+                // Remover event listener
+                document.removeEventListener('click', hideExportDropdownOnClickOutside);
+            }
+        }
+
+        function hideExportDropdownOnClickOutside(event) {
+            const container = document.getElementById('exportDropdownContainer');
+            if (container && !container.contains(event.target)) {
+                hideExportDropdown();
+            }
+        }
+
+        // Mostrar mensajes de éxito/error desde redirect
+        document.addEventListener('DOMContentLoaded', function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const success = urlParams.get('success');
+            const error = urlParams.get('error');
+
+            if (success) {
+                mostrarNotificacion(success, 'success');
+            }
+            if (error) {
+                mostrarNotificacion(error, 'error');
+            }
+
+            // Verificar estado de autenticación al cargar la página
+            verificarEstadoAutenticacion();
+
+            // Inicializar lazy loading para imágenes
+            initializeLazyLoading();
+
+            // Optimizar solicitudes AJAX con debounce
+            initializeRequestOptimization();
+
+            // Inicializar búsqueda con debounce
+            initializeSearchDebounce();
+        });
+
+        // Función para búsqueda con debounce
+        function initializeSearchDebounce() {
+            let searchTimeout;
+            const searchInput = document.getElementById('buscarProducto');
+
+            if (searchInput) {
+                searchInput.addEventListener('input', function() {
+                    clearTimeout(searchTimeout);
+                    searchTimeout = setTimeout(() => {
+                        aplicarFiltros();
+                    }, 500); // Esperar 500ms después de que el usuario deje de escribir
+                });
+            }
+        }
+
+        // Función para manejar errores de imágenes
+        function handleImageError(img) {
+            console.log('Imagen fallida:', img.src);
+            img.style.display = 'none';
+            const placeholder = img.nextElementSibling;
+            if (placeholder && placeholder.classList.contains('loading-placeholder')) {
+                placeholder.style.display = 'block';
+            }
+        }
+
+        // Función para inicializar lazy loading avanzado
+        function initializeLazyLoading() {
+            // Usar Intersection Observer para lazy loading más eficiente
+            if ('IntersectionObserver' in window) {
+                const imageObserver = new IntersectionObserver((entries, observer) => {
+                    entries.forEach(entry => {
+                        if (entry.isIntersecting) {
+                            const img = entry.target;
+                            img.classList.add('loading');
+
+                            // Simular carga (en un caso real, aquí cargarías la imagen)
+                            setTimeout(() => {
+                                img.classList.remove('loading');
+                            }, 200);
+
+                            observer.unobserve(img);
+                        }
+                    });
+                });
+
+                // Observar todas las imágenes lazy
+                document.querySelectorAll('.lazy-image').forEach(img => {
+                    imageObserver.observe(img);
+                });
+            }
+        }
+
+        // Función para optimizar solicitudes AJAX y reducir sobrecarga
+        function initializeRequestOptimization() {
+            // Implementar un sistema de cola para solicitudes AJAX
+            let requestQueue = [];
+            let isProcessingQueue = false;
+
+            // Reemplazar fetch con versión optimizada
+            window.optimizedFetch = async function(url, options = {}) {
+                return new Promise((resolve, reject) => {
+                    requestQueue.push({ url, options, resolve, reject });
+
+                    if (!isProcessingQueue) {
+                        processRequestQueue();
+                    }
+                });
+            };
+
+            async function processRequestQueue() {
+                if (isProcessingQueue || requestQueue.length === 0) return;
+
+                isProcessingQueue = true;
+
+                while (requestQueue.length > 0) {
+                    const { url, options, resolve, reject } = requestQueue.shift();
+
+                    try {
+                        // Agregar delay mínimo entre solicitudes para evitar sobrecarga
+                        if (requestQueue.length > 0) {
+                            await new Promise(resolve => setTimeout(resolve, 50));
+                        }
+
+                        const response = await fetch(url, options);
+                        resolve(response);
+                    } catch (error) {
+                        reject(error);
+                    }
+                }
+
+                isProcessingQueue = false;
+            }
+
+            // Limitar concurrencia de imágenes cargándose
+            let loadingImages = 0;
+            const maxConcurrentImages = 3;
+
+            document.querySelectorAll('.lazy-image').forEach(img => {
+                img.addEventListener('load', () => {
+                    loadingImages = Math.max(0, loadingImages - 1);
+                });
+
+                img.addEventListener('error', () => {
+                    loadingImages = Math.max(0, loadingImages - 1);
+                });
+            });
+        }
+
+        // Función para mostrar notificaciones
+        function mostrarNotificacion(mensaje, tipo = 'info') {
+            console.log(`🔔 [NOTIFICATION] Mostrando notificación: ${mensaje} (${tipo})`);
+
+            // Crear contenedor de notificaciones si no existe
+            let container = document.getElementById('notification-container');
+            if (!container) {
+                container = document.createElement('div');
+                container.id = 'notification-container';
+                container.className = 'notification-container';
+                container.style.cssText = `
+                    position: fixed;
+                    top: 20px;
+                    right: 20px;
+                    z-index: 9999;
+                    max-width: 400px;
+                `;
+                document.body.appendChild(container);
+            }
+
+            // Crear notificación
+            const notification = document.createElement('div');
+            notification.className = `alert alert-${tipo === 'error' ? 'danger' : tipo} alert-dismissible fade show notification-item`;
+            notification.style.cssText = `
+                margin-bottom: 10px;
+                box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+                border: none;
+                border-radius: 8px;
+            `;
+            notification.innerHTML = `
+                ${mensaje}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            `;
+
+            // Agregar al contenedor
+            container.appendChild(notification);
+
+            // Auto-remover después de 5 segundos
+            setTimeout(() => {
+                if (notification.parentNode) {
+                    notification.remove();
+                }
+            }, 5000);
+
+            console.log('✅ [NOTIFICATION] Notificación mostrada');
+        }
+    </script>
+
+    <!-- Script de diagnóstico para ajustes de stock -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('🔍 [DIAGNOSTIC-STOCK] Verificando funcionalidad de ajustes de stock...');
+
+            // Verificar que la función ajustarStockRapido existe
+            if (typeof ajustarStockRapido === 'function') {
+                console.log('✅ [DIAGNOSTIC-STOCK] Función ajustarStockRapido disponible');
+            } else {
+                console.error('❌ [DIAGNOSTIC-STOCK] Función ajustarStockRapido no encontrada');
+                return;
+            }
+
+            // Verificar que la función actualizarFilaInventario existe
+            if (typeof actualizarFilaInventario === 'function') {
+                console.log('✅ [DIAGNOSTIC-STOCK] Función actualizarFilaInventario disponible');
+            } else {
+                console.error('❌ [DIAGNOSTIC-STOCK] Función actualizarFilaInventario no encontrada');
+            }
+
+            // Verificar botones de ajuste de stock
+            const stockButtons = document.querySelectorAll('button[onclick*="ajustarStockRapido"]');
+            console.log('📊 [DIAGNOSTIC-STOCK] Botones de ajuste encontrados:', stockButtons.length);
+
+            stockButtons.forEach((button, index) => {
+                const idProducto = button.getAttribute('data-id');
+                const nombreProducto = button.getAttribute('data-nombre');
+                const onclickAttr = button.getAttribute('onclick');
+
+                console.log(`🔍 [DIAGNOSTIC-STOCK] Botón ${index + 1}:`, {
+                    idProducto,
+                    nombreProducto,
+                    onclick: onclickAttr
+                });
+
+                // Verificar elementos relacionados
+                const stockElement = document.getElementById(`stock-${idProducto}`);
+                const estadoElement = document.getElementById(`estado-${idProducto}`);
+                const fechaElement = document.getElementById(`fecha-${idProducto}`);
+                const usuarioElement = document.getElementById(`usuario-${idProducto}`);
+
+                console.log(`📊 [DIAGNOSTIC-STOCK] Elementos para producto ${idProducto}:`, {
+                    stock: stockElement ? '✅' : '❌',
+                    estado: estadoElement ? '✅' : '❌',
+                    fecha: fechaElement ? '✅' : '❌',
+                    usuario: usuarioElement ? '✅' : '❌'
+                });
+
+                // Agregar event listener para debugging
+                button.addEventListener('click', function(e) {
+                    console.log('🖱️ [DIAGNOSTIC-STOCK] Click en botón de ajuste:', {
+                        producto: nombreProducto,
+                        idProducto: idProducto,
+                        onclick: onclickAttr
+                    });
+                });
+            });
+
+            // Verificar token CSRF
+            const csrfMeta = document.querySelector('meta[name="_csrf"]');
+            if (csrfMeta) {
+                console.log('� [DIAGNOSTIC-STOCK] Token CSRF encontrado');
+            } else {
+                console.warn('⚠️ [DIAGNOSTIC-STOCK] Token CSRF no encontrado - las requests POST pueden fallar');
+            }
+
+            // Verificar endpoints
+            const testEndpoints = [
+                '/admin/inventario/api/aumentar-stock',
+                '/admin/inventario/api/disminuir-stock',
+                '/admin/inventario/api/inventario/producto/1'
+            ];
+
+            console.log('� [DIAGNOSTIC-STOCK] Endpoints disponibles:', testEndpoints);
+
+            console.log('✅ [DIAGNOSTIC-STOCK] Diagnóstico completado');
+        });
+    </script>
+</body>
+</html>

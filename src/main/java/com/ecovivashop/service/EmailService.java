@@ -3,6 +3,8 @@ package com.ecovivashop.service;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.MailException;
@@ -25,6 +27,11 @@ import jakarta.mail.internet.MimeMessage;
  */
 @Service
 public class EmailService {
+
+    private static final Logger logger = LoggerFactory.getLogger(EmailService.class);
+
+    @Value("${server.port:8081}")
+    private int serverPort;
 
     @Autowired(required = false)
     private JavaMailSender mailSender;
@@ -132,15 +139,15 @@ public class EmailService {
         try {
             if (this.puedeEnviarEmailReal()) {
                 this.enviarEmailRealReset(destinatario, nombreUsuario, tokenReset);
-                System.out.println("✅ [EMAIL REAL] Reset password enviado a: " + destinatario);
+                logger.info("✅ [EMAIL REAL] Reset password enviado a: {}", destinatario);
             } else {
                 this.simularEnvioEmailReset(destinatario, nombreUsuario, tokenReset);
             }
         } catch (MailException e) {
-            System.err.println("⚠️ Error enviando reset password, simulando: " + e.getMessage());
+            logger.error("⚠️ Error enviando reset password, simulando: {}", e.getMessage());
             this.simularEnvioEmailReset(destinatario, nombreUsuario, tokenReset);
         } catch (RuntimeException e) {
-            System.err.println("⚠️ Error inesperado enviando reset password, simulando: " + e.getMessage());
+            logger.error("⚠️ Error inesperado enviando reset password, simulando: {}", e.getMessage());
             this.simularEnvioEmailReset(destinatario, nombreUsuario, tokenReset);
         }
     }
@@ -226,17 +233,31 @@ public class EmailService {
     }
 
     private void enviarEmailRealReset(String destinatario, String nombreUsuario, String tokenReset) throws MailException {
-        SimpleMailMessage mensaje = new SimpleMailMessage();
-        mensaje.setFrom(this.fromEmail);
-        mensaje.setTo(destinatario);
-        mensaje.setSubject("🔐 Restablece tu contraseña - EcoVivaShop");
-        mensaje.setText("Hola " + nombreUsuario + ",\n\n"
-                + "Hemos recibido una solicitud para restablecer tu contraseña.\n\n"
-                + "Tu token de restablecimiento es: " + tokenReset + "\n\n"
-                + "Si no solicitaste este cambio, puedes ignorar este mensaje.\n\n"
-                + "Saludos,\n"
-                + "El equipo de EcoVivaShop");
-        this.mailSender.send(mensaje);
+        try {
+            MimeMessage mensaje = this.mailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(mensaje, true, "UTF-8");
+
+            helper.setFrom(this.fromEmail);
+            helper.setTo(destinatario);
+            helper.setSubject("🔐 Restablece tu contraseña - EcoVivaShop");
+
+            // Preparar contexto para Thymeleaf
+            Context context = new Context();
+            context.setVariable("nombreUsuario", nombreUsuario);
+            context.setVariable("emailUsuario", destinatario);
+            context.setVariable("tokenReset", tokenReset);
+            context.setVariable("baseUrl", "http://localhost:" + this.serverPort);
+
+            // Procesar plantilla HTML
+            String contenidoHtml = this.templateEngine.process("email/restablecer-password", context);
+
+            helper.setText(contenidoHtml, true); // true indica que es HTML
+
+            this.mailSender.send(mensaje);
+            logger.info("✅ Email HTML de reset enviado exitosamente a: {}", destinatario);
+        } catch (MessagingException e) {
+            throw new MailException("Error creando email HTML de reset", e) {};
+        }
     }
 
     private void enviarEmailRealOAuth2(String destinatario, String nombreUsuario, String provider) throws MailException {
@@ -289,19 +310,20 @@ public class EmailService {
 
     private void simularEnvioEmailReset(String destinatario, String nombreUsuario, String tokenReset) {
         this.logSimulacion("Reset de Contraseña", destinatario, "Usuario: " + nombreUsuario + " Token: " + tokenReset, "🔐 Restablece tu contraseña - EcoVivaShop");
+        logger.info("🔗 Enlace de restablecimiento: http://localhost:{}/auth/reset-password?token={}", this.serverPort, tokenReset);
     }
 
     // Método genérico para imprimir simulación de email
     private void logSimulacion(String tipo, String destinatario, String infoExtra, String asunto) {
         String timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
-        System.out.println("📧 ============== SIMULACIÓN DE EMAIL ==============");
-        System.out.println("🕒 Hora: " + timestamp);
-        System.out.println("📩 Tipo: " + tipo);
-        System.out.println("👤 Destinatario: " + destinatario);
-        System.out.println("🔎 Info extra: " + infoExtra);
-        System.out.println("📝 Asunto: " + asunto);
-        System.out.println("💡 NOTA: Email simulado (funciona con emails reales y falsos)");
-        System.out.println("📧 =============================================");
+        logger.info("📧 ============== SIMULACIÓN DE EMAIL ==============");
+        logger.info("🕒 Hora: {}", timestamp);
+        logger.info("📩 Tipo: {}", tipo);
+        logger.info("👤 Destinatario: {}", destinatario);
+        logger.info("🔎 Info extra: {}", infoExtra);
+        logger.info("📝 Asunto: {}", asunto);
+        logger.info("💡 NOTA: Email simulado (funciona con emails reales y falsos)");
+        logger.info("📧 =============================================");
     }
 
     // Estado del servicio de email (útil para debug)

@@ -1,6 +1,7 @@
 package com.ecovivashop.controller;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.security.Principal;
 import java.util.List;
 
@@ -17,17 +18,18 @@ import org.springframework.web.multipart.MultipartFile;
 import com.ecovivashop.entity.ImagenPerfil.TipoUsuario;
 import com.ecovivashop.entity.Usuario;
 import com.ecovivashop.service.ImagenService;
+import com.ecovivashop.service.PedidoService;
 import com.ecovivashop.service.UsuarioService;
 
 @Controller
 public class AdminController extends BaseAdminController {
-    private final UsuarioService usuarioService;
     private final ImagenService imagenService;
+    private final PedidoService pedidoService;
 
     // Constructor manual
-    public AdminController(UsuarioService usuarioService, ImagenService imagenService) {
-        this.usuarioService = usuarioService;
+    public AdminController(UsuarioService usuarioService, ImagenService imagenService, PedidoService pedidoService) {
         this.imagenService = imagenService;
+        this.pedidoService = pedidoService;
     }// ========== RUTAS PRINCIPALES ==========
     
     // Dashboard empresarial principal 
@@ -47,19 +49,49 @@ public class AdminController extends BaseAdminController {
     }
 
     @PostMapping("/admin/registro")
-    public String registrarAdmin(@ModelAttribute Usuario usuario, Model model) {
+    public String registrarAdmin(@RequestParam String nombre,
+                                @RequestParam String apellido,
+                                @RequestParam String cedula,
+                                @RequestParam String telefono,
+                                @RequestParam String email,
+                                @RequestParam String password,
+                                @RequestParam String confirmPassword,
+                                @RequestParam String rolAdmin,
+                                @RequestParam String departamento,
+                                @RequestParam(required = false) String observaciones,
+                                @RequestParam(required = false) String[] permisos,
+                                Model model) {
         try {
-            this.usuarioService.crearUsuario(
-                usuario.getNombre(),
-                usuario.getApellido(),
-                usuario.getEmail(),
-                usuario.getPassword(),
-                "ADMIN"
+            // Validar que las contraseñas coincidan
+            if (!password.equals(confirmPassword)) {
+                model.addAttribute("error", "Las contraseñas no coinciden");
+                return "admin/registro-admin";
+            }
+            
+            // Validar contraseña mínima
+            if (password.length() < 8) {
+                model.addAttribute("error", "La contraseña debe tener al menos 8 caracteres");
+                return "admin/registro-admin";
+            }
+            
+            // Crear administrador con todos los campos
+            this.usuarioService.crearAdminCompleto(
+                nombre,
+                apellido,
+                email,
+                password,
+                telefono,
+                cedula,
+                departamento,
+                observaciones,
+                permisos
             );
+            
+            model.addAttribute("success", "Administrador registrado exitosamente");
             return "redirect:/admin/portal_administrador";
         } catch (Exception e) {
             model.addAttribute("error", "Error al registrar administrador: " + e.getMessage());
-            return "admin/registro";
+            return "admin/registro-admin";
         }
     }
 
@@ -68,6 +100,25 @@ public class AdminController extends BaseAdminController {
         if (principal != null) {
             Usuario usuario = this.usuarioService.findByEmail(principal.getName());
             model.addAttribute("usuario", usuario);
+
+            // Calcular estadísticas para el dashboard
+            System.out.println("🔍 AdminController: Calculando estadísticas para dashboard");
+            BigDecimal ventasMes = this.pedidoService.calcularVentasMesActual();
+            System.out.println("🔍 AdminController: Ventas del mes calculadas: " + ventasMes);
+            model.addAttribute("ventasMes", ventasMes);
+
+            // Calcular otras métricas útiles
+            Long totalClientes = this.usuarioService.contarUsuariosActivos();
+            model.addAttribute("totalClientes", totalClientes);
+
+            Long pedidosPendientes = this.pedidoService.contarPorEstado("PENDIENTE");
+            model.addAttribute("pedidosPendientes", pedidosPendientes);
+
+            // Contar productos activos (esto necesitaría un método en ProductoService)
+            // Por ahora usamos un valor por defecto
+            model.addAttribute("totalProductos", 136L);
+        } else {
+            System.out.println("⚠️ AdminController: Usuario no autenticado");
         }
         return "admin/portal_administrador";
     }

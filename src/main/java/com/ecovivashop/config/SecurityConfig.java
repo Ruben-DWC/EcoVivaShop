@@ -69,12 +69,17 @@ public class SecurityConfig {
                 .ignoringRequestMatchers("/admin/productos/bulk-upload")
                 .ignoringRequestMatchers("/admin/productos/cargar-masivo")
                 .ignoringRequestMatchers("/admin/pedidos/api-login") // Login API sin CSRF
+                .ignoringRequestMatchers("/login") // Login form sin CSRF para testing
+                .ignoringRequestMatchers("/auth/forgot-password") // Forgot password form sin CSRF
                 .ignoringRequestMatchers("/client/carrito/**", "/client/agregar-al-carrito", "/client/actualizar-carrito", "/client/remover-del-carrito", "/client/procesar-pago") // Carrito y pago sin CSRF
+                .ignoringRequestMatchers("/admin/inventario/api/aumentar-stock", "/admin/inventario/api/disminuir-stock") // APIs de ajuste de stock sin CSRF
             )
             .authenticationProvider(this.authenticationProvider())
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/auth/**", "/css/**", "/js/**", "/img/**", "/fonts/**", "/").permitAll()
+                .requestMatchers("/auth/**", "/css/**", "/js/**", "/img/**", "/fonts/**", "/favicon.ico", "/").permitAll()
                 .requestMatchers("/uploads/**").permitAll()
+                // Debug endpoints - Mover al principio para asegurar prioridad
+                .requestMatchers("/debug/**").permitAll()
                 // Test endpoints - Permitir acceso público para pruebas
                 .requestMatchers("/test/**").permitAll()
                 // Demo endpoints - Permitir acceso público para demostrar librerías externas

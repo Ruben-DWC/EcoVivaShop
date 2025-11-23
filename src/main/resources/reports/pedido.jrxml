@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Minimal JRXML for Pedido POC -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="pedido" pageWidth="595" pageHeight="842" columnWidth="515" leftMargin="40" rightMargin="40" topMargin="50" bottomMargin="50" uuid="a6c6b2f3-2f9c-4b3b-9a8d-1a2b3c4d5e6f">
+    <property name="ireport.encoding" value="UTF-8"/>
+    <field name="idPedido" class="java.lang.Integer"/>
+    <field name="numeroPedido" class="java.lang.String"/>
+    <field name="fechaPedido" class="java.time.LocalDateTime"/>
+    <field name="total" class="java.math.BigDecimal"/>
+    <field name="usuario" class="com.ecovivashop.entity.Usuario"/>
+
+    <title>
+        <band height="80">
+            <staticText>
+                <reportElement x="0" y="0" width="515" height="30"/>
+                <text><![CDATA[BOLETA / FACTURA - ECO VIVA SHOP]]></text>
+            </staticText>
+            <textField>
+                <reportElement x="0" y="40" width="200" height="20"/>
+                <textFieldExpression><![CDATA["NRO: " + $F{numeroPedido}]]></textFieldExpression>
+            </textField>
+            <textField pattern="dd/MM/yyyy HH:mm">
+                <reportElement x="220" y="40" width="200" height="20"/>
+                <textFieldExpression><![CDATA[$F{fechaPedido}]]></textFieldExpression>
+            </textField>
+        </band>
+    </title>
+
+    <detail>
+        <band height="60">
+            <textField>
+                <reportElement x="0" y="0" width="300" height="20"/>
+                <textFieldExpression><![CDATA["Cliente: " + ($F{usuario} != null ? $F{usuario}.getNombre() + " " + $F{usuario}.getApellido() : "N/A")]]></textFieldExpression>
+            </textField>
+            <textField>
+                <reportElement x="0" y="22" width="300" height="20"/>
+                <textFieldExpression><![CDATA["Total: S/ " + $F{total}]]></textFieldExpression>
+            </textField>
+        </band>
+    </detail>
+
+    <pageFooter>
+        <band height="20">
+            <staticText>
+                <reportElement x="0" y="0" width="515" height="20"/>
+                <text><![CDATA[Gracias por comprar en EcoVivaShop]]></text>
+            </staticText>
+        </band>
+    </pageFooter>
+</jasperReport>

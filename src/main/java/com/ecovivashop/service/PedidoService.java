@@ -2,6 +2,7 @@ package com.ecovivashop.service;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -317,6 +318,17 @@ public class PedidoService {
      */
     public long contarPedidosPorEstado(String estado) {
         return pedidoRepository.countByEstado(estado);
+    }
+    
+    /**
+     * Contar pedidos por usuario
+     */
+    public long contarPedidosPorUsuario(Integer idUsuario) {
+        Optional<Usuario> usuario = this.usuarioRepository.findById(idUsuario);
+        if (usuario.isEmpty()) {
+            throw new RuntimeException("Usuario no encontrado con ID: " + idUsuario);
+        }
+        return this.pedidoRepository.countByUsuario(usuario.get());
     }
     
     /**
@@ -652,5 +664,93 @@ public class PedidoService {
             System.err.println("❌ Tipo de error: " + e.getClass().getSimpleName());
             throw new RuntimeException("Error al crear pedido", e);
         }
+    }
+
+    /**
+     * Calcular ventas del mes actual (todos los pedidos no cancelados)
+     */
+    public BigDecimal calcularVentasMesActual() {
+        LocalDateTime ahora = LocalDateTime.now();
+        LocalDateTime inicioMes = ahora.withDayOfMonth(1).withHour(0).withMinute(0).withSecond(0).withNano(0);
+        LocalDateTime finMes = inicioMes.plusMonths(1).minusSeconds(1);
+
+        System.out.println("🔍 PedidoService.calcularVentasMesActual():");
+        System.out.println("  - Fecha actual: " + ahora);
+        System.out.println("  - Inicio del mes: " + inicioMes);
+        System.out.println("  - Fin del mes: " + finMes);
+
+        // Calcular ventas de todos los pedidos del mes que no estén cancelados
+        List<Pedido> pedidosMes = this.pedidoRepository.findByFechaPedidoBetween(inicioMes, finMes);
+        System.out.println("  - Total de pedidos encontrados en el rango: " + pedidosMes.size());
+
+        for (Pedido p : pedidosMes) {
+            System.out.println("    - Pedido ID " + p.getIdPedido() + ": estado='" + p.getEstado() + "', total=" + p.getTotal() + ", fecha=" + p.getFechaPedido());
+        }
+
+        BigDecimal ventasTotales = pedidosMes.stream()
+            .filter(p -> !Arrays.asList("CANCELADO").contains(p.getEstado())) // Excluir solo cancelados
+            .peek(p -> System.out.println("    - Incluyendo pedido " + p.getIdPedido() + " con total " + p.getTotal()))
+            .map(Pedido::getTotal)
+            .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        System.out.println("  - Ventas totales calculadas: " + ventasTotales);
+        return ventasTotales;
+    }
+
+    /**
+     * Calcular total gastado por un usuario (solo pedidos entregados)
+     */
+    public BigDecimal calcularTotalGastadoPorUsuario(Integer idUsuario) {
+        Optional<Usuario> usuario = this.usuarioRepository.findById(idUsuario);
+        if (usuario.isEmpty()) {
+            throw new RuntimeException("Usuario no encontrado con ID: " + idUsuario);
+        }
+
+        List<Pedido> pedidos = this.pedidoRepository.findByUsuarioOrderByFechaPedidoDesc(usuario.get());
+        return pedidos.stream()
+            .filter(p -> "ENTREGADO".equals(p.getEstado()))
+            .map(Pedido::getTotal)
+            .reduce(BigDecimal.ZERO, BigDecimal::add);
+    }
+
+    /**
+     * Calcular promedio de pedido por usuario (solo pedidos entregados)
+     */
+    public BigDecimal calcularPromedioPedidoPorUsuario(Integer idUsuario) {
+        Optional<Usuario> usuario = this.usuarioRepository.findById(idUsuario);
+        if (usuario.isEmpty()) {
+            throw new RuntimeException("Usuario no encontrado con ID: " + idUsuario);
+        }
+
+        List<Pedido> pedidos = this.pedidoRepository.findByUsuarioOrderByFechaPedidoDesc(usuario.get());
+        List<Pedido> pedidosEntregados = pedidos.stream()
+            .filter(p -> "ENTREGADO".equals(p.getEstado()))
+            .toList();
+
+        if (pedidosEntregados.isEmpty()) {
+            return BigDecimal.ZERO;
+        }
+
+        BigDecimal total = pedidosEntregados.stream()
+            .map(Pedido::getTotal)
+            .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        return total.divide(BigDecimal.valueOf(pedidosEntregados.size()), 2, java.math.RoundingMode.HALF_UP);
+    }
+
+    /**
+     * Obtener fecha del último pedido de un usuario
+     */
+    public java.time.LocalDateTime obtenerFechaUltimoPedido(Integer idUsuario) {
+        Optional<Usuario> usuario = this.usuarioRepository.findById(idUsuario);
+        if (usuario.isEmpty()) {
+            throw new RuntimeException("Usuario no encontrado con ID: " + idUsuario);
+        }
+
+        List<Pedido> pedidos = this.pedidoRepository.findByUsuarioOrderByFechaPedidoDesc(usuario.get());
+        return pedidos.stream()
+            .findFirst()
+            .map(Pedido::getFechaPedido)
+            .orElse(null);
     }
 }

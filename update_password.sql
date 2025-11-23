@@ -1,0 +1,1 @@
+UPDATE tb_usuario SET password = '$2a$10$W9vFLnoBpuJGNqM5cihlLu/220LxXfIZ2bgr6znD/3sjqdC0IFQDq' WHERE email = 'admin@ecovivashop.com';

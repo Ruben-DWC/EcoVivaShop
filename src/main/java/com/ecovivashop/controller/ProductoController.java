@@ -12,6 +12,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.ContentDisposition;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -28,6 +29,7 @@ import com.ecovivashop.dto.ProductoBulkUploadResult;
 import com.ecovivashop.entity.Producto;
 import com.ecovivashop.entity.Usuario;
 import com.ecovivashop.service.ExportService;
+import com.ecovivashop.service.JasperExportService;
 import com.ecovivashop.service.ProductoBulkService;
 import com.ecovivashop.service.ProductoService;
 
@@ -38,13 +40,16 @@ public class ProductoController extends BaseAdminController {
     private final ProductoService productoService;
     private final ProductoBulkService productoBulkService;
     private final ExportService exportService;
+    private final JasperExportService jasperExportService;
     
     public ProductoController(ProductoService productoService, 
                              ProductoBulkService productoBulkService,
-                             ExportService exportService) {
+                             ExportService exportService,
+                             JasperExportService jasperExportService) {
         this.productoService = productoService;
         this.productoBulkService = productoBulkService;
         this.exportService = exportService;
+        this.jasperExportService = jasperExportService;
     }
     
     /**
@@ -385,7 +390,7 @@ public class ProductoController extends BaseAdminController {
             
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_PDF);
-            headers.setContentDispositionFormData("attachment", "reporte_productos.pdf");
+            headers.setContentDisposition(ContentDisposition.builder("attachment").filename("reporte_productos.pdf").build());
             headers.setContentLength(pdfBytes.length);
             
             return ResponseEntity.ok()
@@ -410,12 +415,37 @@ public class ProductoController extends BaseAdminController {
             
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.parseMediaType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"));
-            headers.setContentDispositionFormData("attachment", "reporte_productos.xlsx");
+            headers.setContentDisposition(ContentDisposition.builder("attachment").filename("reporte_productos.xlsx").build());
             headers.setContentLength(excelBytes.length);
             
             return ResponseEntity.ok()
                     .headers(headers)
                     .body(excelBytes);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().build();
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().build();
+        }
+    }
+
+    /**
+     * Exportar reporte de productos via JasperReports (POC) en formato PDF
+     */
+    @GetMapping("/exportar/jasper/pdf")
+    @SuppressWarnings("UseSpecificCatch")
+    public ResponseEntity<byte[]> exportarProductosJasperPDF() {
+        try {
+            List<Producto> productos = productoService.findAll();
+            byte[] pdfBytes = jasperExportService.exportarProductosJasperPDF(productos);
+
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_PDF);
+            headers.setContentDisposition(ContentDisposition.builder("attachment").filename("reporte_productos_jasper.pdf").build());
+            headers.setContentLength(pdfBytes.length);
+
+            return ResponseEntity.ok()
+                    .headers(headers)
+                    .body(pdfBytes);
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().build();
         } catch (Exception e) {

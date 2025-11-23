@@ -28,6 +28,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.ecovivashop.entity.Pedido;
 import com.ecovivashop.service.ExportService;
+import com.ecovivashop.service.JasperExportService;
 import com.ecovivashop.service.PedidoService;
 
 import jakarta.servlet.http.Cookie;
@@ -39,10 +40,12 @@ public class PedidoAdminController extends BaseAdminController {
     
     private final PedidoService pedidoService;
     private final ExportService exportService;
+    private final JasperExportService jasperExportService;
     
-    public PedidoAdminController(PedidoService pedidoService, ExportService exportService) {
+    public PedidoAdminController(PedidoService pedidoService, ExportService exportService, JasperExportService jasperExportService) {
         this.pedidoService = pedidoService;
         this.exportService = exportService;
+        this.jasperExportService = jasperExportService;
     }
     
     /**
@@ -519,6 +522,37 @@ public class PedidoAdminController extends BaseAdminController {
                     .body(pdfBytes);
                     
         } catch (Exception e) {
+            return ResponseEntity.internalServerError().build();
+        }
+    }
+
+    @GetMapping("/pedidos/exportar/jasper/{id}/pdf")
+    @SuppressWarnings({"UseSpecificCatch", "CallToPrintStackTrace"})
+    public ResponseEntity<byte[]> imprimirPedidoJasperPDF(@PathVariable Integer id, HttpServletResponse response) {
+        try {
+            Optional<Pedido> pedidoOpt = pedidoService.findById(id);
+            if (pedidoOpt.isEmpty()) {
+                return ResponseEntity.notFound().build();
+            }
+
+            Pedido pedido = pedidoOpt.get();
+            byte[] pdfBytes = jasperExportService.exportarPedidoJasperPDF(pedido);
+
+            String filename = "pedido_jasper_" + pedido.getNumeroPedido() + "_" + LocalDate.now().format(DateTimeFormatter.ofPattern("ddMMyyyy")) + ".pdf";
+
+            // Set cookie to indicate download completed
+            String downloadId = "download_" + System.currentTimeMillis();
+            Cookie downloadCookie = new Cookie("downloadComplete", downloadId);
+            downloadCookie.setMaxAge(30);
+            downloadCookie.setPath("/");
+            response.addCookie(downloadCookie);
+
+            return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + filename + "\"")
+                .contentType(MediaType.APPLICATION_PDF)
+                .body(pdfBytes);
+        } catch (Exception e) {
+            e.printStackTrace();
             return ResponseEntity.internalServerError().build();
         }
     }

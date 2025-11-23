@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Editar Inventario | EcoVivaShop Admin</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-green: #20c997;
+            --secondary-green: #28a745;
+            --accent-teal: #17a2b8;
+            --card-shadow: 0 4px 20px rgba(32, 201, 151, 0.15);
+        }
+
+        body {
+            background: linear-gradient(135deg, #f0f8f5 0%, #e8f5f0 100%);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: #212529;
+        }
+
+        .form-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .form-card {
+            background: white;
+            border-radius: 20px;
+            box-shadow: var(--card-shadow);
+            border: none;
+            border-left: 5px solid var(--primary-green);
+            overflow: hidden;
+        }
+
+        .form-header {
+            background: linear-gradient(135deg, var(--primary-green) 0%, var(--secondary-green) 100%);
+            color: white;
+            padding: 2.5rem 2rem;
+        }
+
+        .form-section {
+            border-left: 4px solid var(--primary-green);
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .form-section h5 {
+            color: var(--primary-green);
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+
+        .form-control, .form-select, .form-control:focus, .form-select:focus {
+            border-radius: 15px;
+            border: 2px solid #e9ecef;
+            padding: 0.75rem 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .form-control:focus, .form-select:focus {
+            border-color: var(--primary-green);
+            box-shadow: 0 0 0 0.2rem rgba(32, 201, 151, 0.25);
+        }
+
+        .btn {
+            border-radius: 25px;
+            font-weight: 600;
+            padding: 0.75rem 2rem;
+            transition: all 0.3s ease;
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, var(--primary-green), var(--secondary-green));
+            border: none;
+            box-shadow: 0 4px 15px rgba(32, 201, 151, 0.3);
+        }
+
+        .btn-success:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(32, 201, 151, 0.4);
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, #6c757d, #5a6268);
+            border: none;
+        }
+
+        .btn-outline-secondary {
+            border: 2px solid #6c757d;
+            color: #6c757d;
+            border-radius: 25px;
+        }
+
+        .navbar {
+            background: linear-gradient(135deg, var(--primary-green) 0%, var(--secondary-green) 100%) !important;
+            box-shadow: var(--card-shadow);
+        }
+
+        .form-label {
+            font-weight: 600;
+            color: #495057;
+            margin-bottom: 0.5rem;
+        }
+
+        .required {
+            color: #dc3545;
+        }
+
+        .info-card {
+            background: linear-gradient(135deg, #e3f2fd 0%, #f3e5f5 100%);
+            border: none;
+            border-radius: 15px;
+            border-left: 4px solid var(--accent-teal);
+        }
+
+        .status-alert {
+            border-radius: 15px;
+            border: none;
+            padding: 1.5rem;
+        }
+
+        .status-alert.alert-success {
+            background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
+            color: #155724;
+        }
+
+        .status-alert.alert-warning {
+            background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%);
+            color: #856404;
+        }
+
+        .status-alert.alert-danger {
+            background: linear-gradient(135deg, #f8d7da 0%, #f5c6cb 100%);
+            color: #721c24;
+        }
+
+        .status-alert.alert-info {
+            background: linear-gradient(135deg, #d1ecf1 0%, #bee5eb 100%);
+            color: #0c5460;
+        }
+
+        .history-card {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            border: none;
+            border-radius: 15px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navbar usando fragment -->
+    <div th:replace="~{fragments/admin-navbar :: admin-navbar}"></div>
+
+    <div class="form-container">
+        <div class="form-card">
+            <!-- Header -->
+            <div class="form-header">
+                <h1 class="mb-0">
+                    <i class="bi bi-box-seam me-3"></i>
+                    Editar Inventario
+                </h1>
+                <p class="mb-0 opacity-75 mt-2">Modificar configuración y stock del producto eco-sustentable</p>
+            </div>
+
+            <!-- Formulario -->
+            <div class="p-4">
+                <form th:action="@{/admin/inventario/guardar}" method="post" th:object="${inventario}">
+                    <input type="hidden" th:field="*{idInventario}">
+
+                    <!-- Mensajes -->
+                    <div th:if="${success}" class="alert alert-success alert-dismissible fade show status-alert" role="alert">
+                        <i class="bi bi-check-circle me-2"></i> <span th:text="${success}"></span>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" title="Cerrar mensaje"></button>
+                    </div>
+                    <div th:if="${error}" class="alert alert-danger alert-dismissible fade show status-alert" role="alert">
+                        <i class="bi bi-exclamation-triangle me-2"></i> <span th:text="${error}"></span>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" title="Cerrar mensaje"></button>
+                    </div>
+
+                    <!-- Información del Producto (solo lectura) -->
+                    <div class="form-section">
+                        <h5><i class="bi bi-info-circle me-2"></i>Información del Producto</h5>
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label">Producto</label>
+                                <input type="text" class="form-control"
+                                       th:value="${inventario.producto.nombre}" readonly>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Categoría</label>
+                                <input type="text" class="form-control"
+                                       th:value="${inventario.producto.categoria}" readonly>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Marca</label>
+                                <input type="text" class="form-control"
+                                       th:value="${inventario.producto.marca}" readonly>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Modelo</label>
+                                <input type="text" class="form-control"
+                                       th:value="${inventario.producto.modelo}" readonly>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Configuración de Inventario -->
+                    <div class="form-section">
+                        <h5><i class="bi bi-gear me-2"></i>Configuración de Inventario</h5>
+                        <div class="row g-3">
+                            <div class="col-md-4">
+                                <label for="stock" class="form-label">
+                                    Stock Actual <span class="required">*</span>
+                                </label>
+                                <input type="number" class="form-control" id="stock"
+                                       th:field="*{stock}" min="0" required>
+                                <div class="form-text">
+                                    Cantidad actual disponible
+                                </div>
+                            </div>
+
+                            <div class="col-md-4">
+                                <label for="stockMinimo" class="form-label">
+                                    Stock Mínimo <span class="required">*</span>
+                                </label>
+                                <input type="number" class="form-control" id="stockMinimo"
+                                       th:field="*{stockMinimo}" min="0" required>
+                                <div class="form-text">
+                                    Nivel mínimo antes de alerta
+                                </div>
+                            </div>
+
+                            <div class="col-md-4">
+                                <label for="stockMaximo" class="form-label">Stock Máximo</label>
+                                <input type="number" class="form-control" id="stockMaximo"
+                                       th:field="*{stockMaximo}" min="0">
+                                <div class="form-text">
+                                    Nivel máximo recomendado (opcional)
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label for="ubicacion" class="form-label">Ubicación</label>
+                                <select class="form-select" id="ubicacion" th:field="*{ubicacion}">
+                                    <option value="">Seleccionar ubicación...</option>
+                                    <option th:each="ubic : ${ubicaciones}"
+                                            th:value="${ubic}" th:text="${ubic}"></option>
+                                </select>
+                                <div class="form-text">
+                                    Lugar físico donde se almacena el producto
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label for="motivo" class="form-label">Motivo del Cambio</label>
+                                <input type="text" class="form-control" id="motivo" name="motivo"
+                                       placeholder="Ej: Ajuste por inventario físico, recepción de mercancía, etc.">
+                                <div class="form-text">
+                                    Razón del cambio (para trazabilidad)
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Información de Estado -->
+                    <div class="form-section">
+                        <h5><i class="bi bi-info-circle me-2"></i>Estado Actual del Inventario</h5>
+                        <div class="status-alert" th:with="alertClass=${inventario.agotado()} ? 'alert-danger' : (${inventario.stockCritico()} ? 'alert-warning' : (${inventario.necesitaReposicion()} ? 'alert-info' : 'alert-success'))" th:classappend="${alertClass}">
+                            <h6 class="mb-3">
+                                <i class="bi bi-info-circle me-1"></i>Estado del Stock
+                            </h6>
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <p class="mb-1">
+                                        <strong>Estado:</strong>
+                                        <span th:text="${inventario.estadoStock}"></span>
+                                    </p>
+                                    <p class="mb-1">
+                                        <strong>Última actualización:</strong>
+                                        <span th:text="${#temporals.format(inventario.fechaActualizacion, 'dd/MM/yyyy HH:mm')}"></span>
+                                        <span th:if="${inventario.usuarioActualizacion != null}">
+                                            por <span th:text="${inventario.usuarioActualizacion}"></span>
+                                        </span>
+                                    </p>
+                                </div>
+                                <div class="col-md-6">
+                                    <div th:if="${inventario.agotado()}">
+                                        <i class="bi bi-exclamation-triangle-fill me-1"></i>
+                                        <strong>Producto agotado - Requiere reposición inmediata</strong>
+                                    </div>
+                                    <div th:elseif="${inventario.stockCritico()}">
+                                        <i class="bi bi-dash-circle-fill me-1"></i>
+                                        <strong>Stock crítico - Considere reponer pronto</strong>
+                                    </div>
+                                    <div th:elseif="${inventario.necesitaReposicion()}">
+                                        <i class="bi bi-info-circle-fill me-1"></i>
+                                        <strong>Stock bajo - Planificar reposición</strong>
+                                    </div>
+                                    <div th:else>
+                                        <i class="bi bi-check-circle-fill me-1"></i>
+                                        <strong>Stock normal - Nivel adecuado</strong>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Botones de Acción -->
+                    <div class="d-flex justify-content-between pt-4">
+                        <a th:href="@{/admin/inventario}" class="btn btn-outline-secondary btn-lg">
+                            <i class="bi bi-arrow-left me-2"></i>Cancelar
+                        </a>
+                        <button type="submit" class="btn btn-success btn-lg">
+                            <i class="bi bi-check-circle me-2"></i>Guardar Cambios
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Historial de Cambios -->
+        <div class="history-card shadow-sm mt-4 p-4">
+            <h5 class="mb-3">
+                <i class="bi bi-clock-history me-2"></i>Historial de Cambios Recientes
+            </h5>
+
+            <div th:if="${historialReciente != null and !historialReciente.empty}" class="history-list">
+                <div th:each="cambio : ${historialReciente}" class="history-item mb-3 p-3 bg-light rounded">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div class="flex-grow-1">
+                            <div class="d-flex align-items-center mb-1">
+                                <span th:classappend="'badge me-2 ' + ${cambio.tipoCambio == 'AUMENTO' ? 'bg-success' : cambio.tipoCambio == 'DISMINUCION' ? 'bg-warning' : 'bg-info'}"
+                                      th:text="${cambio.tipoCambioFormateado}"></span>
+                                <small class="text-muted">
+                                    <i class="bi bi-person-circle me-1"></i>
+                                    <span th:text="${cambio.usuario}"></span>
+                                </small>
+                            </div>
+                            <div class="mb-1">
+                                <small class="text-dark fw-medium" th:text="${cambio.cambioFormateado}"></small>
+                            </div>
+                            <div th:if="${cambio.motivo != null and !cambio.motivo.empty}">
+                                <small class="text-muted">
+                                    <i class="bi bi-chat-dots me-1"></i>
+                                    <span th:text="${cambio.motivo}"></span>
+                                </small>
+                            </div>
+                        </div>
+                        <div class="text-end">
+                            <small class="text-muted d-block">
+                                <i class="bi bi-calendar-event me-1"></i>
+                                <span th:text="${#temporals.format(cambio.fechaCambio, 'dd/MM/yyyy')}"></span>
+                            </small>
+                            <small class="text-muted">
+                                <i class="bi bi-clock me-1"></i>
+                                <span th:text="${#temporals.format(cambio.fechaCambio, 'HH:mm')}"></span>
+                            </small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div th:if="${historialReciente == null or historialReciente.empty}" class="text-center py-4">
+                <i class="bi bi-info-circle text-muted" style="font-size: 2rem;"></i>
+                <p class="text-muted mt-2 mb-0">No hay cambios registrados para este inventario.</p>
+                <small class="text-muted">Los cambios futuros se mostrarán aquí automáticamente.</small>
+            </div>
+
+            <div class="mt-3 pt-3 border-top">
+                <small class="text-muted">
+                    <i class="bi bi-info-circle me-1"></i>
+                    Se muestran los últimos 10 cambios. Para ver el historial completo,
+                    <a href="#" class="text-decoration-none">consulta la gestión de inventario</a>.
+                </small>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Validación del formulario
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.querySelector('form');
+            const stockMinimoInput = document.getElementById('stockMinimo');
+            const stockMaximoInput = document.getElementById('stockMaximo');
+
+            form.addEventListener('submit', function(e) {
+                const stockMinimo = parseInt(stockMinimoInput.value) || 0;
+                const stockMaximo = parseInt(stockMaximoInput.value) || 0;
+
+                if (stockMaximo > 0 && stockMaximo <= stockMinimo) {
+                    e.preventDefault();
+                    showAlert('danger', 'El stock máximo debe ser mayor que el stock mínimo.');
+                    stockMaximoInput.focus();
+                    return false;
+                }
+            });
+
+            // Mostrar mensajes de éxito/error desde URL params
+            const urlParams = new URLSearchParams(window.location.search);
+            const success = urlParams.get('success');
+            const error = urlParams.get('error');
+
+            if (success) {
+                showAlert('success', success);
+            }
+            if (error) {
+                showAlert('danger', error);
+            }
+        });
+
+        function showAlert(type, message) {
+            const alertDiv = document.createElement('div');
+            alertDiv.className = `alert alert-${type} alert-dismissible fade show position-fixed`;
+            alertDiv.style.cssText = 'top: 20px; right: 20px; z-index: 9999; min-width: 300px; border-radius: 15px; border: none; box-shadow: 0 4px 20px rgba(0,0,0,0.15);';
+            alertDiv.innerHTML = `
+                <i class="bi bi-${type === 'success' ? 'check-circle' : 'exclamation-triangle'} me-2"></i>
+                ${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            `;
+
+            document.body.appendChild(alertDiv);
+
+            // Auto-remover después de 5 segundos
+            setTimeout(() => {
+                if (alertDiv.parentNode) {
+                    alertDiv.remove();
+                }
+            }, 5000);
+        }
+
+        // Auto-dismiss alerts
+        setTimeout(function() {
+            const alerts = document.querySelectorAll('.alert-dismissible');
+            alerts.forEach(function(alert) {
+                if (alert) {
+                    const bsAlert = new bootstrap.Alert(alert);
+                    bsAlert.close();
+                }
+            });
+        }, 5000);
+    </script>
+</body>
+</html>

@@ -131,6 +131,72 @@
                             </div>
                         </div>
                     </div>
+
+                    <!-- INFORMACIÓN ECOLÓGICA -->
+                    <div class="mt-4 pt-4 border-top" th:if="${producto.puntuacionEco != null or producto.impactoAmbiental != null or producto.eficienciaEnergetica != null or producto.material != null}">
+                        <h5 class="mb-3 text-success">
+                            <i class="bi bi-leaf-fill me-2"></i>Información Ecológica
+                        </h5>
+                        <div class="row g-3">
+                            <div class="col-md-6" th:if="${producto.puntuacionEco != null}">
+                                <div class="d-flex align-items-center">
+                                    <i class="bi bi-star-fill text-warning me-3" style="font-size: 1.5rem;"></i>
+                                    <div>
+                                        <strong class="text-dark">Puntuación Ecológica</strong><br>
+                                        <small class="text-muted" th:text="${producto.puntuacionEco + '/10'}">8.5/10</small>
+                                        <div class="progress mt-1" style="height: 6px;">
+                                            <div class="progress-bar bg-success" role="progressbar" 
+                                                 th:style="'width: ' + ${producto.puntuacionEco * 10} + '%'" 
+                                                 th:aria-valuenow="${producto.puntuacionEco * 10}" 
+                                                 aria-valuemin="0" aria-valuemax="100"
+                                                 th:aria-label="'Puntuación ecológica: ' + ${producto.puntuacionEco} + ' de 10'"
+                                                 title="Puntuación ecológica"
+                                                 th:title="'Puntuación ecológica: ' + ${producto.puntuacionEco} + ' de 10'"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6" th:if="${producto.impactoAmbiental != null}">
+                                <div class="d-flex align-items-center">
+                                    <i class="bi bi-tree-fill text-success me-3" style="font-size: 1.5rem;"></i>
+                                    <div>
+                                        <strong class="text-dark">Impacto Ambiental</strong><br>
+                                        <small class="text-muted" th:text="${producto.impactoAmbiental}">Bajo</small>
+                                        <span class="badge ms-2" th:classappend="${producto.impactoAmbiental == 'Bajo' ? 'bg-success' : producto.impactoAmbiental == 'Medio' ? 'bg-warning' : 'bg-danger'}"
+                                              th:text="${producto.impactoAmbiental}">Bajo</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6" th:if="${producto.eficienciaEnergetica != null}">
+                                <div class="d-flex align-items-center">
+                                    <i class="bi bi-lightning-charge-fill text-warning me-3" style="font-size: 1.5rem;"></i>
+                                    <div>
+                                        <strong class="text-dark">Eficiencia Energética</strong><br>
+                                        <small class="text-muted" th:text="${producto.eficienciaEnergetica}">A++</small>
+                                        <span class="badge ms-2 bg-info" th:text="${producto.eficienciaEnergetica}">A++</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6" th:if="${producto.material != null}">
+                                <div class="d-flex align-items-center">
+                                    <i class="bi bi-recycle text-info me-3" style="font-size: 1.5rem;"></i>
+                                    <div>
+                                        <strong class="text-dark">Material Sostenible</strong><br>
+                                        <small class="text-muted" th:text="${producto.material}">Bambú reciclado</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mt-3 p-3 bg-light rounded" th:if="${producto.esEcoAmigable()}">
+                            <div class="d-flex align-items-center">
+                                <i class="bi bi-check-circle-fill text-success me-3" style="font-size: 1.5rem;"></i>
+                                <div>
+                                    <strong class="text-success">¡Producto EcoAmigable Certificado!</strong><br>
+                                    <small class="text-muted">Este producto cumple con nuestros estándares de sostenibilidad</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>

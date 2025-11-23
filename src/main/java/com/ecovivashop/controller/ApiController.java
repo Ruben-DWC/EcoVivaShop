@@ -1,7 +1,6 @@
 package com.ecovivashop.controller;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -77,8 +76,7 @@ public class ApiController {
             stats.put("pedidosEnviados", this.pedidoService.contarPorEstado("ENVIADO"));
             stats.put("pedidosEntregados", this.pedidoService.contarPorEstado("ENTREGADO"));
               // Ventas del mes
-            LocalDateTime inicioMes = LocalDateTime.now().withDayOfMonth(1).withHour(0).withMinute(0).withSecond(0);
-            BigDecimal ventasMes = this.pedidoService.calcularVentasEnPeriodo(inicioMes, LocalDateTime.now());
+            BigDecimal ventasMes = this.pedidoService.calcularVentasMesActual();
             stats.put("ventasMes", ventasMes != null ? ventasMes : BigDecimal.ZERO);
               return ResponseEntity.ok(stats);
         } catch (RuntimeException e) {

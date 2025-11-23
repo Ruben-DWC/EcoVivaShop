@@ -83,7 +83,19 @@
                     </div>
                 </div>
             </div>
-        </div>                        <!-- Stats Cards -->
+        </div>
+
+        <!-- Flash Messages -->
+        <div th:if="${success}" class="alert alert-success alert-dismissible fade show" role="alert">
+            <i class="bi bi-check-circle-fill me-2"></i>
+            <span th:text="${success}"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        <div th:if="${error}" class="alert alert-danger alert-dismissible fade show" role="alert">
+            <i class="bi bi-exclamation-triangle-fill me-2"></i>
+            <span th:text="${error}"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
         <div class="row g-4 mb-4">
             <div class="col-xl-3 col-md-6">
                 <div class="card border-0 shadow-lg stats-card-1" style="background: linear-gradient(135deg, #007bff 0%, #0056b3 100%) !important; min-height: 120px;">
@@ -206,7 +218,7 @@
                                                   th:text="${cliente.estado ? 'Activo' : 'Inactivo'}">Estado</span>
                                         </td>
                                         <td>
-                                            <span class="badge bg-primary">0 pedidos</span>
+                                            <span class="badge bg-primary" th:text="${conteoPedidosPorCliente[cliente.idUsuario] ?: 0} + ' pedidos'">0 pedidos</span>
                                         </td>
                                         <td>
                                             <div class="btn-group btn-group-sm">
@@ -236,17 +248,15 @@
                                                             <i class="bi bi-person-check"></i>
                                                         </button>
                                                     </form>
-                                                    <!-- Botón de eliminación completa solo si no tiene pedidos -->
-                                                    <div th:if="${cliente.pedidos == null or cliente.pedidos.empty}">
-                                                        <form th:action="@{/admin/clientes/eliminar-completo/{id}(id=${cliente.idUsuario})}" 
-                                                              method="post" style="display: inline;">
-                                                            <button type="submit" class="btn btn-outline-dark" 
-                                                                    title="Eliminar completamente" 
-                                                                    onclick="return confirm('¿Está seguro de eliminar completamente este cliente? Esta acción no se puede deshacer.')">
-                                                                <i class="bi bi-trash"></i>
-                                                            </button>
-                                                        </form>
-                                                    </div>
+                                                    <!-- Botón de eliminación completa para usuarios inactivos -->
+                                                    <form th:action="@{/admin/clientes/eliminar-completo/{id}(id=${cliente.idUsuario})}" 
+                                                          method="post" style="display: inline;">
+                                                        <button type="submit" class="btn btn-outline-dark" 
+                                                                title="Eliminar completamente" 
+                                                                onclick="return confirm('¿Está seguro de eliminar completamente este cliente? Esta acción no se puede deshacer.')">
+                                                            <i class="bi bi-trash"></i>
+                                                        </button>
+                                                    </form>
                                                 </div>
                                             </div>
                                         </td>

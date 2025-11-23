@@ -159,6 +159,22 @@ CREATE TABLE tb_usuario (
     fecha_actualizacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     rol_id INTEGER NOT NULL,
     
+    -- Nuevos campos agregados (v0.8.0)
+    foto_perfil VARCHAR(500),
+    dni VARCHAR(20),
+    departamento VARCHAR(100),
+    observaciones VARCHAR(1000),
+    permisos VARCHAR(1000), -- JSON string
+    
+    -- Campos OAuth2
+    provider VARCHAR(50),
+    provider_id VARCHAR(100),
+    provider_email VARCHAR(150),
+    
+    -- Campos Reset Password
+    reset_token VARCHAR(255),
+    reset_token_expiry TIMESTAMP,
+    
     -- Constraints
     CONSTRAINT pk_tb_usuario PRIMARY KEY (id),
     CONSTRAINT fk_usuario_rol FOREIGN KEY (rol_id) REFERENCES tb_rol(id),
@@ -222,11 +238,13 @@ COMMENT ON COLUMN tb_producto.imagen_url IS 'URL de la imagen principal del prod
 CREATE TABLE tb_inventario (
     id INTEGER NOT NULL DEFAULT nextval('tb_inventario_id_seq'),
     producto_id INTEGER NOT NULL,
-    cantidad_actual INTEGER NOT NULL DEFAULT 0,
-    cantidad_minima INTEGER NOT NULL DEFAULT 10,
-    cantidad_maxima INTEGER NOT NULL DEFAULT 1000,
+    cantidad_actual INTEGER NOT NULL DEFAULT 0, -- Mapeado a 'stock' en Entity
+    cantidad_minima INTEGER NOT NULL DEFAULT 10, -- Mapeado a 'stockMinimo' en Entity
+    cantidad_maxima INTEGER NOT NULL DEFAULT 1000, -- Mapeado a 'stockMaximo' en Entity
     ubicacion VARCHAR(100),
-    fecha_ultima_actualizacion TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    fecha_ultima_actualizacion TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP, -- Mapeado a 'fechaActualizacion'
+    usuario_actualizacion VARCHAR(100), -- Nuevo campo
+    estado BOOLEAN NOT NULL DEFAULT true, -- Nuevo campo
     
     -- Constraints
     CONSTRAINT pk_tb_inventario PRIMARY KEY (id),

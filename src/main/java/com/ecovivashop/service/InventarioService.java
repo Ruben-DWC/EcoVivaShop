@@ -4,6 +4,8 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -83,46 +85,71 @@ public class InventarioService {
     }
     
     public void reducirStock(Integer idProducto, Integer cantidad, String usuarioActualizacion) {
+        System.out.println("🔄 [SERVICE] reducirStock called - idProducto: " + idProducto + ", cantidad: " + cantidad + ", usuario: " + usuarioActualizacion);
+
         Optional<Inventario> inventarioExistente = this.inventarioRepository.findByProductoId(idProducto);
-        
+
         if (inventarioExistente.isEmpty()) {
+            System.err.println("❌ [SERVICE] Inventario no encontrado para el producto ID: " + idProducto);
             throw new RuntimeException("Inventario no encontrado para el producto ID: " + idProducto);
         }
-        
+
+        System.out.println("✅ [SERVICE] Inventario encontrado, stock actual: " + inventarioExistente.get().getStock());
+
         Inventario inventario = inventarioExistente.get();
-        
+
         if (inventario.getStock() < cantidad) {
+            System.err.println("❌ [SERVICE] Stock insuficiente. Disponible: " + inventario.getStock() + ", Solicitado: " + cantidad);
             throw new RuntimeException("Stock insuficiente. Disponible: " + inventario.getStock() + ", Solicitado: " + cantidad);
         }
-        
+
         inventario.reducirStock(cantidad);
         inventario.setFechaActualizacion(LocalDateTime.now());
         inventario.setUsuarioActualizacion(usuarioActualizacion);
-        
+
+        System.out.println("🔄 [SERVICE] Saving inventario with new stock: " + inventario.getStock());
         this.inventarioRepository.save(inventario);
+
+        System.out.println("✅ [SERVICE] reducirStock completed successfully");
     }
     
     public void aumentarStock(Integer idProducto, Integer cantidad, String usuarioActualizacion) {
+        System.out.println("🔄 [SERVICE] aumentarStock called - idProducto: " + idProducto + ", cantidad: " + cantidad + ", usuario: " + usuarioActualizacion);
+
         Optional<Inventario> inventarioExistente = this.inventarioRepository.findByProductoId(idProducto);
-        
+
         if (inventarioExistente.isEmpty()) {
+            System.err.println("❌ [SERVICE] Inventario no encontrado para el producto ID: " + idProducto);
             throw new RuntimeException("Inventario no encontrado para el producto ID: " + idProducto);
         }
-        
+
+        System.out.println("✅ [SERVICE] Inventario encontrado, stock actual: " + inventarioExistente.get().getStock());
+
         Inventario inventario = inventarioExistente.get();
         inventario.aumentarStock(cantidad);
         inventario.setFechaActualizacion(LocalDateTime.now());
         inventario.setUsuarioActualizacion(usuarioActualizacion);
-        
+
+        System.out.println("🔄 [SERVICE] Saving inventario with new stock: " + inventario.getStock());
         this.inventarioRepository.save(inventario);
+
+        System.out.println("✅ [SERVICE] aumentarStock completed successfully");
     }
     
     public void ajustarStock(Integer idProducto, Integer cantidadAjuste, String motivo, String usuarioActualizacion) {
+        System.out.println("🔄 [SERVICE] ajustarStock called - idProducto: " + idProducto + ", cantidadAjuste: " + cantidadAjuste + ", motivo: " + motivo + ", usuario: " + usuarioActualizacion);
+
         if (cantidadAjuste > 0) {
+            System.out.println("🔄 [SERVICE] Calling aumentarStock with cantidad: " + cantidadAjuste);
             this.aumentarStock(idProducto, cantidadAjuste, usuarioActualizacion + " - " + motivo);
         } else if (cantidadAjuste < 0) {
+            System.out.println("🔄 [SERVICE] Calling reducirStock with cantidad: " + Math.abs(cantidadAjuste));
             this.reducirStock(idProducto, Math.abs(cantidadAjuste), usuarioActualizacion + " - " + motivo);
+        } else {
+            System.out.println("⚠️ [SERVICE] cantidadAjuste is zero, no adjustment needed");
         }
+
+        System.out.println("✅ [SERVICE] ajustarStock completed successfully");
     }
     
     // Crear inventario para nuevo producto
@@ -243,6 +270,32 @@ public class InventarioService {
                 System.err.println("Error ajustando inventario para producto " + ajuste.getIdProducto() + ": " + e.getMessage());
             }
         }
+    }
+    
+    // ========== MÉTODOS CON PAGINACIÓN ==========
+    
+    public Page<Inventario> obtenerInventariosActivos(Pageable pageable) {
+        return this.inventarioRepository.findByEstadoTrue(pageable);
+    }
+    
+    public Page<Inventario> obtenerConStock(Pageable pageable) {
+        return this.inventarioRepository.findConStock(pageable);
+    }
+    
+    public Page<Inventario> obtenerAgotados(Pageable pageable) {
+        return this.inventarioRepository.findAgotados(pageable);
+    }
+    
+    public Page<Inventario> obtenerConStockBajo(Pageable pageable) {
+        return this.inventarioRepository.findConStockBajo(pageable);
+    }
+    
+    public Page<Inventario> obtenerEnEstadoCritico(Pageable pageable) {
+        return this.inventarioRepository.findEnEstadoCritico(pageable);
+    }
+    
+    public Page<Inventario> obtenerAlertasInventario(Pageable pageable) {
+        return this.inventarioRepository.obtenerAlertasInventario(pageable);
     }
     
     // Clase auxiliar para ajustes de inventario
